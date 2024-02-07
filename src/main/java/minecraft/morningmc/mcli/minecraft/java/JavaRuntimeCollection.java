@@ -265,10 +265,17 @@ public class JavaRuntimeCollection implements Runnable {
 				
 				// Minecraft-installed locations
 				
-				// PATH
-				if (System.getenv("PATH") != null) {
 				
-				}
+				// PATH
+				try {
+					for (String path : System.getenv("PATH").split(Platform.getPathSeparator())) {
+						try {
+							File executable = new File(path, JavaRuntime.JAVA);
+							LOGGER.trace("Query executable in PATH: " + executable);
+							potentialRuntimes.add(JavaRuntime.fromPath(executable));
+						} catch (IllegalJavaException ignored) {}
+					}
+				} catch (Exception ignored) {}
 				
 				if (JavaRuntime.CURRENT != null) {
 					potentialRuntimes.add(JavaRuntime.CURRENT);
