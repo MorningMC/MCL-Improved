@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <property name="pattern">%d{yyyy-MM-dd} %d{HH:mm:ss:SSS} [%t] %-5level %logger.%M - %msg%n</property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${pattern}" />
+        </Console>
+
+        <RollingFile name="File" fileName="${env:APPDATA}/.mcli/logs/latest.log" filePattern="${env:APPDATA}/.mcli/logs/%d{yyyy_MM_dd.HH_mm_ss_SSS}.log" append="true">
+            <Policies>
+                <OnStartupTriggeringPolicy minSize="1"/>
+            </Policies>
+            <PatternLayout pattern="${pattern}" />
+        </RollingFile>
+
+        <RollingFile name="FileError" fileName="${env:APPDATA}/.mcli/logs/latest.error.log" filePattern="${env:APPDATA}/.mcli/logs/%d{yyyy_MM_dd.HH_mm_ss_SSS}.error.log" append="true">
+            <Policies>
+                <OnStartupTriggeringPolicy minSize="1"/>
+            </Policies>
+            <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY" />
+            <PatternLayout pattern="${pattern}" />
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="trace">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="File" />
+            <AppenderRef ref="FileError" />
+        </Root>
+    </Loggers>
+</Configuration>
