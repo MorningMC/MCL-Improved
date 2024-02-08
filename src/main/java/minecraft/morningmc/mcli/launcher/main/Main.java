@@ -77,7 +77,7 @@ public class Main extends Application {
 		try {
 			launcher = Launcher.LOADER.loadFromNbt(config.getCompound("launcher"));
 		} catch (Exception e) {
-			LOGGER.warn("Failed to load launcher: " + e.getMessage(), e);
+			LOGGER.warn("Failed to load launcher: " + e.getMessage());
 			launcher = new Launcher(LaunchOptions.DEFAULT, null);
 		}
 	}

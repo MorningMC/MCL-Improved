@@ -12,7 +12,7 @@ import java.io.InputStream;
  */
 public class FileMetadata {
 	/** The root directory for application data. */
-	public static final File APPDATA = new File(System.getenv("APPDATA"));
+	public static final File APPDATA = new File(System.getenv("AppData"));
 	
 	/** The root directory where the MCLI launcher is installed. */
 	public static final File INSTALL_ROOT = new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().getPath());

@@ -264,15 +264,72 @@ public class JavaRuntimeCollection implements Runnable {
 				}
 				
 				// Minecraft-installed locations
+				Set<File> minecraftLocations = new HashSet<>();
+				switch (Platform.CURRENT) {
+					case WINDOWS -> {
+						File file = new File(System.getenv("LocalAppData"), "Packages\\Microsoft.4297127D64EC6_8wekyb3d8bbwe\\LocalCache\\Local\\runtime");
+						if (file.exists()) {
+							minecraftLocations.add(file);
+						}
+						
+						File programFile;
+						try {
+							programFile = new File(System.getenv("ProgramFiles(x86)"));
+						} catch (Exception e) {
+							programFile = new File("C:\\Program Files (x86)");
+						}
+						if (programFile.exists()) {
+							minecraftLocations.add(new File(programFile, "Minecraft Launcher\\runtime"));
+						}
+					}
+					
+					case LINUX -> {
+						File file = new File(System.getProperty("user.home", ".minecraft/runtime"));
+						if (file.exists()) {
+							minecraftLocations.add(file);
+						}
+					}
+					
+					case MACOS -> {
+						String userHome = System.getProperty("user.home");
+						if (userHome != null) {
+							File file = new File(userHome, "Library/Application Support/minecraft/runtime");
+							if (file.exists()) {
+								minecraftLocations.add(file);
+							}
+						}
+					}
+				}
 				
+				for (File location : minecraftLocations) {
+					try {
+						for (File dir : Objects.requireNonNull(location.listFiles())) {
+							if (dir.isDirectory()) {
+								String component = dir.getName();
+								
+								try {
+									for (File file : Objects.requireNonNull(dir.listFiles())) {
+										File home = new File(file, component);
+										
+										LOGGER.trace("Query home: " + home.getAbsolutePath());
+										potentialRuntimes.add(JavaRuntime.fromHome(home));
+									}
+								} catch (Exception ignored) {}
+							}
+						}
+					} catch (Exception ignored) {}
+				}
 				
 				// PATH
 				try {
 					for (String path : System.getenv("PATH").split(Platform.getPathSeparator())) {
 						try {
 							File executable = new File(path, JavaRuntime.JAVA);
-							LOGGER.trace("Query executable in PATH: " + executable);
-							potentialRuntimes.add(JavaRuntime.fromPath(executable));
+							
+							if (executable.getParentFile().getName().equals("bin")) {
+								LOGGER.trace("Query executable in PATH: " + executable);
+								potentialRuntimes.add(JavaRuntime.fromPath(executable));
+							}
 						} catch (IllegalJavaException ignored) {}
 					}
 				} catch (Exception ignored) {}

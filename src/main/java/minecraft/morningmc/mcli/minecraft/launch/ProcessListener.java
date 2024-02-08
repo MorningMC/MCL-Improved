@@ -53,7 +53,6 @@ public class ProcessListener {
 	}
 	
 	// Thread Operations
-	
 	/**
 	 * Listens to the provided input stream and logs the lines to the console.
 	 *
@@ -89,7 +88,6 @@ public class ProcessListener {
 	}
 	
 	// Getters
-	
 	/**
 	 * Gets the Minecraft process being monitored.
 	 *
