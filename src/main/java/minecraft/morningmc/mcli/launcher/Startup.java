@@ -31,7 +31,7 @@ public class Startup {
     }
     
     /**
-     * The main method for launching the Minecraft launcher.
+     * The main method for launching the MCL Improved.
      *
      * @param args Command-line arguments.
      */
