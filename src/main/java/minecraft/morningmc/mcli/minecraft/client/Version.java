@@ -1,5 +1,6 @@
 package minecraft.morningmc.mcli.minecraft.client;
 
+import minecraft.morningmc.mcli.minecraft.client.directory.SourceMinecraftDirectory;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
@@ -19,6 +20,17 @@ public class Version {
 			return null;
 		}
 	};
+	
+	public final SourceMinecraftDirectory source;
+	
+	public Version(SourceMinecraftDirectory source) {
+		this.source = source;
+	}
+	
+	// Getters
+	public SourceMinecraftDirectory getSource() {
+		return source;
+	}
 	
 	public enum Policy {
 		RELEASE, SNAPSHOT, CUSTOM

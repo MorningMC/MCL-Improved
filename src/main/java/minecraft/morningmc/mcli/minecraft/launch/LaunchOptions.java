@@ -195,7 +195,7 @@ public class LaunchOptions {
 			false,
 			List.of("-XX:+UnlockExperimentalVMOptions", "-XX:+UseG1GC", "-XX:G1NewSizePercent=20", "-XX:G1ReservePercent=20", "-XX:MaxGCPauseMillis=50", "-XX:G1HeapRegionSize=32M"),
 			false,
-			TargetMinecraftDirectory.Policy.STANDARD,
+			TargetMinecraftDirectory.Policy.SOURCE,
 			TargetMinecraftDirectory.STANDARD,
 			WindowSize.window(1024, 768),
 			null

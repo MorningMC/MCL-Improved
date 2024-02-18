@@ -11,53 +11,27 @@ import java.nio.file.FileSystems;
 public enum Platform {
     WINDOWS, MACOS, LINUX, UNKNOWN;
     
-    /**
-     * The current platform of the system.
-     */
+    /** The current platform of the system. */
     public static final Platform CURRENT = inferPlatform(System.getProperty("os.name"));
     
-    /**
-     * Gets the file separator for the current platform.
-     *
-     * @return The file separator.
-     */
-    public static String getFileSeparator() {
-        return FileSystems.getDefault().getSeparator();
-    }
+    /** The file separator for the current platform. */
+    public static final String FILE_SEPARATOR = File.separator;
     
-    /**
-     * Gets the path separator for the current platform.
-     *
-     * @return The path separator.
-     */
-    public static String getPathSeparator() {
-        return File.pathSeparator;
-    }
+    /** The path separator for the current platform. */
+    public static final String PATH_SEPARATOR = File.pathSeparator;
+
+    /** The line separator for the current platform. */
+    public static final String LINE_SEPARATOR = System.lineSeparator();
     
-    /**
-     * Gets the line separator for the current platform.
-     *
-     * @return The line separator.
-     */
-    public static String getLineSeparator() {
-        return System.lineSeparator();
-    }
-    
-    /**
-     * Gets the default encoding for the current platform.
-     *
-     * @return The default encoding.
-     */
-    public static String getEncoding() {
-        return System.getProperty("sun.jnu.encoding", Charset.defaultCharset().name());
-    }
+    /** The default encoding for the current platform. */
+    public static final Charset ENCODING = Charset.forName(System.getProperty("sun.jnu.encoding", Charset.defaultCharset().name()));
     
     /**
      * Checks if the current system architecture is 64-bit.
      *
-     * @return True if the system architecture is 64-bit, false otherwise.
+     * @return {@code true} if the system architecture is 64-bit, {@code false} otherwise.
      */
-    public static boolean isX64() {
+    public static boolean is64bit() {
         String sunArchDataModel = System.getProperty("sun.arch.data.model");
         
         if (sunArchDataModel != null) {

@@ -119,7 +119,7 @@ public class JavaRuntimeCollection implements Runnable {
 	/**
 	 * Check if the search for potential Java runtimes is in progress.
 	 *
-	 * @return True if the search is ongoing, false otherwise.
+	 * @return {@code true} if the search is ongoing, {@code false} otherwise.
 	 */
 	public static boolean isSearching() {
 		if (instance.thread == null) {
@@ -322,7 +322,7 @@ public class JavaRuntimeCollection implements Runnable {
 				
 				// PATH
 				try {
-					for (String path : System.getenv("PATH").split(Platform.getPathSeparator())) {
+					for (String path : System.getenv("PATH").split(Platform.PATH_SEPARATOR)) {
 						try {
 							File executable = new File(path, JavaRuntime.JAVA);
 							

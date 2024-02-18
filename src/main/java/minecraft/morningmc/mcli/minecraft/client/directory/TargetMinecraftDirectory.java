@@ -16,7 +16,11 @@ public class TargetMinecraftDirectory extends MinecraftDirectory {
 		super(root);
 	}
 	
+	public SourceMinecraftDirectory toSource() {
+		return new SourceMinecraftDirectory(this.getRoot());
+	}
+	
 	public enum Policy {
-		STANDARD, ISOLATED, CUSTOM
+		STANDARD, SOURCE, ISOLATED, CUSTOM
 	}
 }

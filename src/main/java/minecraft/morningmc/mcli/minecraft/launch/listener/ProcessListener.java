@@ -1,10 +1,10 @@
-package minecraft.morningmc.mcli.minecraft.launch;
+package minecraft.morningmc.mcli.minecraft.launch.listener;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
-import java.util.List;
+import java.util.*;
 
 /**
  * A utility class for listening to the output streams (stdout, stderr) of a Minecraft process.
@@ -14,6 +14,7 @@ public class ProcessListener {
 	private static final Logger LOGGER = LogManager.getLogger();
 	
 	private final Process minecraftInstance;
+	private final long pid;
 	
 	private volatile boolean running = true;
 	
@@ -30,10 +31,10 @@ public class ProcessListener {
 	 */
 	public ProcessListener(Process minecraftInstance) {
 		this.minecraftInstance = minecraftInstance;
-		long pid = minecraftInstance.pid();
+		pid = minecraftInstance.pid();
 		
-		stdOutListener = new Thread(() -> streamListener(minecraftInstance.getInputStream()), "stdOutListener#" + pid);
-		stdErrListener = new Thread(() -> streamListener(minecraftInstance.getErrorStream()), "stdErrListener#" + pid);
+		stdOutListener = new Thread(() -> readerListener(minecraftInstance.inputReader()), "stdOutListener#" + pid);
+		stdErrListener = new Thread(() -> readerListener(minecraftInstance.errorReader()), "stdErrListener#" + pid);
 		exitChecker = new Thread(this::exitChecker, "exitChecker#" + pid);
 		minecraftLogs = List.of();
 		
@@ -50,20 +51,23 @@ public class ProcessListener {
 	public void stop() {
 		running = false;
 		exitChecker.interrupt();
+		
+		minecraftInstance.destroy();
+		LOGGER.info("Stopped Minecraft instance " + minecraftInstance.pid());
 	}
 	
 	// Thread Operations
 	/**
-	 * Listens to the provided input stream and logs the lines to the console.
+	 * Listens to the provided {@code BufferedReader} and logs the lines to the console.
 	 *
-	 * @param stream The input stream to listen to.
+	 * @param reader The {@code BufferedReader} to listen to.
 	 */
-	private void streamListener(InputStream stream) {
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
+	private void readerListener(BufferedReader reader) {
+		try {
 			String line;
 			
 			while (running && (line = reader.readLine()) != null) {
-				LOGGER.info("[Minecraft Log] " + line);
+				LOGGER.info("[Minecraft Log #" + pid + "] " + line);
 				minecraftLogs.add(line);
 			}
 			
@@ -95,6 +99,15 @@ public class ProcessListener {
 	 */
 	public Process getMinecraftInstance() {
 		return minecraftInstance;
+	}
+	
+	/**
+	 * Gets the process ID of the Minecraft process.
+	 *
+	 * @return the process ID of the Minecraft process
+	 */
+	public long getPid() {
+		return pid;
 	}
 	
 	/**
@@ -140,5 +153,30 @@ public class ProcessListener {
 	 */
 	public List<String> getMinecraftLogs() {
 		return minecraftLogs;
+	}
+	
+	// Overrides
+	@Override
+	public String toString() {
+		return "Minecraft Instance " + minecraftInstance.pid();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		
+		ProcessListener that = (ProcessListener) o;
+		return Objects.equals(minecraftInstance, that.minecraftInstance);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(minecraftInstance);
 	}
 }

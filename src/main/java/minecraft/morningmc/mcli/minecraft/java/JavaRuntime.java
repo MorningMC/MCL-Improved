@@ -21,7 +21,7 @@ public record JavaRuntime(File executable, int version) implements Comparable<Ja
 	public static final String JAVA = Platform.CURRENT == Platform.WINDOWS ? "java.exe" : "java";
 	
 	/** The current Java runtime based on the system properties. */
-	public static final JavaRuntime CURRENT = getCurrent();
+	public static final JavaRuntime CURRENT = resolveCurrent();
 	
 	/**
 	 * Creates a JavaRuntime instance from the given executable path.
@@ -37,7 +37,7 @@ public record JavaRuntime(File executable, int version) implements Comparable<Ja
 		String version = "";
 		try {
 			Process process = builder.start();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), Platform.getEncoding()));
+			BufferedReader reader = process.inputReader();
 			
 			StringBuilder contentBuilder = new StringBuilder();
 			for (String line; (line = reader.readLine()) != null; ) {
@@ -87,7 +87,7 @@ public record JavaRuntime(File executable, int version) implements Comparable<Ja
 		}
 	}
 	
-	private static JavaRuntime getCurrent() {
+	private static JavaRuntime resolveCurrent() {
 		try {
 			return fromHome(new File(System.getProperty("java.home")));
 			

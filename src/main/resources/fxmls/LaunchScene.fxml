@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="632" prefWidth="1024" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="minecraft.morningmc.mcli.ui.controller.LaunchSceneController">
+   <ImageView id="banner" fitHeight="632" fitWidth="1024">
+      <Image url="@/assets/banner.png" />
+   </ImageView>
+
+   <VBox prefHeight="632.0" prefWidth="250.0">
+      <Group>
+         <children>
+            <Button id="Account" mnemonicParsing="false" opacity="0.0" prefHeight="50.0" prefWidth="250.0" text="Account">
+               <font>
+                  <Font name="Minecraft AE Pixel" size="12.0" />
+               </font>
+            </Button>
+            <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </Group>
+   </VBox>
+
+   <SubScene height="632.0" layoutX="250.0" opacity="0.0" width="774.0">
+     <root>
+       <Region />
+     </root>
+   </SubScene>
+</AnchorPane>

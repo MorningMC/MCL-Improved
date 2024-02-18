@@ -1,7 +1,7 @@
 package minecraft.morningmc.mcli.launcher.metadata;
 
-import minecraft.morningmc.mcli.launcher.Startup;
 import minecraft.morningmc.mcli.minecraft.client.directory.TargetMinecraftDirectory;
+import minecraft.morningmc.mcli.utils.Platform;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,19 +12,62 @@ import java.io.InputStream;
  */
 public class FileMetadata {
 	/** The root directory for application data. */
-	public static final File APPDATA = new File(System.getenv("AppData"));
-	
-	/** The root directory where the MCLI launcher is installed. */
-	public static final File INSTALL_ROOT = new File(Startup.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+	public static final File APPDATA = resolveAppData();
 	
 	/** The working root directory for MCLI. */
 	public static final File WORKING_ROOT = new File(APPDATA, ".mcli");
 	
+	/** The root directory for the MCLI service. */
+	public static final File SERVICE_ROOT = new File(WORKING_ROOT, "service");
+	
 	/** The root directory for caching MCLI-related data. */
 	public static final File CACHE_ROOT = new File(WORKING_ROOT, "cache");
-	
+
 	/** The configuration file for MCLI. */
 	public static final File CONFIG = new File(WORKING_ROOT, "config.nbt");
+
+	/**
+	 * Resolves the root directory for application data.
+	 *
+	 * @return The root directory for application data.
+	 */
+	private static File resolveAppData() {
+		String appData = System.getenv("AppData");
+		if (appData != null) {
+			return new File(appData);
+		}
+
+		try {
+			switch (Platform.CURRENT) {
+				case WINDOWS -> {
+					String userProfile = System.getenv("UserProfile");
+					if (userProfile == null) {
+						userProfile = System.getProperty("user.home");
+					}
+
+					return new File(userProfile, "AppData/Roaming");
+				}
+
+				case MACOS -> {
+					return new File(System.getProperty("user.home"), "Library/Application Support");
+				}
+
+				case LINUX -> {
+					return new File(System.getProperty("user.home"), ".config");
+				}
+				
+				default -> {
+					return File.listRoots()[0];
+				}
+			}
+		} catch (Exception e) {
+			try {
+				return File.listRoots()[0];
+			} catch (Exception ex) {
+				return null;
+			}
+		}
+	}
 	
 	/**
 	 * Completes the required files and directories for the MCLI launcher.

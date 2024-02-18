@@ -11,12 +11,12 @@ public abstract class MinecraftDirectory {
 	/**
 	 * The root directory for Minecraft-related files.
 	 */
-	private final File root;
+	protected final File root;
 	
 	/**
 	 * Constructs a MinecraftDirectory with the default root directory ".minecraft".
 	 */
-	MinecraftDirectory() {
+	protected MinecraftDirectory() {
 		this.root = new File(".minecraft");
 	}
 	
@@ -25,7 +25,7 @@ public abstract class MinecraftDirectory {
 	 *
 	 * @param root The root directory for Minecraft-related files.
 	 */
-	MinecraftDirectory(File root) {
+	protected MinecraftDirectory(File root) {
 		this.root = root;
 	}
 	

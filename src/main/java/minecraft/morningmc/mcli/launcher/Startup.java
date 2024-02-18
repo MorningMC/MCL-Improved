@@ -22,7 +22,6 @@ public class Startup {
     public Startup() {
         LOGGER.info(LauncherMetadata.LONG_FULL_NAME);
         LOGGER.info("Current platform: " + Platform.CURRENT);
-        LOGGER.info("Install root: " + FileMetadata.INSTALL_ROOT);
         LOGGER.info("Working root: " + FileMetadata.WORKING_ROOT);
         
         if (!LauncherMetadata.isStable()) {

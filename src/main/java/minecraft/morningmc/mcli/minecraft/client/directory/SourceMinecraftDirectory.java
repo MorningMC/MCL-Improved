@@ -15,4 +15,8 @@ public class SourceMinecraftDirectory extends MinecraftDirectory {
 	public SourceMinecraftDirectory(File root) {
 		super(root);
 	}
+	
+	public TargetMinecraftDirectory toTarget() {
+		return new TargetMinecraftDirectory(this.getRoot());
+	}
 }

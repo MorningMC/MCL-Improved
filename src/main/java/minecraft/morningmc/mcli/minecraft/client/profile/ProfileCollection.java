@@ -53,7 +53,7 @@ public class ProfileCollection {
 		public ListTag<CompoundTag> saveToNbt(ProfileCollection object) {
 			ListTag<CompoundTag> tag = new ListTag<>();
 			
-			for (Profile profile : object.profiles) {
+			for (Profile profile : object.profiles.values()) {
 				tag.add(Profile.LOADER.saveToNbt(profile));
 			}
 			
@@ -63,7 +63,7 @@ public class ProfileCollection {
 	
 	public static ProfileCollection instance = null;
 	
-	private final Set<Profile> profiles = new TreeSet<>();
+	private final Map<String, Profile> profiles = new HashMap<>();
 	
 	/**
 	 * Initializes the ProfileCollection with the given profiles.
@@ -76,7 +76,9 @@ public class ProfileCollection {
 		}
 		
 		instance = new ProfileCollection();
-		instance.profiles.addAll(profiles);
+		for (Profile profile : profiles) {
+			add(profile);
+		}
 	}
 	
 	/**
@@ -84,8 +86,8 @@ public class ProfileCollection {
 	 *
 	 * @return The set of profiles.
 	 */
-	public static Set<Profile> get() {
-		return instance.profiles;
+	public static Collection<Profile> get() {
+		return instance.profiles.values();
 	}
 	
 	/**
@@ -94,7 +96,7 @@ public class ProfileCollection {
 	 * @param profile The profile to be added.
 	 */
 	public static void add(Profile profile) {
-		instance.profiles.add(profile);
+		instance.profiles.put(profile.getName(), profile);
 	}
 	
 	/**
@@ -103,7 +105,7 @@ public class ProfileCollection {
 	 * @param profile The profile to be removed.
 	 */
 	public static void remove(Profile profile) {
-		instance.profiles.remove(profile);
+		instance.profiles.remove(profile.getName());
 	}
 	
 	/**
@@ -113,13 +115,6 @@ public class ProfileCollection {
 	 * @return The resolved Profile object, or null if not found.
 	 */
 	public static Profile resolve(String name) {
-		for (Profile profile : instance.profiles) {
-			if (profile.getName().equals(name)) {
-				return profile;
-			}
-		}
-		
-		LOGGER.warn("Failed to resolve profile: " + name);
-		return null;
+		return instance.profiles.get(name);
 	}
 }

@@ -13,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.fxml.FXMLLoader;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +23,7 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.HashMap;
 
 /**
  * The Main class represents the main entry point for the Minecraft launcher application.
@@ -32,6 +34,8 @@ public class Main extends Application {
 	private static final Logger LOGGER = LogManager.getLogger();
 	
 	private Launcher launcher;
+	
+	private final Map<String, Scene> scenes = new HashMap<>();
 	
 	/**
 	 * Initializes the application. Completes files, loads configuration.
@@ -80,6 +84,14 @@ public class Main extends Application {
 			LOGGER.warn("Failed to load launcher: " + e.getMessage());
 			launcher = new Launcher(LaunchOptions.DEFAULT, null);
 		}
+		
+		// Preparing scenes
+		LOGGER.info("Preparing scenes...");
+		
+		FXMLLoader loader = new FXMLLoader();
+		
+		Scene launch = new Scene(loader.load(FileMetadata.getResource("fxmls/LaunchScene.fxml")));
+		scenes.put("launch", launch);
 	}
 	
 	/**
@@ -95,13 +107,7 @@ public class Main extends Application {
 		mainStage.getIcons().add(new Image(FileMetadata.getResource("assets/icon.png")));
 		mainStage.setTitle(LauncherMetadata.FULL_NAME);
 		
-		Image banner = new Image(FileMetadata.getResource("assets/banner.png"), 1024, 632, false, true);
-		ImageView bannerView = new ImageView(banner);
-		
-		Group root = new Group(bannerView);
-		Scene scene = new Scene(root);
-		
-		mainStage.setScene(scene);
+		mainStage.setScene(scenes.get("launch"));
 		
 		mainStage.show();
 	}
