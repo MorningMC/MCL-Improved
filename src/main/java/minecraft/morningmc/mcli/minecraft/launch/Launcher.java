@@ -18,7 +18,7 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
 public class Launcher {
 	private static final Logger LOGGER = LogManager.getLogger();
 	
-	/** NbtLoader for loading and saving Launcher objects from/to NBT data. */
+	/** NbtLoader for loading and saving {@code Launcher} objects from/to NBT data. */
 	public static final NbtLoader<Launcher, CompoundTag> LOADER = new NbtLoader<>() {
 		
 		/**

@@ -9,7 +9,7 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
  * Represents information about a Minecraft server, including its host and port.
  */
 public record ServerInfo(String host, int port) {
-	/** NbtLoader for loading and saving ServerInfo objects from/to NBT data. */
+	/** NbtLoader for loading and saving {@code ServerInfo} objects from/to NBT data. */
 	public static final NbtLoader<ServerInfo, CompoundTag> LOADER = new NbtLoader<>() {
 		
 		/**

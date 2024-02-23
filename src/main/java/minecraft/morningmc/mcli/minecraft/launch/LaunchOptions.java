@@ -18,7 +18,7 @@ import java.util.*;
 public class LaunchOptions {
 	private static final Logger LOGGER = LogManager.getLogger();
 	
-	/** NbtLoader for loading and saving LaunchOptions objects from/to NBT data. */
+	/** NbtLoader for loading and saving {@code LaunchOptions} objects from/to NBT data. */
 	public static final NbtLoader<LaunchOptions, CompoundTag> LOADER = new NbtLoader<>() {
 		
 		@Override

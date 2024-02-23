@@ -17,6 +17,6 @@ public class SourceMinecraftDirectory extends MinecraftDirectory {
 	}
 	
 	public TargetMinecraftDirectory toTarget() {
-		return new TargetMinecraftDirectory(this.getRoot());
+		return new TargetMinecraftDirectory(root);
 	}
 }

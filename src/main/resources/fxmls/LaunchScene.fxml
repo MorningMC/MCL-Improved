@@ -13,14 +13,12 @@
 
    <VBox prefHeight="632.0" prefWidth="250.0">
       <Group>
-         <children>
-            <Button id="Account" mnemonicParsing="false" opacity="0.0" prefHeight="50.0" prefWidth="250.0" text="Account">
-               <font>
-                  <Font name="Minecraft AE Pixel" size="12.0" />
-               </font>
-            </Button>
-            <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
-         </children>
+         <Button id="Account" mnemonicParsing="false" opacity="0.0" prefHeight="50.0" prefWidth="250.0" text="Account">
+            <font>
+               <Font name="Minecraft AE Pixel" size="12.0"/>
+            </font>
+         </Button>
+         <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true"/>
       </Group>
    </VBox>
 

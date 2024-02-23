@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.InvalidPathException;
 import java.util.*;
+import java.util.stream.*;
 
 /**
  * A collection of Java runtimes managed by the launcher.
@@ -24,53 +25,56 @@ import java.util.*;
 public class JavaRuntimeCollection implements Runnable {
 	private static final Logger LOGGER = LogManager.getLogger();
 	
-	/** NbtLoader for loading and saving JavaRuntimeCollection objects from/to NBT data. */
+	/** NbtLoader for loading and saving {@code JavaRuntimeCollection} objects from/to NBT data. */
 	public static final NbtLoader<JavaRuntimeCollection, ListTag<StringTag>> LOADER = new NbtLoader<>() {
 		
 		/**
-		 * Load JavaRuntimeCollection from an NBT list tag.
+		 * Load {@code JavaRuntimeCollection} from an NBT list tag.
 		 *
 		 * @param tag The NBT list tag containing Java runtime paths.
-		 * @return The loaded JavaRuntimeCollection.
+		 * @return The loaded {@code JavaRuntimeCollection}.
 		 * @throws IllegalNbtException If there is an issue with the NBT data.
 		 */
 		@Override
 		public JavaRuntimeCollection loadFromNbt(ListTag<StringTag> tag) throws IllegalNbtException {
-			Set<JavaRuntime> runtimes = new TreeSet<>(Comparator.reverseOrder());
-			
-			for (StringTag subTag : tag) {
-				try {
-					runtimes.add(JavaRuntime.fromPath(new File(subTag.getValue())));
-				} catch (IllegalJavaException e) {
-					LOGGER.warn("Failed to load Java runtime from NBT: " + e.getMessage());
-				}
-			}
-			
-			init(runtimes);
+			init(tag.getValue().stream()
+					     .map(StringTag::getValue)
+					     .map(File::new)
+					     .flatMap(path -> {
+						     try {
+							     return Stream.of(JavaRuntime.fromPath(path));
+						     } catch (IllegalJavaException e) {
+							     LOGGER.warn("Failed to load Java runtime from NBT: " + e.getMessage());
+							     return Stream.empty();
+						     }
+					     })
+					     .collect(Collectors.toSet()));
 			return instance;
 		}
 		
 		/**
-		 * Save JavaRuntimeCollection to an NBT list tag.
+		 * Save {@code JavaRuntimeCollection} to an NBT list tag.
 		 *
-		 * @param object The JavaRuntimeCollection to be saved.
+		 * @param object The {@code JavaRuntimeCollection} to be saved.
 		 * @return The NBT list tag containing Java runtime paths.
 		 */
 		@Override
 		public ListTag<StringTag> saveToNbt(JavaRuntimeCollection object) {
 			ListTag<StringTag> tag = new ListTag<>();
 			
-			for (JavaRuntime runtime : object.runtimes) {
-				tag.add(new StringTag(runtime.executable().getAbsolutePath()));
-			}
+			object.runtimes.stream()
+					.map(JavaRuntime::executable)
+					.map(File::getAbsolutePath)
+					.map(StringTag::new)
+					.forEach(tag::add);
 			
 			return tag;
 		}
 	};
+	private static final Comparator<JavaRuntime> COMPARATOR = Comparator.reverseOrder();
 	
 	public static JavaRuntimeCollection instance = null;
 	
-	private static final Comparator<JavaRuntime> COMPARATOR = Comparator.reverseOrder();
 	private final Set<JavaRuntime> runtimes = new TreeSet<>(COMPARATOR.thenComparingInt(JavaRuntime::hashCode));
 	private Thread thread = null;
 	
@@ -385,10 +389,10 @@ public class JavaRuntimeCollection implements Runnable {
 	}
 	
 	/**
-	 * Query subfolders under a Windows Registry location.
+	 * Query sub-folders under a Windows Registry location.
 	 *
 	 * @param location The Windows Registry key location.
-	 * @return The set of subfolder names.
+	 * @return The set of sub-folder names.
 	 * @throws IOException If there is an issue with querying the registry.
 	 */
 	private static Set<String> querySubFolders(String location) throws IOException {

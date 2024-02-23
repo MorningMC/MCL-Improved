@@ -1,5 +1,6 @@
 package minecraft.morningmc.mcli.minecraft.client.profile;
 
+
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
@@ -10,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
+import java.util.stream.*;
 
 /**
  * The ProfileCollection class manages a collection of Minecraft profiles.
@@ -17,11 +19,11 @@ import java.util.*;
 public class ProfileCollection {
 	private static final Logger LOGGER = LogManager.getLogger();
 	
-	/** NbtLoader for loading and saving ProfileCollection objects from/to NBT data. */
+	/** NbtLoader for loading and saving {@code ProfileCollection} objects from/to NBT data. */
 	public static final NbtLoader<ProfileCollection, ListTag<CompoundTag>> LOADER = new NbtLoader<>() {
 		
 		/**
-		 * Loads a ProfileCollection object from a list of NBT compound tags.
+		 * Loads a {@code ProfileCollection} object from a list of NBT compound tags.
 		 *
 		 * @param tag The list of NBT compound tags representing profiles.
 		 * @return The loaded ProfileCollection object.
@@ -29,22 +31,21 @@ public class ProfileCollection {
 		 */
 		@Override
 		public ProfileCollection loadFromNbt(ListTag<CompoundTag> tag) throws IllegalNbtException {
-			Set<Profile> profiles = new TreeSet<>();
-			
-			for (CompoundTag subTag : tag) {
-				try {
-					profiles.add(Profile.LOADER.loadFromNbt(subTag));
-				} catch (IllegalNbtException e) {
-					LOGGER.warn("Failed to load profile from NBT: " + e.getMessage());
-				}
-			}
-			
-			init(profiles);
+			init(tag.getValue().stream()
+					     .flatMap(subTag -> {
+						     try {
+							     return Stream.of(Profile.LOADER.loadFromNbt(subTag));
+						     } catch (IllegalNbtException e) {
+							     LOGGER.warn("Failed to load profile from NBT: " + e.getMessage());
+							     return Stream.empty();
+						     }
+					     })
+					     .collect(Collectors.toSet()));
 			return instance;
 		}
 		
 		/**
-		 * Saves a ProfileCollection object to a list of NBT compound tags.
+		 * Saves a {@code ProfileCollection} object to a list of NBT compound tags.
 		 *
 		 * @param object The ProfileCollection object to be saved.
 		 * @return The list of NBT compound tags representing profiles.
@@ -53,9 +54,9 @@ public class ProfileCollection {
 		public ListTag<CompoundTag> saveToNbt(ProfileCollection object) {
 			ListTag<CompoundTag> tag = new ListTag<>();
 			
-			for (Profile profile : object.profiles.values()) {
-				tag.add(Profile.LOADER.saveToNbt(profile));
-			}
+			object.profiles.values().stream()
+					.map(Profile.LOADER::saveToNbt)
+					.forEach(tag::add);
 			
 			return tag;
 		}

@@ -17,7 +17,7 @@ public class TargetMinecraftDirectory extends MinecraftDirectory {
 	}
 	
 	public SourceMinecraftDirectory toSource() {
-		return new SourceMinecraftDirectory(this.getRoot());
+		return new SourceMinecraftDirectory(root);
 	}
 	
 	public enum Policy {

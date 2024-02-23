@@ -9,6 +9,8 @@ import java.io.InputStream;
 
 /**
  * Utility class for managing file and directory metadata in the MCLI launcher.
+ *
+ * @see LauncherMetadata
  */
 public class FileMetadata {
 	/** The root directory for application data. */
@@ -79,6 +81,8 @@ public class FileMetadata {
 		File[] directories = {
 				WORKING_ROOT,
 				CACHE_ROOT,
+				SERVICE_ROOT,
+				
 				TargetMinecraftDirectory.STANDARD.getRoot(),
 				TargetMinecraftDirectory.ISOLATE_ROOT
 		};

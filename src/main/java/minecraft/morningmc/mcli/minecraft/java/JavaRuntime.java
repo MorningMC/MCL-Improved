@@ -24,10 +24,10 @@ public record JavaRuntime(File executable, int version) implements Comparable<Ja
 	public static final JavaRuntime CURRENT = resolveCurrent();
 	
 	/**
-	 * Creates a JavaRuntime instance from the given executable path.
+	 * Creates a {@code JavaRuntime} instance from the given executable path.
 	 *
 	 * @param path The path to the Java executable.
-	 * @return The JavaRuntime instance.
+	 * @return The {@code JavaRuntime} instance.
 	 * @throws IllegalJavaException If an error occurs during Java version retrieval or the executable is illegal.
 	 */
 	public static JavaRuntime fromPath(File path) throws IllegalJavaException {
@@ -56,7 +56,7 @@ public record JavaRuntime(File executable, int version) implements Comparable<Ja
 				LOGGER.warn("Failed to retrieve Java version from: " + path);
 			}
 			
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new IllegalJavaException(path, e);
 		}
 		
@@ -64,10 +64,10 @@ public record JavaRuntime(File executable, int version) implements Comparable<Ja
 	}
 	
 	/**
-	 * Creates a JavaRuntime instance from the Java home directory.
+	 * Creates a {@code JavaRuntime} instance from the Java home directory.
 	 *
 	 * @param home The Java home directory.
-	 * @return The JavaRuntime instance.
+	 * @return The {@code JavaRuntime} instance.
 	 * @throws IllegalJavaException If an error occurs during Java version retrieval.
 	 */
 	public static JavaRuntime fromHome(File home) throws IllegalJavaException {
@@ -75,7 +75,7 @@ public record JavaRuntime(File executable, int version) implements Comparable<Ja
 	}
 	
 	/**
-	 * Refreshes the JavaRuntime instance to check for changes.
+	 * Refreshes the {@code JavaRuntime} instance to check for changes.
 	 *
 	 * @throws IllegalJavaException If an error occurs during Java version retrieval or the executable is illegal.
 	 */
@@ -87,6 +87,11 @@ public record JavaRuntime(File executable, int version) implements Comparable<Ja
 		}
 	}
 	
+	/**
+	 * Resolves the current Java runtime based on the system properties.
+	 *
+	 * @return The current Java runtime, or {@code null} if an error occurs.
+	 */
 	private static JavaRuntime resolveCurrent() {
 		try {
 			return fromHome(new File(System.getProperty("java.home")));
@@ -97,9 +102,13 @@ public record JavaRuntime(File executable, int version) implements Comparable<Ja
 		}
 	}
 	
+	/**
+	 * Parses the Java version string into an integer.
+	 *
+	 * @param version The version string to be parsed.
+	 * @return The parsed Java version, or -1 if an error occurs.
+	 */
 	private static int parseVersion(String version) {
-		// parse the version string into int
-		
 		Matcher matcher = Pattern.compile("^(?<version>[0-9]+)").matcher(version);
 		
 		if (matcher.find()) {

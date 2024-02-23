@@ -23,7 +23,7 @@ import java.util.*;
 public class Profile implements Comparable<Profile> {
 	private static final Logger LOGGER = LogManager.getLogger();
 	
-	/** NbtLoader for loading and saving Profile objects from/to NBT data. */
+	/** NbtLoader for loading and saving {@code Profile} objects from/to NBT data. */
 	public static final NbtLoader<Profile, CompoundTag> LOADER = new NbtLoader<>() {
 		
 		@Override

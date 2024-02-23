@@ -43,6 +43,7 @@ public class ProcessListener {
 		exitChecker.start();
 		
 		LOGGER.info("Started listening for Minecraft instance " + pid);
+		ProcessListenerCollection.add(this);
 	}
 	
 	/**
@@ -54,6 +55,7 @@ public class ProcessListener {
 		
 		minecraftInstance.destroy();
 		LOGGER.info("Stopped Minecraft instance " + minecraftInstance.pid());
+		ProcessListenerCollection.remove(this);
 	}
 	
 	// Thread Operations
@@ -85,6 +87,7 @@ public class ProcessListener {
 			LOGGER.info("Minecraft process exited with code: " + exitCode);
 			
 			running = false;
+			ProcessListenerCollection.remove(this);
 			
 		} catch (InterruptedException e) {
 			LOGGER.error("exitChecker interrupted: ", e);
