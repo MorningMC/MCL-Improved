@@ -1,6 +1,7 @@
 package minecraft.morningmc.mcli.minecraft.java;
 
 import minecraft.morningmc.mcli.utils.Platform;
+import minecraft.morningmc.mcli.utils.annotations.ObjectCollection;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalJavaException;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
@@ -22,6 +23,7 @@ import java.util.stream.*;
 /**
  * A collection of Java runtimes managed by the launcher.
  */
+@ObjectCollection
 public class JavaRuntimeCollection implements Runnable {
 	private static final Logger LOGGER = LogManager.getLogger();
 	
@@ -71,11 +73,14 @@ public class JavaRuntimeCollection implements Runnable {
 			return tag;
 		}
 	};
-	private static final Comparator<JavaRuntime> COMPARATOR = Comparator.reverseOrder();
+	@SuppressWarnings("unchecked")
+	private static final Comparator<JavaRuntime> COMPARATOR = ((Comparator<JavaRuntime>) Comparator.naturalOrder())
+			                                                              .thenComparingInt(runtime -> runtime.platform().architecture().bits()).reversed()
+			                                                              .thenComparingInt(JavaRuntime::hashCode);
 	
 	public static JavaRuntimeCollection instance = null;
 	
-	private final Set<JavaRuntime> runtimes = new TreeSet<>(COMPARATOR.thenComparingInt(JavaRuntime::hashCode));
+	private final Set<JavaRuntime> runtimes = new TreeSet<>(COMPARATOR);
 	private Thread thread = null;
 	
 	/**
@@ -139,22 +144,24 @@ public class JavaRuntimeCollection implements Runnable {
 	@Override
 	public void run() {
 		synchronized (runtimes) {
-			// Refresh old runtimes
-			for (JavaRuntime runtime : runtimes) {
+			// refresh old runtimes
+			runtimes.removeIf(runtime -> {
 				try {
 					runtime.refresh();
 				} catch (IllegalJavaException e) {
-					LOGGER.warn("Expired Java runtime: " + runtime);
-					runtimes.remove(runtime);
+					LOGGER.warn("Expired Java runtime: " + runtime, e);
+					return true;
 				}
-			}
+				
+				return false;
+			});
 			
 			// search potential runtimes
 			LOGGER.info("Start searching for potential Java runtimes...");
 			
 			try {
 				long startTime = System.currentTimeMillis();
-				Set<JavaRuntime> potentialRuntimes = new TreeSet<>(COMPARATOR.thenComparingInt(JavaRuntime::hashCode));
+				Set<JavaRuntime> potentialRuntimes = new TreeSet<>(COMPARATOR);
 				
 				// Add order:
 				// 1. System-defined locations
@@ -162,69 +169,30 @@ public class JavaRuntimeCollection implements Runnable {
 				// 3. PATH
 				
 				// System-defined locations
-				switch (Platform.CURRENT) {
+				switch (Platform.CURRENT.operatingSystem()) {
 					case WINDOWS -> {
 						potentialRuntimes.addAll(queryJavaHomesInRegistryKey("HKEY_LOCAL_MACHINE\\SOFTWARE\\JavaSoft\\Java Runtime Environment\\"));
 						potentialRuntimes.addAll(queryJavaHomesInRegistryKey("HKEY_LOCAL_MACHINE\\SOFTWARE\\JavaSoft\\Java Development Kit\\"));
 						potentialRuntimes.addAll(queryJavaHomesInRegistryKey("HKEY_LOCAL_MACHINE\\SOFTWARE\\JavaSoft\\JRE\\"));
 						potentialRuntimes.addAll(queryJavaHomesInRegistryKey("HKEY_LOCAL_MACHINE\\SOFTWARE\\JavaSoft\\JDK\\"));
 						
-						// Program Files
-						Set<File> programFiles = new HashSet<>();
-						try {
-							for (String env : new String[]{ "ProgramFiles", "ProgramFiles(x86)", "ProgramFiles(ARM)" }) {
-								String value = System.getenv(env);
-								
-								if (value != null) {
-									programFiles.add(new File(value));
-								}
-							}
-						} catch (Exception e) {
-							for (String root : new String[]{ "C:\\Program Files", "C:\\Program Files (x86)", "C:\\Program Files (ARM)" }) {
-								File file = new File(root);
-								
-								if (file.exists()) {
-									programFiles.add(file);
-								}
-							}
-						}
-						
-						for (File programFile : programFiles) {
-							for (String vendor : new String[]{ "Java", "BellSoft", "AdoptOpenJDK", "Zulu", "Microsoft", "Eclipse Foundation", "Semeru" }) {
-								File root = new File(programFile, vendor);
-								
-								try {
-									for (File home : Objects.requireNonNull(root.listFiles())) {
-										if (home.isDirectory()) {
-											LOGGER.trace("Query home: " + home.getAbsolutePath());
-											
-											try {
-												potentialRuntimes.add(JavaRuntime.fromHome(home));
-											} catch (IllegalJavaException ignored) {}
-										}
-									}
-								} catch (Exception ignored) {}
-							}
-						}
+						// program files
+						Stream.of("ProgramFiles", "ProgramFiles(x86)", "ProgramFiles(ARM)")
+								.map(System::getenv)
+								.filter(Objects::nonNull)
+								.map(File::new)
+								.flatMap(programFile -> Stream.of("Java", "BellSoft", "AdoptOpenJDK", "Zulu", "Microsoft", "Eclipse Foundation", "Semeru")
+										                         .map(vendor -> new File(programFile, vendor)))
+								.flatMap(JavaRuntimeCollection::listDirectories)
+								.flatMap(JavaRuntimeCollection::parseHome)
+								.forEach(potentialRuntimes::add);
 					}
 					
-					case LINUX -> {
-						for (String path : new String[]{ "/usr/java", "/usr/lib/jvm", "/usr/lib32/jvm" }) {
-							File root = new File(path);
-							
-							try {
-								for (File home : Objects.requireNonNull(root.listFiles())) {
-									if (home.isDirectory()) {
-										LOGGER.trace("Query home: " + home.getAbsolutePath());
-										
-										try {
-											potentialRuntimes.add(JavaRuntime.fromHome(home));
-										} catch (IllegalJavaException ignored) {}
-									}
-								}
-							} catch (Exception ignored) {}
-						}
-					}
+					case LINUX -> Stream.of("/usr/java", "/usr/lib/jvm", "/usr/lib32/jvm")
+										.map(File::new)
+										.flatMap(JavaRuntimeCollection::listDirectories)
+										.flatMap(JavaRuntimeCollection::parseHome)
+										.forEach(potentialRuntimes::add);
 					
 					case MACOS -> {
 						try {
@@ -269,7 +237,7 @@ public class JavaRuntimeCollection implements Runnable {
 				
 				// Minecraft-installed locations
 				Set<File> minecraftLocations = new HashSet<>();
-				switch (Platform.CURRENT) {
+				switch (Platform.CURRENT.operatingSystem()) {
 					case WINDOWS -> {
 						File file = new File(System.getenv("LocalAppData"), "Packages\\Microsoft.4297127D64EC6_8wekyb3d8bbwe\\LocalCache\\Local\\runtime");
 						if (file.exists()) {
@@ -326,17 +294,24 @@ public class JavaRuntimeCollection implements Runnable {
 				
 				// PATH
 				try {
-					for (String path : System.getenv("PATH").split(Platform.PATH_SEPARATOR)) {
-						try {
-							File executable = new File(path, JavaRuntime.JAVA);
-							
-							if (executable.getParentFile().getName().equals("bin")) {
+					Arrays.stream(System.getenv("PATH").split(Platform.CURRENT.pathSeparator()))
+							.map(File::new)
+							.filter(bin -> bin.getName().equals("bin"))
+							.map(bin -> new File(bin, JavaRuntime.JAVA))
+							.flatMap(executable -> {
 								LOGGER.trace("Query executable in PATH: " + executable);
-								potentialRuntimes.add(JavaRuntime.fromPath(executable));
-							}
-						} catch (IllegalJavaException ignored) {}
-					}
-				} catch (Exception ignored) {}
+								
+								try {
+									return Stream.of(JavaRuntime.fromPath(executable));
+								} catch (IllegalJavaException e) {
+									return Stream.empty();
+								}
+							})
+							.forEach(potentialRuntimes::add);
+					
+				} catch (Exception e) {
+					LOGGER.warn("Failed to parse PATH: " + e.getMessage());
+				}
 				
 				if (JavaRuntime.CURRENT != null) {
 					potentialRuntimes.add(JavaRuntime.CURRENT);
@@ -344,7 +319,7 @@ public class JavaRuntimeCollection implements Runnable {
 				
 				long stopTime = System.currentTimeMillis();
 				
-				LOGGER.info("Finish searching potential Java runtimes. Found " + potentialRuntimes.size());
+				LOGGER.debug("Finish searching potential Java runtimes. Found " + potentialRuntimes.size());
 				LOGGER.debug("Used " + (stopTime - startTime) + " ms");
 				
 				runtimes.addAll(potentialRuntimes);
@@ -353,15 +328,41 @@ public class JavaRuntimeCollection implements Runnable {
 				LOGGER.error("Failed to search potential Java runtimes: ", e);
 			}
 			
-			LOGGER.trace("Found " + get().size() + " Java runtimes in total:");
+			// list found runtimes
+			LOGGER.debug("Found " + get().size() + " Java runtimes in total:");
 			for (JavaRuntime runtime : runtimes) {
-				LOGGER.trace(runtime.toString());
+				LOGGER.debug(runtime.toString());
 			}
 		}
 	}
 	
-	// Windows Registry Support
+	/**
+	 * List subdirectories of the given directory.
+	 *
+	 * @param directory The directory to be rooted.
+	 * @return A stream that contains all subdirectories of the given directory,
+	 *         or empty if an error occurs.
+	 */
+	private static Stream<File> listDirectories(File directory) {
+		File[] files = directory.listFiles();
+		if (files != null) {
+			return Arrays.stream(files).filter(File::isDirectory);
+		}
+		
+		return Stream.empty();
+	}
 	
+	private static Stream<JavaRuntime> parseHome(File home) {
+		LOGGER.trace("Query home: " + home.getAbsolutePath());
+		
+		try {
+			return Stream.of(JavaRuntime.fromHome(home));
+		} catch (IllegalJavaException e) {
+			return Stream.empty();
+		}
+	}
+	
+	// Windows Registry Support
 	/**
 	 * Query Java home locations in the Windows Registry key.
 	 *
@@ -372,19 +373,18 @@ public class JavaRuntimeCollection implements Runnable {
 	private static Set<JavaRuntime> queryJavaHomesInRegistryKey(String location) throws IOException {
 		Set<JavaRuntime> homes = new HashSet<>();
 		for (String java : querySubFolders(location)) {
-			if (!querySubFolders(java).contains(java + "\\MSI")) {
-				continue;
-			}
-			String home = queryRegisterValue(java, "JavaHome");
-			if (home != null) {
-				try {
-					homes.add(JavaRuntime.fromHome(new File(home)));
-					
-				} catch (InvalidPathException | IllegalJavaException e) {
-					LOGGER.warn("Invalid Java path in system registry: " + home);
+			if (querySubFolders(java).contains(java + "\\MSI")) {
+				String home = queryRegisterValue(java, "JavaHome");
+				if (home != null) {
+					try {
+						homes.add(JavaRuntime.fromHome(new File(home)));
+					} catch (InvalidPathException | IllegalJavaException e) {
+						LOGGER.warn("Invalid Java path in system registry: " + home);
+					}
 				}
 			}
 		}
+		
 		return homes;
 	}
 	
@@ -406,6 +406,7 @@ public class JavaRuntimeCollection implements Runnable {
 				}
 			}
 		}
+		
 		return res;
 	}
 	
@@ -442,6 +443,7 @@ public class JavaRuntimeCollection implements Runnable {
 				}
 			}
 		}
+		
 		return null;
 	}
 }

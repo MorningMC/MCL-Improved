@@ -12,13 +12,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Represents a Java Runtime, providing methods for retrieving Java version and executable information.
+ * Represents a Java runtime, providing methods for retrieving Java version and executable information.
  */
-public record JavaRuntime(File executable, int version) implements Comparable<JavaRuntime> {
+public record JavaRuntime(File executable, int version, Platform platform) implements Comparable<JavaRuntime> {
 	private static final Logger LOGGER = LogManager.getLogger();
 	
-	/** The default executable name for Java on Windows and non-Windows platforms. */
-	public static final String JAVA = Platform.CURRENT == Platform.WINDOWS ? "java.exe" : "java";
+	/** The default executable name for Java. */
+	public static final String JAVA = Platform.SYSTEM.operatingSystem() == Platform.OperatingSystem.WINDOWS ? "java.exe" : "java";
 	
 	/** The current Java runtime based on the system properties. */
 	public static final JavaRuntime CURRENT = resolveCurrent();
@@ -34,33 +34,37 @@ public record JavaRuntime(File executable, int version) implements Comparable<Ja
 		ProcessBuilder builder = new ProcessBuilder(path.getAbsolutePath(), "-XshowSettings:properties", "-version");
 		builder.redirectErrorStream(true);
 		
-		String version = "";
+		String content;
+		
 		try {
 			Process process = builder.start();
 			BufferedReader reader = process.inputReader();
-			
 			StringBuilder contentBuilder = new StringBuilder();
+			
 			for (String line; (line = reader.readLine()) != null; ) {
 				contentBuilder.append(line).append("\n");
 			}
-			String content = contentBuilder.toString();
-			
-			if (!content.contains("java") && !content.contains("sun")) {
-				throw new IllegalJavaException(path);
-			}
-			
-			Matcher matcher = Pattern.compile("java\\.version = (?<version>.*)").matcher(content);
-			if (matcher.find()) {
-				version = matcher.group(1);
-			} else {
-				LOGGER.warn("Failed to retrieve Java version from: " + path);
-			}
+			content = contentBuilder.toString();
 			
 		} catch (Exception e) {
 			throw new IllegalJavaException(path, e);
 		}
 		
-		return new JavaRuntime(path, parseVersion(version));
+		if (!content.contains("java") && !content.contains("sun")) {
+			throw new IllegalJavaException(path);
+		}
+		
+		return new JavaRuntime(
+				path, parseVersion(getProperty(content, "java.version")),
+				new Platform(
+						Platform.OperatingSystem.infer(getProperty(content, "os.name")),
+						Platform.Architecture.infer(getProperty(content, "sun.arch.data.model"), getProperty(content, "os.arch")),
+						getProperty(content, "file.separator"),
+						getProperty(content, "path.separator"),
+						System.lineSeparator(),
+						Platform.inferEncoding(getProperty(content, "sun.jnu.encoding"))
+				)
+		);
 	}
 	
 	/**
@@ -109,42 +113,60 @@ public record JavaRuntime(File executable, int version) implements Comparable<Ja
 	 * @return The parsed Java version, or -1 if an error occurs.
 	 */
 	private static int parseVersion(String version) {
-		Matcher matcher = Pattern.compile("^(?<version>[0-9]+)").matcher(version);
+		if (version != null) {
+			Matcher matcher = Pattern.compile("^(?<version>[0-9]+)").matcher(version);
+			
+			if (matcher.find()) {
+				int head;
+				try {
+					head = Integer.parseInt(matcher.group());
+				} catch (NumberFormatException e) {
+					head = -1;
+				}
+				
+				if (head > 1) {
+					return head;
+				}
+			}
+			
+			// using 1.x format
+			if (version.contains("1.8")) {
+				return 8;
+			} else if (version.contains("1.7")) {
+				return 7;
+			} else if (version.contains("1.6")) {
+				return 6;
+			} else {
+				LOGGER.warn("Failed to parse Java version: " + version);
+				return -1;
+			}
+		}
 		
+		return -1;
+	}
+	
+	/**
+	 * Retrieves a system property from the given content.
+	 *
+	 * @param content The given content.
+	 * @param key The key of the system property to be retrieved.
+	 * @return The value of the system property, or {@code null} if not found.
+	 */
+	private static String getProperty(String content, String key) {
+		key = key.replace(".", "\\.");
+		Matcher matcher = Pattern.compile(key + " = (?<value>.*)").matcher(content);
+
 		if (matcher.find()) {
-			int head;
-			
-			try {
-				head = Integer.parseInt(matcher.group());
-			} catch (NumberFormatException e) {
-				head = -1;
-			}
-			
-			if (head > 1) {
-				return head;
-			}
+			return matcher.group(1);
 		}
-		
-		// using 1.x format
-		if (version.contains("1.8")) {
-			return 8;
-			
-		} else if (version.contains("1.7")) {
-			return 7;
-			
-		} else if (version.contains("1.6")) {
-			return 6;
-			
-		} else {
-			LOGGER.warn("Failed to parse Java version: " + version);
-			return -1;
-		}
+
+		return null;
 	}
 	
 	// Overrides
 	@Override
 	public String toString() {
-		return "Java " + (version >= 0 ? version : "<unknown>") + " (" + executable.getAbsolutePath() + ")";
+		return "Java " + (version >= 0 ? version : "<unknown>") + " (" + executable.getAbsolutePath() + ", " + platform + ")";
 	}
 	
 	@Override

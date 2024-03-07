@@ -1,6 +1,7 @@
 package minecraft.morningmc.mcli.minecraft.client.profile;
 
 
+import minecraft.morningmc.mcli.utils.annotations.ObjectCollection;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
@@ -16,6 +17,7 @@ import java.util.stream.*;
 /**
  * The ProfileCollection class manages a collection of Minecraft profiles.
  */
+@ObjectCollection
 public class ProfileCollection {
 	private static final Logger LOGGER = LogManager.getLogger();
 	

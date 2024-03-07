@@ -1,5 +1,7 @@
 package minecraft.morningmc.mcli.minecraft.launch.listener;
 
+import minecraft.morningmc.mcli.utils.annotations.LauncherProcess;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -10,6 +12,7 @@ import java.util.*;
  * A utility class for listening to the output streams (stdout, stderr) of a Minecraft process.
  * It provides separate threads for listening to stdout, stderr, and checking for process exit.
  */
+@LauncherProcess("launch")
 public class ProcessListener {
 	private static final Logger LOGGER = LogManager.getLogger();
 	
@@ -52,10 +55,11 @@ public class ProcessListener {
 	public void stop() {
 		running = false;
 		exitChecker.interrupt();
+		stdOutListener.interrupt();
+		stdErrListener.interrupt();
 		
 		minecraftInstance.destroy();
 		LOGGER.info("Stopped Minecraft instance " + minecraftInstance.pid());
-		ProcessListenerCollection.remove(this);
 	}
 	
 	// Thread Operations

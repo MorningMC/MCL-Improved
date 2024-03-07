@@ -1,67 +1,153 @@
 package minecraft.morningmc.mcli.utils;
 
+import minecraft.morningmc.mcli.minecraft.java.JavaRuntime;
+
 import java.io.File;
 import java.nio.charset.Charset;
-import java.nio.file.FileSystems;
 
 /**
- * The Platform enum represents different operating systems and provides utility methods
- * for platform-specific operations.
+ * The {@code Platform} record represents a platform-specific configuration.
+ *
+ * @param operatingSystem The operating system of the platform.
+ * @param architecture The architecture of the platform.
+ * @param fileSeparator The file separator of the platform.
+ * @param pathSeparator The path separator of the platform.
+ * @param lineSeparator The line separator of the platform.
+ * @param encoding The encoding of the platform.
  */
-public enum Platform {
-    WINDOWS, MACOS, LINUX, UNKNOWN;
+public record Platform(OperatingSystem operatingSystem,
+                       Architecture architecture,
+                       String fileSeparator,
+                       String pathSeparator,
+                       String lineSeparator,
+                       Charset encoding) {
     
-    /** The current platform of the system. */
-    public static final Platform CURRENT = inferPlatform(System.getProperty("os.name"));
+    /** The system platform */
+    public static final Platform SYSTEM = resolveSystem();
     
-    /** The file separator for the current platform. */
-    public static final String FILE_SEPARATOR = File.separator;
-    
-    /** The path separator for the current platform. */
-    public static final String PATH_SEPARATOR = File.pathSeparator;
-
-    /** The line separator for the current platform. */
-    public static final String LINE_SEPARATOR = System.lineSeparator();
-    
-    /** The default encoding for the current platform. */
-    public static final Charset ENCODING = Charset.forName(System.getProperty("sun.jnu.encoding", Charset.defaultCharset().name()));
+    /** The current Java runtime platform */
+    public static final Platform CURRENT = JavaRuntime.CURRENT != null ? JavaRuntime.CURRENT.platform() : SYSTEM;
     
     /**
-     * Checks if the current system architecture is 64-bit.
+     * Resolves the system platform.
      *
-     * @return {@code true} if the system architecture is 64-bit, {@code false} otherwise.
+     * @return The system platform.
      */
-    public static boolean is64bit() {
-        String sunArchDataModel = System.getProperty("sun.arch.data.model");
+    private static Platform resolveSystem() {
+        OperatingSystem os = OperatingSystem.infer(System.getProperty("os.name"));
         
-        if (sunArchDataModel != null) {
-            return "64".equals(sunArchDataModel);
+        Architecture arch;
+        if (os == OperatingSystem.WINDOWS) {
+            String processorArch = System.getenv("PROCESSOR_ARCHITECTURE");
+            String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
+            
+            arch = processorArch != null && processorArch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64")
+                           ? Architecture.BIT64 : Architecture.BIT32;
+        } else {
+            arch = System.getProperty("os.arch").contains("64")
+                           ? Architecture.BIT64 : Architecture.BIT32;
         }
         
-        return System.getProperty("os.arch").contains("64");
+        return new Platform(
+                os,
+                arch,
+		        File.separator,
+                File.pathSeparator,
+                System.lineSeparator(),
+                inferEncoding(System.getProperty("sun.jnu.encoding"))
+        );
     }
     
     /**
-     * Infers the platform based on the provided OS name.
+     * Infers the encoding based on the provided name.
      *
-     * @param osName The name of the operating system.
-     * @return The inferred platform.
+     * @param name The value of property {@code sun.jnu.encoding}.
+     * @return The inferred encoding.
      */
-    public static Platform inferPlatform(String osName) {
-        if (osName == null) return UNKNOWN;
-        osName = osName.toLowerCase();
+    public static Charset inferEncoding(String name) {
+        if (name != null) {
+            try {
+                return Charset.forName(name);
+            } catch (Exception e) {
+                return Charset.defaultCharset();
+            }
+        }
         
-        if (osName.contains("linux") || osName.contains("unix")) {
-            return LINUX;
+        return Charset.defaultCharset();
+    }
+    
+    @Override
+    public String toString() {
+        return operatingSystem + " " + architecture;
+    }
+    
+    /**
+     * The {@code OperatingSystem} enum represents different operating systems and provides utility methods
+     */
+    public enum OperatingSystem {
+        WINDOWS, MACOS, LINUX, UNKNOWN;
+        
+        /**
+        * Infers the operating system based on the provided name.
+        *
+        * @param name The value of property {@code os.name}.
+        * @return The inferred operating system.
+        */
+        public static OperatingSystem infer(String name) {
+            if (name != null) {
+                name = name.toLowerCase();
+                
+                if (name.contains("linux")) {
+                    return LINUX;
+                } else if (name.contains("osx") || name.contains("os x") || name.contains("mac")) {
+                    return MACOS;
+                } else if (name.contains("windows")) {
+                    return WINDOWS;
+                } else {
+                    return UNKNOWN;
+                }
+            }
             
-        } else if (osName.contains("osx") || osName.contains("os x") || osName.contains("mac")) {
-            return MACOS;
-            
-        } else if (osName.contains("windows")) {
-            return WINDOWS;
-            
-        } else {
             return UNKNOWN;
+        }
+    }
+    
+    /**
+     * The {@code Architecture} enum represents different architectures and provides utility methods.
+     */
+    public enum Architecture {
+        BIT32, BIT64, UNKNOWN;
+        
+        /**
+         * Infers the architecture based on the provided name.
+         *
+         * @param name The value of property {@code sun.arch.data.model}.
+         * @param archName The value of property {@code os.arch}.
+         * @return The inferred architecture.
+         */
+        public static Architecture infer(String name, String archName) {
+            if (name != null) {
+                return name.equals("64") ? BIT64 : BIT32;
+            }
+            
+            if (archName != null) {
+                return archName.contains("64") ? BIT64 : BIT32;
+            }
+            
+            return UNKNOWN;
+        }
+        
+        /**
+         * Returns the number of bits of the architecture.
+         *
+         * @return The number of bits of the architecture, or 0 if unknown.
+         */
+        public int bits() {
+	        return switch (this) {
+		        case BIT32 -> 32;
+		        case BIT64 -> 64;
+		        default -> 0;
+	        };
         }
     }
 }

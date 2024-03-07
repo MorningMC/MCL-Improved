@@ -11,16 +11,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * The entry point for launching the Minecraft launcher.
+ * The entry point for launching the MCL Improved.
  */
 public class Startup {
     private static final Logger LOGGER = LogManager.getLogger();
     
     /**
-     * Constructs a new instance of Startup, logging launcher information.
+     * Constructs a new instance of {@code Startup}, logging launcher information.
      */
     public Startup() {
         LOGGER.info(LauncherMetadata.LONG_FULL_NAME);
+        LOGGER.info("System platform: " + Platform.SYSTEM);
         LOGGER.info("Current platform: " + Platform.CURRENT);
         LOGGER.info("Working root: " + FileMetadata.WORKING_ROOT);
         
@@ -40,8 +41,8 @@ public class Startup {
         try {
             new Startup().run(args);
             
-        } catch (Exception e) {
-            LOGGER.fatal("Launcher crashed: ", e);
+        } catch (Throwable t) {
+            LOGGER.fatal("Launcher crashed: ", t);
             System.exit(-1);
             
         } finally {
@@ -50,7 +51,7 @@ public class Startup {
     }
     
     /**
-     * Runs the launcher by launching the JavaFX application.
+     * Runs the launcher.
      *
      * @param args Command-line arguments.
      */

@@ -38,36 +38,16 @@ public class FileMetadata {
 		if (appData != null) {
 			return new File(appData);
 		}
-
+		
 		try {
-			switch (Platform.CURRENT) {
-				case WINDOWS -> {
-					String userProfile = System.getenv("UserProfile");
-					if (userProfile == null) {
-						userProfile = System.getProperty("user.home");
-					}
-
-					return new File(userProfile, "AppData/Roaming");
-				}
-
-				case MACOS -> {
-					return new File(System.getProperty("user.home"), "Library/Application Support");
-				}
-
-				case LINUX -> {
-					return new File(System.getProperty("user.home"), ".config");
-				}
-				
-				default -> {
-					return File.listRoots()[0];
-				}
-			}
+			return switch (Platform.CURRENT.operatingSystem()) {
+				case WINDOWS -> new File(System.getenv("UserProfile") != null ? System.getenv("UserProfile") : System.getProperty("user.home"), "AppData/Roaming");
+				case MACOS -> new File(System.getProperty("user.home"), "Library/Application Support");
+				case LINUX -> new File(System.getProperty("user.home"), ".config");
+				default -> new File(".");
+			};
 		} catch (Exception e) {
-			try {
-				return File.listRoots()[0];
-			} catch (Exception ex) {
-				return null;
-			}
+			return new File(".");
 		}
 	}
 	
