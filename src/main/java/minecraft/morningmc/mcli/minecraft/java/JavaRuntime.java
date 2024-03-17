@@ -2,6 +2,10 @@ package minecraft.morningmc.mcli.minecraft.java;
 
 import minecraft.morningmc.mcli.utils.Platform;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalJavaException;
+import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
+import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
+
+import dev.dewy.nbt.tags.primitive.StringTag;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,6 +20,25 @@ import java.util.regex.Pattern;
  */
 public record JavaRuntime(File executable, int version, Platform platform) implements Comparable<JavaRuntime> {
 	private static final Logger LOGGER = LogManager.getLogger();
+	
+	/** NbtLoader for loading and saving {@code JavaRuntime} objects from/to NBT data. */
+	public static final NbtLoader<JavaRuntime, StringTag> LOADER = new NbtLoader<>() {
+		
+		@Override
+		public JavaRuntime loadFromNbt(StringTag tag) throws IllegalNbtException {
+			try {
+				return JavaRuntime.fromPath(new File(tag.getValue()));
+			} catch (IllegalJavaException e) {
+				LOGGER.warn("Failed to load Java runtime from NBT: " + e.getMessage());
+				return null;
+			}
+		}
+
+		@Override
+		public StringTag saveToNbt(JavaRuntime object) {
+			return new StringTag(object.executable.getAbsolutePath());
+		}
+	};
 	
 	/** The default executable name for Java. */
 	public static final String JAVA = Platform.SYSTEM.operatingSystem() == Platform.OperatingSystem.WINDOWS ? "java.exe" : "java";
@@ -61,7 +84,7 @@ public record JavaRuntime(File executable, int version, Platform platform) imple
 						Platform.Architecture.infer(getProperty(content, "sun.arch.data.model"), getProperty(content, "os.arch")),
 						getProperty(content, "file.separator"),
 						getProperty(content, "path.separator"),
-						System.lineSeparator(),
+						getProperty(content, "line.separator"),
 						Platform.inferEncoding(getProperty(content, "sun.jnu.encoding"))
 				)
 		);
@@ -166,7 +189,7 @@ public record JavaRuntime(File executable, int version, Platform platform) imple
 	// Overrides
 	@Override
 	public String toString() {
-		return "Java " + (version >= 0 ? version : "<unknown>") + " (" + executable.getAbsolutePath() + ", " + platform + ")";
+		return "Java " + (version >= 0 ? version : "?") + " (" + executable.getAbsolutePath() + ", " + platform + ")";
 	}
 	
 	@Override

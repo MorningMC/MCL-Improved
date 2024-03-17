@@ -35,7 +35,7 @@ public final class LauncherMetadata {
 	/** Represents the release channel name of the launcher (0 for {@code DEV}, 1 for {@code STABLE}). */
 	public static final String CHANNEL_NAME = isStable() ? "STABLE" : "DEV";
 	
-	/** Represents the version string in the format "{@code CHANNEL.VERSION.BRANCH.BUILD}". */
+	/** Represents the version string in the format {@code "CHANNEL.VERSION.BRANCH.BUILD"}. */
 	public static final String VERSION_STRING = "%s.%s.%s.%s".formatted(CHANNEL, VERSION, BRANCH, BUILD);
 	
 	/** Represents the full version string including channel information. */

@@ -19,9 +19,6 @@ public class FileMetadata {
 	/** The working root directory for MCLI. */
 	public static final File WORKING_ROOT = new File(APPDATA, ".mcli");
 	
-	/** The root directory for the MCLI service. */
-	public static final File SERVICE_ROOT = new File(WORKING_ROOT, "service");
-	
 	/** The root directory for caching MCLI-related data. */
 	public static final File CACHE_ROOT = new File(WORKING_ROOT, "cache");
 
@@ -61,7 +58,6 @@ public class FileMetadata {
 		File[] directories = {
 				WORKING_ROOT,
 				CACHE_ROOT,
-				SERVICE_ROOT,
 				
 				TargetMinecraftDirectory.STANDARD.getRoot(),
 				TargetMinecraftDirectory.ISOLATE_ROOT

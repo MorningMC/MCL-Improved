@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.stream.*;
 
 /**
- * The ProfileCollection class manages a collection of Minecraft profiles.
+ * The {@code ProfileCollection} class manages a collection of Minecraft profiles.
  */
 @ObjectCollection
 public class ProfileCollection {

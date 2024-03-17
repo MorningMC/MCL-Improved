@@ -7,6 +7,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
+/**
+ * A collection of process listeners.
+ */
 @ObjectCollection
 public class ProcessListenerCollection {
 	private static final Logger LOGGER = LogManager.getLogger();

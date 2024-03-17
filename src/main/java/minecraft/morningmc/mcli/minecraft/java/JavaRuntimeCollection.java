@@ -40,16 +40,14 @@ public class JavaRuntimeCollection implements Runnable {
 		@Override
 		public JavaRuntimeCollection loadFromNbt(ListTag<StringTag> tag) throws IllegalNbtException {
 			init(tag.getValue().stream()
-					     .map(StringTag::getValue)
-					     .map(File::new)
-					     .flatMap(path -> {
+					     .flatMap(subTag -> {
 						     try {
-							     return Stream.of(JavaRuntime.fromPath(path));
-						     } catch (IllegalJavaException e) {
-							     LOGGER.warn("Failed to load Java runtime from NBT: " + e.getMessage());
+							     return Stream.of(JavaRuntime.LOADER.loadFromNbt(subTag));
+						     } catch (IllegalNbtException e) {
 							     return Stream.empty();
 						     }
 					     })
+					     .filter(Objects::nonNull)
 					     .collect(Collectors.toSet()));
 			return instance;
 		}
@@ -65,9 +63,7 @@ public class JavaRuntimeCollection implements Runnable {
 			ListTag<StringTag> tag = new ListTag<>();
 			
 			object.runtimes.stream()
-					.map(JavaRuntime::executable)
-					.map(File::getAbsolutePath)
-					.map(StringTag::new)
+					.map(JavaRuntime.LOADER::saveToNbt)
 					.forEach(tag::add);
 			
 			return tag;
@@ -75,7 +71,8 @@ public class JavaRuntimeCollection implements Runnable {
 	};
 	@SuppressWarnings("unchecked")
 	private static final Comparator<JavaRuntime> COMPARATOR = ((Comparator<JavaRuntime>) Comparator.naturalOrder())
-			                                                              .thenComparingInt(runtime -> runtime.platform().architecture().bits()).reversed()
+			                                                              .thenComparingInt(runtime -> runtime.platform().architecture().bits())
+			                                                              .reversed()
 			                                                              .thenComparingInt(JavaRuntime::hashCode);
 	
 	public static JavaRuntimeCollection instance = null;

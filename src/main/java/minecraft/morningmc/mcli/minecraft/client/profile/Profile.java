@@ -4,6 +4,7 @@ import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
 import minecraft.morningmc.mcli.minecraft.client.directory.TargetMinecraftDirectory;
 import minecraft.morningmc.mcli.minecraft.client.Version;
 import minecraft.morningmc.mcli.minecraft.launch.LaunchOptions;
+import minecraft.morningmc.mcli.utils.Switchable;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
@@ -32,10 +33,9 @@ public class Profile implements Comparable<Profile> {
 			String icon = tag.getString("icon").getValue();
 			Version.Policy versionPolicy = Version.Policy.valueOf(tag.getString("versionPolicy").getValue());
 			Version version = Version.LOADER.loadFromNbt(tag.getCompound("version"));
-			boolean useCustomOptions = tag.getByte("useCustomOptions").getValue() != 0;
-			LaunchOptions options = LaunchOptions.LOADER.loadFromNbt(tag.getCompound("options"));
+			Switchable<LaunchOptions> options = NbtLoader.switchableLoader(LaunchOptions.LOADER).loadFromNbt(tag.getCompound("options"));
 			
-			return new Profile(name, icon, versionPolicy, version, useCustomOptions, options);
+			return new Profile(name, icon, versionPolicy, version, options);
 		}
 		
 		@Override
@@ -50,8 +50,7 @@ public class Profile implements Comparable<Profile> {
 			tag.putString("icon", object.icon);
 			tag.putString("versionPolicy", object.versionPolicy.name());
 			tag.put("version", Version.LOADER.saveToNbt(object.version));
-			tag.putByte("useCustomOptions", (byte) (object.useCustomOptions ? 1 : 0));
-			tag.put("options", LaunchOptions.LOADER.saveToNbt(object.options));
+			tag.put("options", NbtLoader.switchableLoader(LaunchOptions.LOADER).saveToNbt(object.options));
 			
 			return tag;
 		}
@@ -61,31 +60,27 @@ public class Profile implements Comparable<Profile> {
 	private String icon;
 	private Version.Policy versionPolicy;
 	private Version version;
-	private boolean useCustomOptions;
-	private LaunchOptions options;
+	private Switchable<LaunchOptions> options;
 	
 	/**
 	 * Constructs a new Profile instance.
 	 *
-	 * @param name            The name of the profile.
-	 * @param icon            The icon representing the profile.
-	 * @param versionPolicy   The version policy for the profile.
-	 * @param version         The Minecraft version associated with the profile.
-	 * @param useCustomOptions Whether custom launch options are used for this profile.
-	 * @param options         The launch options for this profile.
+	 * @param name The name of the profile.
+	 * @param icon The icon representing the profile.
+	 * @param versionPolicy The version policy for the profile.
+	 * @param version The Minecraft version associated with the profile.
+	 * @param options The launch options for this profile.
 	 */
 	public Profile(String name,
 	               String icon,
 	               Version.Policy versionPolicy,
 	               Version version,
-	               boolean useCustomOptions,
-	               LaunchOptions options) {
+	               Switchable<LaunchOptions> options) {
 		
 		this.name = name;
 		this.icon = icon;
 		this.versionPolicy = versionPolicy;
 		this.version = version;
-		this.useCustomOptions = useCustomOptions;
 		this.options = options;
 	}
 	
@@ -104,7 +99,6 @@ public class Profile implements Comparable<Profile> {
 	}
 	
 	// Getters
-	
 	/**
 	 * Gets the name of the profile.
 	 *
@@ -156,25 +150,15 @@ public class Profile implements Comparable<Profile> {
 	}
 	
 	/**
-	 * Checks if custom launch options are used for this profile.
-	 *
-	 * @return True if custom launch options are used, false otherwise.
-	 */
-	public boolean isUseCustomOptions() {
-		return useCustomOptions;
-	}
-	
-	/**
 	 * Gets the launch options for this profile.
 	 *
 	 * @return The launch options.
 	 */
-	public LaunchOptions getOptions() {
+	public Switchable<LaunchOptions> getOptions() {
 		return options;
 	}
 	
 	// Setters
-	
 	/**
 	 * Sets the icon representing the profile.
 	 *
@@ -203,25 +187,15 @@ public class Profile implements Comparable<Profile> {
 	}
 	
 	/**
-	 * Sets whether custom launch options are used for this profile.
-	 *
-	 * @param useCustomOptions True to use custom launch options, false otherwise.
-	 */
-	public void setUseCustomOptions(boolean useCustomOptions) {
-		this.useCustomOptions = useCustomOptions;
-	}
-	
-	/**
 	 * Sets the launch options for this profile.
 	 *
 	 * @param options The new launch options.
 	 */
-	public void setOptions(LaunchOptions options) {
+	public void setOptions(Switchable<LaunchOptions> options) {
 		this.options = options;
 	}
 	
 	// Overrides
-	
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

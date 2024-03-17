@@ -6,8 +6,7 @@ import minecraft.morningmc.mcli.minecraft.client.profile.Profile;
 import java.io.File;
 import java.util.*;
 
-public record LaunchArguments(LaunchOptions options,
-                              Profile profile) {
+public record LaunchArguments(LaunchOptions options, Profile profile) {
 	
 	public LaunchArguments(LaunchOptions options, Profile profile) {
 		this.options = Objects.requireNonNull(options);
@@ -15,7 +14,7 @@ public record LaunchArguments(LaunchOptions options,
 	}
 	
 	public List<String> generateCommandline() {
-		return new ArrayList<>();
+		return List.of();
 	}
 	
 	public File getDirectory() {

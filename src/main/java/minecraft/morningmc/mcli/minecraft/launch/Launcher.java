@@ -143,8 +143,7 @@ public class Launcher {
 	 * @throws NullPointerException If the profile is null.
 	 */
 	public LaunchArguments generateArguments(Profile profile) {
-		LaunchOptions o = profile.isUseCustomOptions() ? profile.getOptions() : options;
-		return new LaunchArguments(o, profile);
+		return new LaunchArguments(profile.getOptions().getIfEnabled(options), profile);
 	}
 	
 	/**

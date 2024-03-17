@@ -2,8 +2,7 @@ package minecraft.morningmc.mcli.minecraft.launch;
 
 import minecraft.morningmc.mcli.minecraft.client.directory.TargetMinecraftDirectory;
 import minecraft.morningmc.mcli.minecraft.java.JavaRuntime;
-import minecraft.morningmc.mcli.utils.ServerInfo;
-import minecraft.morningmc.mcli.utils.WindowSize;
+import minecraft.morningmc.mcli.utils.*;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
@@ -23,52 +22,28 @@ public class LaunchOptions {
 		
 		@Override
 		public LaunchOptions loadFromNbt(CompoundTag tag) throws IllegalNbtException {
-			boolean autoSelectJavaRuntimes;
+			Switchable<JavaRuntime> javaRuntime;
 			try {
-				autoSelectJavaRuntimes = tag.getByte("autoSelectJavaRuntimes").getValue() != 0;
-			} catch (Exception e) {
-				LOGGER.warn("autoSelectJavaRuntimes load failed: " + e.getMessage());
-				autoSelectJavaRuntimes = DEFAULT.autoSelectJavaRuntimes;
-			}
-			
-			JavaRuntime javaRuntime;
-			try {
-				javaRuntime = JavaRuntime.fromPath(new File(tag.getString("javaRuntime").getValue()));
+				javaRuntime = NbtLoader.switchableLoader(JavaRuntime.LOADER).loadFromNbt(tag.getCompound("javaRuntime"));
 			} catch (Exception e) {
 				LOGGER.warn("javaRuntime load failed: " + e.getMessage());
 				javaRuntime = DEFAULT.javaRuntime;
 			}
 			
-			int maxMemory;
+			Switchable<MemoryRange> memoryRange;
 			try {
-				maxMemory = tag.getInt("maxMemory").getValue();
+				memoryRange = NbtLoader.switchableLoader(MemoryRange.LOADER).loadFromNbt(tag.getCompound("memoryRange"));
 			} catch (Exception e) {
-				LOGGER.warn("maxMemory load failed: " + e.getMessage());
-				maxMemory = DEFAULT.maxMemory;
+				LOGGER.warn("memoryRange load failed: " + e.getMessage());
+				memoryRange = DEFAULT.memoryRange;
 			}
 			
-			int minMemory;
+			Switchable<List<String>> customJavaArguments;
 			try {
-				minMemory = tag.getInt("minMemory").getValue();
-			} catch (Exception e) {
-				LOGGER.warn("minMemory load failed: " + e.getMessage());
-				minMemory = DEFAULT.minMemory;
-			}
-			
-			boolean useCustomJavaArguments;
-			try {
-				useCustomJavaArguments = tag.getByte("useCustomJavaArguments").getValue() != 0;
-			} catch (Exception e) {
-				LOGGER.warn("useCustomJavaArguments load failed: " + e.getMessage());
-				useCustomJavaArguments = DEFAULT.useCustomJavaArguments;
-			}
-			
-			List<String> customJavaArguments;
-			try {
-				customJavaArguments = NbtLoader.STRING_LIST_LOADER.loadFromNbt(tag.getList("customJavaArguments"));
+				customJavaArguments = NbtLoader.switchableLoader(NbtLoader.STRING_LIST_LOADER).loadFromNbt(tag.getCompound("customJavaArguments"));
 			} catch (Exception e) {
 				LOGGER.warn("customJavaArguments load failed: " + e.getMessage());
-				customJavaArguments = DEFAULT.customJavaArguments;
+				customJavaArguments = DEFAULT.javaArguments;
 			}
 			
 			boolean useWaterMark;
@@ -103,15 +78,15 @@ public class LaunchOptions {
 				windowSize = DEFAULT.windowSize;
 			}
 			
-			ServerInfo serverInfo;
+			Switchable<ServerInfo> serverInfo;
 			try {
-				serverInfo = ServerInfo.LOADER.loadFromNbt(tag.getCompound("serverInfo"));
+				serverInfo = NbtLoader.switchableLoader(ServerInfo.LOADER).loadFromNbt(tag.getCompound("serverInfo"));
 			} catch (Exception e) {
 				LOGGER.warn("serverInfo load failed: " + e.getMessage());
 				serverInfo = DEFAULT.serverInfo;
 			}
 			
-			return new LaunchOptions(autoSelectJavaRuntimes, javaRuntime, maxMemory, minMemory, useCustomJavaArguments, customJavaArguments, useWaterMark, gameDirPolicy, gameDir, windowSize, serverInfo);
+			return new LaunchOptions(javaRuntime, memoryRange, customJavaArguments, useWaterMark, gameDirPolicy, gameDir, windowSize, serverInfo);
 		}
 		
 		@Override
@@ -119,37 +94,19 @@ public class LaunchOptions {
 			CompoundTag tag = new CompoundTag();
 			
 			try {
-				tag.putByte("autoSelectJavaRuntimes", (byte) (object.autoSelectJavaRuntimes ? 1 : 0));
-			} catch (Exception e) {
-				LOGGER.warn("autoSelectJavaRuntimes save failed: " + e.getMessage());
-			}
-			
-			try {
-				tag.putString("javaRuntime", object.javaRuntime.executable().getAbsolutePath());
+				tag.put("javaRuntime", NbtLoader.switchableLoader(JavaRuntime.LOADER).saveToNbt(object.javaRuntime));
 			} catch (Exception e) {
 				LOGGER.warn("javaRuntime save failed: " + e.getMessage());
 			}
 			
 			try {
-				tag.putInt("maxMemory", object.maxMemory);
+				tag.put("maxMemory", NbtLoader.switchableLoader(MemoryRange.LOADER).saveToNbt(object.memoryRange));
 			} catch (Exception e) {
 				LOGGER.warn("maxMemory save failed: " + e.getMessage());
 			}
 			
 			try {
-				tag.putInt("minMemory", object.minMemory);
-			} catch (Exception e) {
-				LOGGER.warn("minMemory save failed: " + e.getMessage());
-			}
-			
-			try {
-				tag.putByte("useCustomJavaArguments", (byte) (object.useCustomJavaArguments ? 1 : 0));
-			} catch (Exception e) {
-				LOGGER.warn("useCustomJavaArguments save failed: " + e.getMessage());
-			}
-			
-			try {
-				tag.put("customJavaArguments", NbtLoader.STRING_LIST_LOADER.saveToNbt(object.customJavaArguments));
+				tag.put("customJavaArguments", NbtLoader.switchableLoader(NbtLoader.STRING_LIST_LOADER).saveToNbt(object.javaArguments));
 			} catch (Exception e) {
 				LOGGER.warn("customJavaArguments save failed: " + e.getMessage());
 			}
@@ -179,7 +136,7 @@ public class LaunchOptions {
 			}
 			
 			try {
-				tag.put("serverInfo", ServerInfo.LOADER.saveToNbt(object.serverInfo));
+				tag.put("serverInfo", NbtLoader.switchableLoader(ServerInfo.LOADER).saveToNbt(object.serverInfo));
 			} catch (Exception e) {
 				LOGGER.warn("serverInfo save failed: " + e.getMessage());
 			}
@@ -188,12 +145,9 @@ public class LaunchOptions {
 		}
 	};
 	public static final LaunchOptions DEFAULT = new LaunchOptions(
-			true,
-			null,
-			2048,
-			0,
-			false,
-			List.of("-XX:+UnlockExperimentalVMOptions", "-XX:+UseG1GC", "-XX:G1NewSizePercent=20", "-XX:G1ReservePercent=20", "-XX:MaxGCPauseMillis=50", "-XX:G1HeapRegionSize=32M"),
+			Switchable.ofDisabled(null),
+			Switchable.ofDisabled(MemoryRange.of(2048)),
+			Switchable.ofDisabled(List.of("-XX:+UnlockExperimentalVMOptions", "-XX:+UseG1GC", "-XX:G1NewSizePercent=20", "-XX:G1ReservePercent=20", "-XX:MaxGCPauseMillis=50", "-XX:G1HeapRegionSize=32M")),
 			false,
 			TargetMinecraftDirectory.Policy.SOURCE,
 			TargetMinecraftDirectory.STANDARD,
@@ -201,36 +155,27 @@ public class LaunchOptions {
 			null
 	);
 	
-	private boolean autoSelectJavaRuntimes;
-	private JavaRuntime javaRuntime;
-	private int maxMemory;
-	private int minMemory;
-	private boolean useCustomJavaArguments;
-	private List<String> customJavaArguments;
+	private Switchable<JavaRuntime> javaRuntime;
+	private Switchable<MemoryRange> memoryRange;
+	private Switchable<List<String>> javaArguments;
 	private boolean useWaterMark;
 	private TargetMinecraftDirectory.Policy gameDirPolicy;
 	private TargetMinecraftDirectory gameDir;
 	private WindowSize windowSize;
-	private ServerInfo serverInfo;
+	private Switchable<ServerInfo> serverInfo;
 	
-	public LaunchOptions(boolean autoSelectJavaRuntimes,
-	                     JavaRuntime javaRuntime,
-						 int maxMemory,
-						 int minMemory,
-						 boolean useCustomJavaArguments,
-						 List<String> customJavaArguments,
+	public LaunchOptions(Switchable<JavaRuntime> javaRuntime,
+	                     Switchable<MemoryRange> memoryRange,
+	                     Switchable<List<String>> javaArguments,
 						 boolean useWaterMark,
 						 TargetMinecraftDirectory.Policy gameDirPolicy,
 	                     TargetMinecraftDirectory gameDir,
 	                     WindowSize windowSize,
-	                     ServerInfo serverInfo) {
-
-		this.autoSelectJavaRuntimes = autoSelectJavaRuntimes;
+	                     Switchable<ServerInfo> serverInfo) {
+		
 		this.javaRuntime = javaRuntime;
-		this.maxMemory = maxMemory;
-		this.minMemory = minMemory;
-		this.useCustomJavaArguments = useCustomJavaArguments;
-		this.customJavaArguments = customJavaArguments;
+		this.memoryRange = memoryRange;
+		this.javaArguments = javaArguments;
 		this.useWaterMark = useWaterMark;
 		this.gameDirPolicy = gameDirPolicy;
 		this.gameDir = gameDir;
@@ -239,28 +184,16 @@ public class LaunchOptions {
 	}
 	
 	// Getters
-	public boolean isAutoSelectJavaRuntimes() {
-		return autoSelectJavaRuntimes;
-	}
-	
-	public JavaRuntime getJavaRuntime() {
+	public Switchable<JavaRuntime> getJavaRuntime() {
 		return javaRuntime;
 	}
 	
-	public int getMaxMemory() {
-		return maxMemory;
+	public Switchable<MemoryRange> getMemoryRange() {
+		return memoryRange;
 	}
 	
-	public int getMinMemory() {
-		return minMemory;
-	}
-	
-	public boolean isUseCustomJavaArguments() {
-		return useCustomJavaArguments;
-	}
-	
-	public List<String> getCustomJavaArguments() {
-		return customJavaArguments;
+	public Switchable<List<String>> getJavaArguments() {
+		return javaArguments;
 	}
 	
 	public boolean isUseWaterMark() {
@@ -279,33 +212,21 @@ public class LaunchOptions {
 		return windowSize;
 	}
 	
-	public ServerInfo getServerInfo() {
+	public Switchable<ServerInfo> getServerInfo() {
 		return serverInfo;
 	}
 	
 	// Setters
-	public void setAutoSelectJavaRuntimes(boolean autoSelectJavaRuntimes) {
-		this.autoSelectJavaRuntimes = autoSelectJavaRuntimes;
-	}
-	
-	public void setJavaRuntime(JavaRuntime javaRuntime) {
+	public void setJavaRuntime(Switchable<JavaRuntime> javaRuntime) {
 		this.javaRuntime = javaRuntime;
 	}
 	
-	public void setMaxMemory(int maxMemory) {
-		this.maxMemory = maxMemory;
+	public void setMemoryRange(Switchable<MemoryRange> memoryRange) {
+		this.memoryRange = memoryRange;
 	}
 	
-	public void setMinMemory(int minMemory) {
-		this.minMemory = minMemory;
-	}
-	
-	public void setUseCustomJavaArguments(boolean useCustomJavaArguments) {
-		this.useCustomJavaArguments = useCustomJavaArguments;
-	}
-	
-	public void setCustomJavaArguments(List<String> customJavaArguments) {
-		this.customJavaArguments = customJavaArguments;
+	public void setJavaArguments(Switchable<List<String>> javaArguments) {
+		this.javaArguments = javaArguments;
 	}
 	
 	public void setUseWaterMark(boolean useWaterMark) {
@@ -324,7 +245,7 @@ public class LaunchOptions {
 		this.windowSize = windowSize;
 	}
 	
-	public void setServerInfo(ServerInfo serverInfo) {
+	public void setServerInfo(Switchable<ServerInfo> serverInfo) {
 		this.serverInfo = serverInfo;
 	}
 }
