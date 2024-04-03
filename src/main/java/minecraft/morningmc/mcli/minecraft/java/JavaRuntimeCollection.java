@@ -38,11 +38,11 @@ public class JavaRuntimeCollection implements Runnable {
 		 * @throws IllegalNbtException If there is an issue with the NBT data.
 		 */
 		@Override
-		public JavaRuntimeCollection loadFromNbt(ListTag<StringTag> tag) throws IllegalNbtException {
+		public JavaRuntimeCollection load(ListTag<StringTag> tag) throws IllegalNbtException {
 			init(tag.getValue().stream()
 					     .flatMap(subTag -> {
 						     try {
-							     return Stream.of(JavaRuntime.LOADER.loadFromNbt(subTag));
+							     return Stream.of(JavaRuntime.LOADER.load(subTag));
 						     } catch (IllegalNbtException e) {
 							     return Stream.empty();
 						     }
@@ -59,11 +59,11 @@ public class JavaRuntimeCollection implements Runnable {
 		 * @return The NBT list tag containing Java runtime paths.
 		 */
 		@Override
-		public ListTag<StringTag> saveToNbt(JavaRuntimeCollection object) {
+		public ListTag<StringTag> save(JavaRuntimeCollection object) {
 			ListTag<StringTag> tag = new ListTag<>();
 			
 			object.runtimes.stream()
-					.map(JavaRuntime.LOADER::saveToNbt)
+					.map(JavaRuntime.LOADER::save)
 					.forEach(tag::add);
 			
 			return tag;
@@ -316,8 +316,8 @@ public class JavaRuntimeCollection implements Runnable {
 				
 				long stopTime = System.currentTimeMillis();
 				
-				LOGGER.debug("Finish searching potential Java runtimes. Found " + potentialRuntimes.size());
-				LOGGER.debug("Used " + (stopTime - startTime) + " ms");
+				LOGGER.info("Finish searching potential Java runtimes. Found " + potentialRuntimes.size());
+				LOGGER.info("Used " + (stopTime - startTime) + " ms");
 				
 				runtimes.addAll(potentialRuntimes);
 				
@@ -326,7 +326,7 @@ public class JavaRuntimeCollection implements Runnable {
 			}
 			
 			// list found runtimes
-			LOGGER.debug("Found " + get().size() + " Java runtimes in total:");
+			LOGGER.debug("Found " + runtimes.size() + " Java runtimes in total:");
 			for (JavaRuntime runtime : runtimes) {
 				LOGGER.debug(runtime.toString());
 			}

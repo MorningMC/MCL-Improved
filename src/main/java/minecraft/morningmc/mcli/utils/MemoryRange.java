@@ -22,7 +22,7 @@ public record MemoryRange(int minimum, int maximum) {
 		 * @return The loaded {@code MemoryRange} object, or null if an error occurs.
 		 */
 		@Override
-		public MemoryRange loadFromNbt(CompoundTag tag) throws IllegalNbtException {
+		public MemoryRange load(CompoundTag tag) throws IllegalNbtException {
 			int minimum = tag.getInt("minimum").getValue();
 			int maximum = tag.getInt("maximum").getValue();
 			
@@ -36,7 +36,7 @@ public record MemoryRange(int minimum, int maximum) {
 		 * @return The NBT compound tag representing the {@code MemoryRange} object.
 		 */
 		@Override
-		public CompoundTag saveToNbt(MemoryRange object) {
+		public CompoundTag save(MemoryRange object) {
 			CompoundTag tag = new CompoundTag();
 			
 			tag.putInt("minimum", object.minimum);

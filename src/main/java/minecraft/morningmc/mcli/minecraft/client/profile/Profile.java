@@ -4,7 +4,7 @@ import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
 import minecraft.morningmc.mcli.minecraft.client.directory.TargetMinecraftDirectory;
 import minecraft.morningmc.mcli.minecraft.client.Version;
 import minecraft.morningmc.mcli.minecraft.launch.LaunchOptions;
-import minecraft.morningmc.mcli.utils.Switchable;
+import minecraft.morningmc.mcli.utils.containers.Switchable;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
@@ -28,18 +28,18 @@ public class Profile implements Comparable<Profile> {
 	public static final NbtLoader<Profile, CompoundTag> LOADER = new NbtLoader<>() {
 		
 		@Override
-		public Profile loadFromNbt(CompoundTag tag) throws IllegalNbtException {
+		public Profile load(CompoundTag tag) throws IllegalNbtException {
 			String name = tag.getString("name").getValue();
 			String icon = tag.getString("icon").getValue();
 			Version.Policy versionPolicy = Version.Policy.valueOf(tag.getString("versionPolicy").getValue());
-			Version version = Version.LOADER.loadFromNbt(tag.getCompound("version"));
-			Switchable<LaunchOptions> options = NbtLoader.switchableLoader(LaunchOptions.LOADER).loadFromNbt(tag.getCompound("options"));
+			Version version = Version.LOADER.load(tag.getCompound("version"));
+			Switchable<LaunchOptions> options = NbtLoader.switchableLoader(LaunchOptions.LOADER).load(tag.getCompound("options"));
 			
 			return new Profile(name, icon, versionPolicy, version, options);
 		}
 		
 		@Override
-		public CompoundTag saveToNbt(Profile object) {
+		public CompoundTag save(Profile object) {
 			CompoundTag tag = new CompoundTag();
 			
 			if (object == null) {
@@ -49,8 +49,8 @@ public class Profile implements Comparable<Profile> {
 			tag.putString("name", object.name);
 			tag.putString("icon", object.icon);
 			tag.putString("versionPolicy", object.versionPolicy.name());
-			tag.put("version", Version.LOADER.saveToNbt(object.version));
-			tag.put("options", NbtLoader.switchableLoader(LaunchOptions.LOADER).saveToNbt(object.options));
+			tag.put("version", Version.LOADER.save(object.version));
+			tag.put("options", NbtLoader.switchableLoader(LaunchOptions.LOADER).save(object.options));
 			
 			return tag;
 		}

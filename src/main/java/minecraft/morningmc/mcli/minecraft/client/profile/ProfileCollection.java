@@ -32,11 +32,11 @@ public class ProfileCollection {
 		 * @throws IllegalNbtException If the NBT data is invalid or missing required information.
 		 */
 		@Override
-		public ProfileCollection loadFromNbt(ListTag<CompoundTag> tag) throws IllegalNbtException {
+		public ProfileCollection load(ListTag<CompoundTag> tag) throws IllegalNbtException {
 			init(tag.getValue().stream()
 					     .flatMap(subTag -> {
 						     try {
-							     return Stream.of(Profile.LOADER.loadFromNbt(subTag));
+							     return Stream.of(Profile.LOADER.load(subTag));
 						     } catch (IllegalNbtException e) {
 							     LOGGER.warn("Failed to load profile from NBT: " + e.getMessage());
 							     return Stream.empty();
@@ -53,11 +53,11 @@ public class ProfileCollection {
 		 * @return The list of NBT compound tags representing profiles.
 		 */
 		@Override
-		public ListTag<CompoundTag> saveToNbt(ProfileCollection object) {
+		public ListTag<CompoundTag> save(ProfileCollection object) {
 			ListTag<CompoundTag> tag = new ListTag<>();
 			
 			object.profiles.values().stream()
-					.map(Profile.LOADER::saveToNbt)
+					.map(Profile.LOADER::save)
 					.forEach(tag::add);
 			
 			return tag;

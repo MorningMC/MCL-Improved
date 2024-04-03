@@ -55,7 +55,7 @@ public class Startup {
      *
      * @param args Command-line arguments.
      */
-    private void run(String... args) {
+    private void run(String... args) throws Throwable {
         Application.launch(Main.class, args);
     }
 }

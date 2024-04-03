@@ -21,7 +21,6 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.HashMap;
 
 /**
  * The Main class represents the main entry point for the Minecraft launcher application.
@@ -62,14 +61,14 @@ public class Main extends Application {
 		}
 		
 		try {
-			ProfileCollection.LOADER.loadFromNbt(config.getList("profileCollection"));
+			ProfileCollection.LOADER.load(config.getList("profileCollection"));
 		} catch (Exception e) {
 			LOGGER.warn("Failed to load profileCollection: " + e.getMessage());
 			ProfileCollection.init(Set.of());
 		}
 		
 		try {
-			JavaRuntimeCollection.LOADER.loadFromNbt(config.getList("javaRuntimeCollection"));
+			JavaRuntimeCollection.LOADER.load(config.getList("javaRuntimeCollection"));
 		} catch (Exception e) {
 			LOGGER.warn("Failed to load javaRuntimeCollection: " + e.getMessage());
 			JavaRuntimeCollection.init(Set.of());
@@ -77,7 +76,7 @@ public class Main extends Application {
 		JavaRuntimeCollection.search();
 		
 		try {
-			launcher = Launcher.LOADER.loadFromNbt(config.getCompound("launcher"));
+			launcher = Launcher.LOADER.load(config.getCompound("launcher"));
 		} catch (Exception e) {
 			LOGGER.warn("Failed to load launcher: " + e.getMessage());
 			launcher = new Launcher(LaunchOptions.DEFAULT, null);
@@ -122,9 +121,9 @@ public class Main extends Application {
 		// Save config
 		CompoundTag config = new CompoundTag();
 		
-		config.put("profileCollection", ProfileCollection.LOADER.saveToNbt(ProfileCollection.instance));
-		config.put("javaRuntimeCollection", JavaRuntimeCollection.LOADER.saveToNbt(JavaRuntimeCollection.instance));
-		config.put("launcher", Launcher.LOADER.saveToNbt(launcher));
+		config.put("profileCollection", ProfileCollection.LOADER.save(ProfileCollection.instance));
+		config.put("javaRuntimeCollection", JavaRuntimeCollection.LOADER.save(JavaRuntimeCollection.instance));
+		config.put("launcher", Launcher.LOADER.save(launcher));
 		
 		try {
 			new Nbt().toFile(config, FileMetadata.CONFIG);

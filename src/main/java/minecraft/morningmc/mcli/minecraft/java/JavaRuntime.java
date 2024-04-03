@@ -25,7 +25,7 @@ public record JavaRuntime(File executable, int version, Platform platform) imple
 	public static final NbtLoader<JavaRuntime, StringTag> LOADER = new NbtLoader<>() {
 		
 		@Override
-		public JavaRuntime loadFromNbt(StringTag tag) throws IllegalNbtException {
+		public JavaRuntime load(StringTag tag) throws IllegalNbtException {
 			try {
 				return JavaRuntime.fromPath(new File(tag.getValue()));
 			} catch (IllegalJavaException e) {
@@ -35,7 +35,7 @@ public record JavaRuntime(File executable, int version, Platform platform) imple
 		}
 
 		@Override
-		public StringTag saveToNbt(JavaRuntime object) {
+		public StringTag save(JavaRuntime object) {
 			return new StringTag(object.executable.getAbsolutePath());
 		}
 	};

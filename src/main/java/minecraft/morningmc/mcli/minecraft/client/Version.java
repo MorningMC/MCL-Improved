@@ -11,12 +11,12 @@ public class Version {
 	public static final NbtLoader<Version, CompoundTag> LOADER = new NbtLoader<>() {
 		
 		@Override
-		public Version loadFromNbt(CompoundTag tag) throws IllegalNbtException {
+		public Version load(CompoundTag tag) throws IllegalNbtException {
 			return null;
 		}
 		
 		@Override
-		public CompoundTag saveToNbt(Version object) {
+		public CompoundTag save(Version object) {
 			return null;
 		}
 	};

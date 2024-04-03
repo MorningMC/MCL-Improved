@@ -20,9 +20,9 @@ public record LaunchArguments(LaunchOptions options, Profile profile) {
 	public File getDirectory() {
 		TargetMinecraftDirectory directory;
 		
-		switch (options.getGameDirPolicy()) {
+		switch (options.gameDirPolicy().get()) {
 			case ISOLATED -> directory = new TargetMinecraftDirectory(new File(TargetMinecraftDirectory.ISOLATE_ROOT, profile.getName()));
-			case CUSTOM -> directory = options.getGameDir();
+			case CUSTOM -> directory = options.gameDir().get();
 			case STANDARD -> directory = TargetMinecraftDirectory.STANDARD;
 			default -> directory = profile.getVersion().getSource().toTarget();
 		}

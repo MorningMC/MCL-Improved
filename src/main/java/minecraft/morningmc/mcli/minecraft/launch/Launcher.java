@@ -12,6 +12,8 @@ import org.apache.logging.log4j.Logger;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
 
+import java.util.*;
+
 /**
  * The Launcher class is responsible for launching the Minecraft client with specified options and profiles.
  */
@@ -29,8 +31,8 @@ public class Launcher {
 		 * @throws IllegalNbtException If the NBT data is invalid or missing required information.
 		 */
 		@Override
-		public Launcher loadFromNbt(CompoundTag tag) throws IllegalNbtException {
-			LaunchOptions options = LaunchOptions.LOADER.loadFromNbt(tag.getCompound("options"));
+		public Launcher load(CompoundTag tag) throws IllegalNbtException {
+			LaunchOptions options = LaunchOptions.LOADER.load(tag.getCompound("options"));
 			
 			Profile profile;
 			try {
@@ -50,7 +52,7 @@ public class Launcher {
 		 * @return The NBT compound tag representing the Launcher object.
 		 */
 		@Override
-		public CompoundTag saveToNbt(Launcher object) {
+		public CompoundTag save(Launcher object) {
 			CompoundTag tag = new CompoundTag();
 			
 			try {
@@ -59,7 +61,7 @@ public class Launcher {
 				LOGGER.warn("Failed to save profile: " + e.getMessage());
 			}
 			
-			tag.put("options", LaunchOptions.LOADER.saveToNbt(object.options));
+			tag.put("options", LaunchOptions.LOADER.save(object.options));
 			
 			return tag;
 		}
@@ -108,15 +110,20 @@ public class Launcher {
 	 * @throws LaunchException If there is an issue launching the Minecraft client.
 	 */
 	private ProcessListener launch(LaunchArguments arguments) throws LaunchException {
-		if (arguments == null) {
-			throw new NullPointerException("LaunchArguments cannot be null");
+		Objects.requireNonNull(arguments);
+		
+		LOGGER.info("Launching Minecraft...");
+		
+		List<String> commandline = arguments.generateCommandline();
+		LOGGER.info("Commandline: ");
+		for (String arg : commandline) {
+			LOGGER.info(arg + ",");
 		}
 		
-		ProcessBuilder builder = new ProcessBuilder(arguments.generateCommandline());
+		ProcessBuilder builder = new ProcessBuilder(commandline);
 		builder.directory(arguments.getDirectory());
 		
 		Process process;
-		
 		try {
 			process = builder.start();
 		} catch (Exception e) {

@@ -31,14 +31,9 @@ public class FileMetadata {
 	 * @return The root directory for application data.
 	 */
 	private static File resolveAppData() {
-		String appData = System.getenv("AppData");
-		if (appData != null) {
-			return new File(appData);
-		}
-		
 		try {
 			return switch (Platform.CURRENT.operatingSystem()) {
-				case WINDOWS -> new File(System.getenv("UserProfile") != null ? System.getenv("UserProfile") : System.getProperty("user.home"), "AppData/Roaming");
+				case WINDOWS -> new File(System.getenv("AppData"));
 				case MACOS -> new File(System.getProperty("user.home"), "Library/Application Support");
 				case LINUX -> new File(System.getProperty("user.home"), ".config");
 				default -> new File(".");

@@ -19,7 +19,7 @@ public record ServerInfo(String host, int port) {
 		 * @return The loaded {@code ServerInfo} object, or null if an error occurs.
 		 */
 		@Override
-		public ServerInfo loadFromNbt(CompoundTag tag) throws IllegalNbtException {
+		public ServerInfo load(CompoundTag tag) throws IllegalNbtException {
 			try {
 				String host = tag.getString("host").getValue();
 				int port = tag.getInt("port").getValue();
@@ -37,7 +37,7 @@ public record ServerInfo(String host, int port) {
 		 * @return The NBT compound tag representing the {@code ServerInfo} object.
 		 */
 		@Override
-		public CompoundTag saveToNbt(ServerInfo object) {
+		public CompoundTag save(ServerInfo object) {
 			CompoundTag tag = new CompoundTag();
 			
 			if (object == null) {
@@ -57,7 +57,7 @@ public record ServerInfo(String host, int port) {
 	 * @param host The host of the Minecraft server.
 	 * @return A new {@code ServerInfo} object.
 	 */
-	private static ServerInfo of(String host) {
+	public static ServerInfo of(String host) {
 		return of(host, 25565);
 	}
 	

@@ -23,7 +23,7 @@ public record WindowSize(boolean fullScreen,
 		 * @throws IllegalNbtException If there is an issue with the NBT data.
 		 */
 		@Override
-		public WindowSize loadFromNbt(CompoundTag tag) throws IllegalNbtException {
+		public WindowSize load(CompoundTag tag) throws IllegalNbtException {
 			try {
 				boolean fullScreen = tag.getByte("fullScreen").getValue() != 0;
 				int width = tag.getInt("width").getValue();
@@ -42,7 +42,7 @@ public record WindowSize(boolean fullScreen,
 		 * @return The resulting CompoundTag.
 		 */
 		@Override
-		public CompoundTag saveToNbt(WindowSize object) {
+		public CompoundTag save(WindowSize object) {
 			CompoundTag tag = new CompoundTag();
 			
 			if (object == null) {

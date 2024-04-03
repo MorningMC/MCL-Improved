@@ -1,6 +1,6 @@
 package minecraft.morningmc.mcli.utils.interfaces;
 
-import minecraft.morningmc.mcli.utils.Switchable;
+import minecraft.morningmc.mcli.utils.containers.Switchable;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 
 import dev.dewy.nbt.api.Tag;
@@ -29,7 +29,7 @@ public interface NbtLoader<C, T extends Tag> {
 		 * @throws IllegalNbtException If there is an issue with the NBT data.
 		 */
 		@Override
-		public List<String> loadFromNbt(ListTag<StringTag> tag) throws IllegalNbtException {
+		public List<String> load(ListTag<StringTag> tag) throws IllegalNbtException {
 			return tag.getValue().stream().map(StringTag::getValue).toList();
 		}
 		
@@ -40,7 +40,7 @@ public interface NbtLoader<C, T extends Tag> {
 		 * @return The NBT list tag containing string elements.
 		 */
 		@Override
-		public ListTag<StringTag> saveToNbt(List<String> object) {
+		public ListTag<StringTag> save(List<String> object) {
 			ListTag<StringTag> tag = new ListTag<>();
 			
 			for (String s : object) {
@@ -71,9 +71,9 @@ public interface NbtLoader<C, T extends Tag> {
 			 * @throws IllegalNbtException If there is an issue with the NBT data.
 			 */
 			@Override
-			public Switchable<C> loadFromNbt(CompoundTag tag) throws IllegalNbtException {
+			public Switchable<C> load(CompoundTag tag) throws IllegalNbtException {
 				boolean enabled = tag.getByte("enabled").getValue() != 0;
-				C value = loader.loadFromNbt(tag.get("value"));
+				C value = loader.load(tag.get("value"));
 				
 				return Switchable.of(value, enabled);
 			}
@@ -85,11 +85,11 @@ public interface NbtLoader<C, T extends Tag> {
 			 * @return The NBT tag containing the saved data.
 			 */
 			@Override
-			public CompoundTag saveToNbt(Switchable<C> object) {
+			public CompoundTag save(Switchable<C> object) {
 				CompoundTag tag = new CompoundTag();
 				
 				tag.putByte("enabled", (byte) (object.isEnabled() ? 1 : 0));
-				tag.put("value", loader.saveToNbt(object.get()));
+				tag.put("value", loader.save(object.get()));
 				
 				return tag;
 			}
@@ -103,7 +103,7 @@ public interface NbtLoader<C, T extends Tag> {
 	 * @return The loaded object.
 	 * @throws IllegalNbtException If there is an issue with the NBT data.
 	 */
-	C loadFromNbt(T tag) throws IllegalNbtException;
+	C load(T tag) throws IllegalNbtException;
 	
 	/**
 	 * Save an object to an NBT tag.
@@ -111,5 +111,5 @@ public interface NbtLoader<C, T extends Tag> {
 	 * @param object The object to be saved.
 	 * @return The NBT tag containing the saved data.
 	 */
-	T saveToNbt(C object);
+	T save(C object);
 }

@@ -1,4 +1,4 @@
-package minecraft.morningmc.mcli.utils;
+package minecraft.morningmc.mcli.utils.containers;
 
 /**
  * A container object that allows to switch on or off and modify the value at the same time.
