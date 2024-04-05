@@ -16,6 +16,18 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.util.*;
 
+/**
+ * Represents the options used for launching Minecraft.
+ *
+ * @param javaRuntime The {@code Switchable} object for Java runtime.
+ * @param memoryRange The {@code Switchable} object for memory range.
+ * @param javaArguments The {@code Switchable} object for Java arguments.
+ * @param useWaterMark The {@code Modifiable} object for whether to use the watermark.
+ * @param gameDirPolicy The {@code Modifiable} object for the game directory policy.
+ * @param gameDir The {@code Modifiable} object for the game directory.
+ * @param windowSize The {@code Modifiable} object for the window size.
+ * @param serverInfo The {@code Switchable} object for the server info.
+ */
 public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
                              Switchable<MemoryRange> memoryRange,
                              Switchable<List<String>> javaArguments,
@@ -47,12 +59,12 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 				memoryRange = DEFAULT.memoryRange;
 			}
 			
-			Switchable<List<String>> customJavaArguments;
+			Switchable<List<String>> javaArguments;
 			try {
-				customJavaArguments = NbtLoader.switchableLoader(NbtLoader.STRING_LIST_LOADER).load(tag.getCompound("customJavaArguments"));
+				javaArguments = NbtLoader.switchableLoader(NbtLoader.STRING_LIST_LOADER).load(tag.getCompound("javaArguments"));
 			} catch (Exception e) {
-				LOGGER.warn("customJavaArguments load failed: " + e.getMessage());
-				customJavaArguments = DEFAULT.javaArguments;
+				LOGGER.warn("javaArguments load failed: " + e.getMessage());
+				javaArguments = DEFAULT.javaArguments;
 			}
 			
 			Modifiable<Boolean> useWaterMark;
@@ -95,7 +107,7 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 				serverInfo = DEFAULT.serverInfo;
 			}
 			
-			return new LaunchOptions(javaRuntime, memoryRange, customJavaArguments, useWaterMark, gameDirPolicy, gameDir, windowSize, serverInfo);
+			return new LaunchOptions(javaRuntime, memoryRange, javaArguments, useWaterMark, gameDirPolicy, gameDir, windowSize, serverInfo);
 		}
 		
 		@Override
@@ -109,15 +121,15 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			}
 			
 			try {
-				tag.put("maxMemory", NbtLoader.switchableLoader(MemoryRange.LOADER).save(object.memoryRange));
+				tag.put("memoryRange", NbtLoader.switchableLoader(MemoryRange.LOADER).save(object.memoryRange));
 			} catch (Exception e) {
-				LOGGER.warn("maxMemory save failed: " + e.getMessage());
+				LOGGER.warn("memoryRange save failed: " + e.getMessage());
 			}
 			
 			try {
-				tag.put("customJavaArguments", NbtLoader.switchableLoader(NbtLoader.STRING_LIST_LOADER).save(object.javaArguments));
+				tag.put("javaArguments", NbtLoader.switchableLoader(NbtLoader.STRING_LIST_LOADER).save(object.javaArguments));
 			} catch (Exception e) {
-				LOGGER.warn("customJavaArguments save failed: " + e.getMessage());
+				LOGGER.warn("javaArguments save failed: " + e.getMessage());
 			}
 			
 			try {
@@ -153,6 +165,8 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			return tag;
 		}
 	};
+	
+	/** The default launch options. */
 	public static final LaunchOptions DEFAULT = new LaunchOptions(
 			Switchable.ofDisabled(JavaRuntime.CURRENT),
 			Switchable.ofDisabled(MemoryRange.of(2048)),

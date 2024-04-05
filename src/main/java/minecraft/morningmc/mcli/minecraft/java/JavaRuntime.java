@@ -29,8 +29,7 @@ public record JavaRuntime(File executable, int version, Platform platform) imple
 			try {
 				return JavaRuntime.fromPath(new File(tag.getValue()));
 			} catch (IllegalJavaException e) {
-				LOGGER.warn("Failed to load Java runtime from NBT: " + e.getMessage());
-				return null;
+				throw new IllegalNbtException(e);
 			}
 		}
 

@@ -6,7 +6,7 @@ package minecraft.morningmc.mcli.utils.containers;
  * @param <T> The type of the value.
  */
 public class Modifiable<T> {
-	private T value;
+	protected T value;
 	
 	/**
 	 * Constructs a new {@code Modifiable} instance with the specified initial value.

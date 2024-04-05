@@ -5,8 +5,7 @@ package minecraft.morningmc.mcli.utils.containers;
  *
  * @param <T> The type of the value.
  */
-public class Switchable <T> {
-	private T value;
+public class Switchable<T> extends Modifiable<T> {
 	private boolean enabled;
 	
 	/**
@@ -16,7 +15,7 @@ public class Switchable <T> {
 	 * @param enabled Whether the {@code Switchable} object is enabled.
 	 */
 	private Switchable(T value, boolean enabled) {
-		this.value = value;
+		super(value);
 		this.enabled = enabled;
 	}
 	
@@ -58,15 +57,6 @@ public class Switchable <T> {
 	}
 	
 	/**
-	 * Gets the value of the {@code Switchable} object.
-	 *
-	 * @return The value of the {@code Switchable} object.
-	 */
-	public T get() {
-		return value;
-	}
-	
-	/**
 	 * Returns the value of the {@code Switchable} object if it is enabled,
 	 * or null otherwise.
 	 * <p>
@@ -94,15 +84,6 @@ public class Switchable <T> {
 	}
 	
 	/**
-	 * Modifies the value of the {@code Switchable} object.
-	 *
-	 * @param value The new value to be stored in the {@code Switchable} object.
-	 */
-	public void modify(T value) {
-		this.value = value;
-	}
-	
-	/**
 	 * Returns whether the {@code Switchable} object is enabled.
 	 *
 	 * @return Whether the {@code Switchable} object is enabled.
@@ -116,7 +97,7 @@ public class Switchable <T> {
 	 *
 	 * @param enabled Whether the {@code Switchable} object should be enabled.
 	 */
-	public void switchEnabled(boolean enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 }

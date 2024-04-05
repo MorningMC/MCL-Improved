@@ -44,10 +44,10 @@ public class JavaRuntimeCollection implements Runnable {
 						     try {
 							     return Stream.of(JavaRuntime.LOADER.load(subTag));
 						     } catch (IllegalNbtException e) {
+								 LOGGER.warn("Failed to load Java runtime from NBT: " + e.getMessage());
 							     return Stream.empty();
 						     }
 					     })
-					     .filter(Objects::nonNull)
 					     .collect(Collectors.toSet()));
 			return instance;
 		}
@@ -128,11 +128,7 @@ public class JavaRuntimeCollection implements Runnable {
 	 * @return {@code true} if the search is ongoing, {@code false} otherwise.
 	 */
 	public static boolean isSearching() {
-		if (instance.thread == null) {
-			return false;
-		}
-		
-		return instance.thread.isAlive();
+		return instance.thread != null && instance.thread.isAlive();
 	}
 	
 	/**
@@ -181,15 +177,17 @@ public class JavaRuntimeCollection implements Runnable {
 								.flatMap(programFile -> Stream.of("Java", "BellSoft", "AdoptOpenJDK", "Zulu", "Microsoft", "Eclipse Foundation", "Semeru")
 										                         .map(vendor -> new File(programFile, vendor)))
 								.flatMap(JavaRuntimeCollection::listDirectories)
+								.parallel()
 								.flatMap(JavaRuntimeCollection::parseHome)
 								.forEach(potentialRuntimes::add);
 					}
 					
 					case LINUX -> Stream.of("/usr/java", "/usr/lib/jvm", "/usr/lib32/jvm")
-										.map(File::new)
-										.flatMap(JavaRuntimeCollection::listDirectories)
-										.flatMap(JavaRuntimeCollection::parseHome)
-										.forEach(potentialRuntimes::add);
+							              .map(File::new)
+							              .flatMap(JavaRuntimeCollection::listDirectories)
+							              .parallel()
+							              .flatMap(JavaRuntimeCollection::parseHome)
+							              .forEach(potentialRuntimes::add);
 					
 					case MACOS -> {
 						try {
@@ -292,12 +290,12 @@ public class JavaRuntimeCollection implements Runnable {
 				// PATH
 				try {
 					Arrays.stream(System.getenv("PATH").split(Platform.CURRENT.pathSeparator()))
+							.parallel()
 							.map(File::new)
 							.filter(bin -> bin.getName().equals("bin"))
 							.map(bin -> new File(bin, JavaRuntime.JAVA))
 							.flatMap(executable -> {
 								LOGGER.trace("Query executable in PATH: " + executable);
-								
 								try {
 									return Stream.of(JavaRuntime.fromPath(executable));
 								} catch (IllegalJavaException e) {

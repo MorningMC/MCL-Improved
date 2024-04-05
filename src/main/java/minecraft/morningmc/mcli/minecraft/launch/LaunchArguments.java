@@ -17,17 +17,15 @@ public record LaunchArguments(LaunchOptions options, Profile profile) {
 		return List.of();
 	}
 	
-	public File getDirectory() {
-		TargetMinecraftDirectory directory;
-		
-		switch (options.gameDirPolicy().get()) {
-			case ISOLATED -> directory = new TargetMinecraftDirectory(new File(TargetMinecraftDirectory.ISOLATE_ROOT, profile.getName()));
-			case CUSTOM -> directory = options.gameDir().get();
-			case STANDARD -> directory = TargetMinecraftDirectory.STANDARD;
-			default -> directory = profile.getVersion().getSource().toTarget();
-		}
+	public TargetMinecraftDirectory getDirectory() {
+		TargetMinecraftDirectory directory = switch (options.gameDirPolicy().get()) {
+			case ISOLATED -> new TargetMinecraftDirectory(new File(TargetMinecraftDirectory.ISOLATE_ROOT, profile.getName()));
+			case CUSTOM -> options.gameDir().get();
+			case STANDARD -> TargetMinecraftDirectory.STANDARD;
+			default -> profile.getVersion().getSource().toTarget();
+		};
 		
 		directory.getRoot().mkdirs();
-		return directory.getRoot();
+		return directory;
 	}
 }
