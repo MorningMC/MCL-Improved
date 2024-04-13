@@ -1,5 +1,10 @@
 package minecraft.morningmc.mcli.utils.containers;
 
+import dev.dewy.nbt.api.Tag;
+import dev.dewy.nbt.tags.collection.CompoundTag;
+import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
+import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
+
 /**
  * A container object that allows to switch on or off and modify the value at the same time.
  *
@@ -54,6 +59,51 @@ public class Switchable<T> extends Modifiable<T> {
 	 */
 	public static <T> Switchable<T> ofDisabled(T value) {
 		return new Switchable<>(value, false);
+	}
+	
+	/**
+	 * Creates a {@code Switchable} loader from a loader.
+	 *
+	 * @param loader The loader to be wrapped in a {@code Switchable} loader.
+	 * @return The {@code Switchable} loader.
+	 *
+	 * @param <C> The type of the value.
+	 * @param <T> The type of the NBT tag.
+	 */
+	public static <C, T extends Tag> NbtLoader<Switchable<C>, CompoundTag> generateLoader(NbtLoader<C, T> loader) {
+		return new NbtLoader<>() {
+			
+			/**
+			 * Load a {@code Switchable} object from an NBT tag.
+			 *
+			 * @param tag The NBT tag containing data to be loaded.
+			 * @return The loaded {@code Switchable} object.
+			 * @throws IllegalNbtException If there is an issue with the NBT data.
+			 */
+			@Override
+			public Switchable<C> load(CompoundTag tag) throws IllegalNbtException {
+				boolean enabled = tag.getByte("enabled").getValue() != 0;
+				C value = loader.load(tag.get("value"));
+				
+				return of(value, enabled);
+			}
+			
+			/**
+			 * Save a {@code Switchable} object to an NBT tag.
+			 *
+			 * @param object The object to be saved.
+			 * @return The NBT tag containing the saved data.
+			 */
+			@Override
+			public CompoundTag save(Switchable<C> object) {
+				CompoundTag tag = new CompoundTag();
+				
+				tag.putByte("enabled", (byte) (object.isEnabled() ? 1 : 0));
+				tag.put("value", loader.save(object.get()));
+				
+				return tag;
+			}
+		};
 	}
 	
 	/**

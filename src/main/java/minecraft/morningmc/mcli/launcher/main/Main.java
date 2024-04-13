@@ -1,5 +1,6 @@
 package minecraft.morningmc.mcli.launcher.main;
 
+import minecraft.morningmc.mcli.launcher.GlobalSettings;
 import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
 import minecraft.morningmc.mcli.launcher.metadata.LauncherMetadata;
 import minecraft.morningmc.mcli.minecraft.java.JavaRuntimeCollection;
@@ -58,6 +59,13 @@ public class Main extends Application {
 		} catch (IOException e) {
 			LOGGER.warn("Failed to load config: " + e.getMessage());
 			config = new CompoundTag();
+		}
+		
+		try {
+			GlobalSettings.LOADER.load(config.getCompound("globalSettings"));
+		} catch (Exception e) {
+			LOGGER.warn("Failed to load globalSettings: " + e.getMessage());
+			GlobalSettings.init(GlobalSettings.DEFAULT);
 		}
 		
 		try {
@@ -121,6 +129,7 @@ public class Main extends Application {
 		// Save config
 		CompoundTag config = new CompoundTag();
 		
+		config.put("globalSettings", GlobalSettings.LOADER.save(GlobalSettings.instance));
 		config.put("profileCollection", ProfileCollection.LOADER.save(ProfileCollection.instance));
 		config.put("javaRuntimeCollection", JavaRuntimeCollection.LOADER.save(JavaRuntimeCollection.instance));
 		config.put("launcher", Launcher.LOADER.save(launcher));

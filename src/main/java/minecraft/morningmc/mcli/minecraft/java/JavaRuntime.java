@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 /**
  * Represents a Java runtime, providing methods for retrieving Java version and executable information.
  */
-public record JavaRuntime(File executable, int version, Platform platform) implements Comparable<JavaRuntime> {
+public record JavaRuntime(File executable, Runtime.Version version, Platform platform) implements Comparable<JavaRuntime> {
 	private static final Logger LOGGER = LogManager.getLogger();
 	
 	/** NbtLoader for loading and saving {@code JavaRuntime} objects from/to NBT data. */
@@ -76,17 +76,22 @@ public record JavaRuntime(File executable, int version, Platform platform) imple
 			throw new IllegalJavaException(path);
 		}
 		
-		return new JavaRuntime(
-				path, parseVersion(getProperty(content, "java.version")),
-				new Platform(
-						Platform.OperatingSystem.infer(getProperty(content, "os.name")),
-						Platform.Architecture.infer(getProperty(content, "sun.arch.data.model"), getProperty(content, "os.arch")),
-						getProperty(content, "file.separator"),
-						getProperty(content, "path.separator"),
-						getProperty(content, "line.separator"),
-						Platform.inferEncoding(getProperty(content, "sun.jnu.encoding"))
-				)
-		);
+		try {
+			return new JavaRuntime(
+					path,
+					Runtime.Version.parse(Objects.requireNonNull(getProperty(content, "java.version"))),
+					new Platform(
+							Platform.OperatingSystem.infer(getProperty(content, "os.name")),
+							Platform.Architecture.infer(getProperty(content, "sun.arch.data.model"), getProperty(content, "os.arch")),
+							getProperty(content, "file.separator"),
+							getProperty(content, "path.separator"),
+							getProperty(content, "line.separator"),
+							Platform.inferEncoding(getProperty(content, "sun.jnu.encoding"))
+					)
+			);
+		} catch (Exception e) {
+			throw new IllegalJavaException(path, e);
+		}
 	}
 	
 	/**
@@ -188,7 +193,7 @@ public record JavaRuntime(File executable, int version, Platform platform) imple
 	// Overrides
 	@Override
 	public String toString() {
-		return "Java " + (version >= 0 ? version : "?") + " (" + executable.getAbsolutePath() + ", " + platform + ")";
+		return "Java " + version.toString() + " (" + executable.getAbsolutePath() + ", " + platform + ")";
 	}
 	
 	@Override
@@ -212,6 +217,6 @@ public record JavaRuntime(File executable, int version, Platform platform) imple
 	
 	@Override
 	public int compareTo(JavaRuntime o) {
-		return version - o.version;
+		return version.compareTo(o.version);
 	}
 }

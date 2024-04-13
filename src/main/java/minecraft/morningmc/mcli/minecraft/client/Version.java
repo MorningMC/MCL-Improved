@@ -6,8 +6,13 @@ import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import dev.dewy.nbt.tags.collection.CompoundTag;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
-public class Version {
-	/** NbtLoader for loading and saving {@code Version} objects from/to NBT data. */
+public record Version(SourceMinecraftDirectory source,
+					  String version,
+                      Type type,
+                      String mainClass) {
+	/**
+	 * NbtLoader for loading and saving {@code Version} objects from/to NBT data.
+	 */
 	public static final NbtLoader<Version, CompoundTag> LOADER = new NbtLoader<>() {
 		
 		@Override
@@ -21,18 +26,8 @@ public class Version {
 		}
 	};
 	
-	public final SourceMinecraftDirectory source;
 	
-	public Version(SourceMinecraftDirectory source) {
-		this.source = source;
-	}
-	
-	// Getters
-	public SourceMinecraftDirectory getSource() {
-		return source;
-	}
-	
-	public enum Policy {
+	public enum Type {
 		RELEASE, SNAPSHOT, CUSTOM
 	}
 }

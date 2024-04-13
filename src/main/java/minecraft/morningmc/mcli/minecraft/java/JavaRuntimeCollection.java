@@ -39,7 +39,7 @@ public class JavaRuntimeCollection implements Runnable {
 		 */
 		@Override
 		public JavaRuntimeCollection load(ListTag<StringTag> tag) throws IllegalNbtException {
-			init(tag.getValue().stream()
+			init(tag.getValue().parallelStream()
 					     .flatMap(subTag -> {
 						     try {
 							     return Stream.of(JavaRuntime.LOADER.load(subTag));
@@ -62,7 +62,7 @@ public class JavaRuntimeCollection implements Runnable {
 		public ListTag<StringTag> save(JavaRuntimeCollection object) {
 			ListTag<StringTag> tag = new ListTag<>();
 			
-			object.runtimes.stream()
+			object.runtimes.parallelStream()
 					.map(JavaRuntime.LOADER::save)
 					.forEach(tag::add);
 			

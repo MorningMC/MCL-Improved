@@ -66,7 +66,7 @@ public class ProfileCollection {
 	
 	public static ProfileCollection instance = null;
 	
-	private final Map<String, Profile> profiles = new HashMap<>();
+	private final Map<UUID, Profile> profiles = new HashMap<>();
 	
 	/**
 	 * Initializes the ProfileCollection with the given profiles.
@@ -99,7 +99,7 @@ public class ProfileCollection {
 	 * @param profile The profile to be added.
 	 */
 	public static void add(Profile profile) {
-		instance.profiles.put(profile.getName(), profile);
+		instance.profiles.put(profile.getUUID(), profile);
 	}
 	
 	/**
@@ -108,16 +108,16 @@ public class ProfileCollection {
 	 * @param profile The profile to be removed.
 	 */
 	public static void remove(Profile profile) {
-		instance.profiles.remove(profile.getName());
+		instance.profiles.remove(profile.getUUID());
 	}
 	
 	/**
 	 * Resolves a profile by name from the collection.
 	 *
-	 * @param name The name of the profile to be resolved.
+	 * @param uuid The UUID associated with the profile to be resolved.
 	 * @return The resolved Profile object, or null if not found.
 	 */
-	public static Profile resolve(String name) {
-		return instance.profiles.get(name);
+	public static Profile resolve(UUID uuid) {
+		return instance.profiles.get(uuid);
 	}
 }

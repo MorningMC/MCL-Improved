@@ -31,11 +31,12 @@ public class Profile implements Comparable<Profile> {
 		public Profile load(CompoundTag tag) throws IllegalNbtException {
 			String name = tag.getString("name").getValue();
 			String icon = tag.getString("icon").getValue();
-			Version.Policy versionPolicy = Version.Policy.valueOf(tag.getString("versionPolicy").getValue());
+			Version.Type versionType = Version.Type.valueOf(tag.getString("versionPolicy").getValue());
 			Version version = Version.LOADER.load(tag.getCompound("version"));
-			Switchable<LaunchOptions> options = NbtLoader.switchableLoader(LaunchOptions.LOADER).load(tag.getCompound("options"));
+			Switchable<LaunchOptions> options = Switchable.generateLoader(LaunchOptions.LOADER).load(tag.getCompound("options"));
+			UUID uuid = UUID.fromString(tag.getString("uuid").getValue());
 			
-			return new Profile(name, icon, versionPolicy, version, options);
+			return new Profile(name, icon, versionType, version, options, uuid);
 		}
 		
 		@Override
@@ -48,9 +49,10 @@ public class Profile implements Comparable<Profile> {
 			
 			tag.putString("name", object.name);
 			tag.putString("icon", object.icon);
-			tag.putString("versionPolicy", object.versionPolicy.name());
+			tag.putString("versionPolicy", object.versionType.name());
 			tag.put("version", Version.LOADER.save(object.version));
-			tag.put("options", NbtLoader.switchableLoader(LaunchOptions.LOADER).save(object.options));
+			tag.put("options", Switchable.generateLoader(LaunchOptions.LOADER).save(object.options));
+			tag.putString("uuid", object.uuid.toString());
 			
 			return tag;
 		}
@@ -58,30 +60,52 @@ public class Profile implements Comparable<Profile> {
 	
 	private String name;
 	private String icon;
-	private Version.Policy versionPolicy;
+	private Version.Type versionType;
 	private Version version;
 	private Switchable<LaunchOptions> options;
+	private final UUID uuid;
 	
 	/**
 	 * Constructs a new Profile instance.
 	 *
 	 * @param name The name of the profile.
 	 * @param icon The icon representing the profile.
-	 * @param versionPolicy The version policy for the profile.
+	 * @param versionType The version policy for the profile.
 	 * @param version The Minecraft version associated with the profile.
 	 * @param options The launch options for this profile.
 	 */
 	public Profile(String name,
 	               String icon,
-	               Version.Policy versionPolicy,
+	               Version.Type versionType,
 	               Version version,
 	               Switchable<LaunchOptions> options) {
 		
+		this(name, icon, versionType, version, options, UUID.randomUUID());
+	}
+	
+	/**
+	 * Constructs a new Profile instance.
+	 *
+	 * @param name The name of the profile.
+	 * @param icon The icon representing the profile.
+	 * @param versionType The version policy for the profile.
+	 * @param version The Minecraft version associated with the profile.
+	 * @param options The launch options for this profile.
+	 * @param uuid The UUID associated with the profile.
+	 */
+	private Profile(String name,
+	               String icon,
+	               Version.Type versionType,
+	               Version version,
+	               Switchable<LaunchOptions> options,
+	               UUID uuid) {
+		
 		this.name = name;
 		this.icon = icon;
-		this.versionPolicy = versionPolicy;
+		this.versionType = versionType;
 		this.version = version;
 		this.options = options;
+		this.uuid = uuid;
 	}
 	
 	/**
@@ -136,8 +160,8 @@ public class Profile implements Comparable<Profile> {
 	 *
 	 * @return The version policy for the profile.
 	 */
-	public Version.Policy getVersionPolicy() {
-		return versionPolicy;
+	public Version.Type getVersionPolicy() {
+		return versionType;
 	}
 	
 	/**
@@ -158,6 +182,15 @@ public class Profile implements Comparable<Profile> {
 		return options;
 	}
 	
+	/**
+	 * Gets the UUID associated with the profile.
+	 *
+	 * @return The UUID associated with the profile.
+	 */
+	public UUID getUUID() {
+		return uuid;
+	}
+	
 	// Setters
 	/**
 	 * Sets the icon representing the profile.
@@ -171,10 +204,10 @@ public class Profile implements Comparable<Profile> {
 	/**
 	 * Sets the version policy for the profile.
 	 *
-	 * @param versionPolicy The new version policy.
+	 * @param versionType The new version policy.
 	 */
-	public void setVersionPolicy(Version.Policy versionPolicy) {
-		this.versionPolicy = versionPolicy;
+	public void setVersionPolicy(Version.Type versionType) {
+		this.versionType = versionType;
 	}
 	
 	/**

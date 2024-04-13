@@ -22,7 +22,7 @@ public record LaunchArguments(LaunchOptions options, Profile profile) {
 			case ISOLATED -> new TargetMinecraftDirectory(new File(TargetMinecraftDirectory.ISOLATE_ROOT, profile.getName()));
 			case CUSTOM -> options.gameDir().get();
 			case STANDARD -> TargetMinecraftDirectory.STANDARD;
-			default -> profile.getVersion().getSource().toTarget();
+			default -> profile.getVersion().source().toTarget();
 		};
 		
 		directory.getRoot().mkdirs();

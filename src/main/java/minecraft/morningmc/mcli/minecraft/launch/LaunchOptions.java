@@ -45,7 +45,7 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 		public LaunchOptions load(CompoundTag tag) throws IllegalNbtException {
 			Switchable<JavaRuntime> javaRuntime;
 			try {
-				javaRuntime = NbtLoader.switchableLoader(JavaRuntime.LOADER).load(tag.getCompound("javaRuntime"));
+				javaRuntime = Switchable.generateLoader(JavaRuntime.LOADER).load(tag.getCompound("javaRuntime"));
 			} catch (Exception e) {
 				LOGGER.warn("javaRuntime load failed: " + e.getMessage());
 				javaRuntime = DEFAULT.javaRuntime;
@@ -53,7 +53,7 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			
 			Switchable<MemoryRange> memoryRange;
 			try {
-				memoryRange = NbtLoader.switchableLoader(MemoryRange.LOADER).load(tag.getCompound("memoryRange"));
+				memoryRange = Switchable.generateLoader(MemoryRange.LOADER).load(tag.getCompound("memoryRange"));
 			} catch (Exception e) {
 				LOGGER.warn("memoryRange load failed: " + e.getMessage());
 				memoryRange = DEFAULT.memoryRange;
@@ -61,7 +61,7 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			
 			Switchable<List<String>> javaArguments;
 			try {
-				javaArguments = NbtLoader.switchableLoader(NbtLoader.STRING_LIST_LOADER).load(tag.getCompound("javaArguments"));
+				javaArguments = Switchable.generateLoader(NbtLoader.STRING_LIST_LOADER).load(tag.getCompound("javaArguments"));
 			} catch (Exception e) {
 				LOGGER.warn("javaArguments load failed: " + e.getMessage());
 				javaArguments = DEFAULT.javaArguments;
@@ -101,7 +101,7 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			
 			Switchable<ServerInfo> serverInfo;
 			try {
-				serverInfo = NbtLoader.switchableLoader(ServerInfo.LOADER).load(tag.getCompound("serverInfo"));
+				serverInfo = Switchable.generateLoader(ServerInfo.LOADER).load(tag.getCompound("serverInfo"));
 			} catch (Exception e) {
 				LOGGER.warn("serverInfo load failed: " + e.getMessage());
 				serverInfo = DEFAULT.serverInfo;
@@ -115,19 +115,19 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			CompoundTag tag = new CompoundTag();
 			
 			try {
-				tag.put("javaRuntime", NbtLoader.switchableLoader(JavaRuntime.LOADER).save(object.javaRuntime));
+				tag.put("javaRuntime", Switchable.generateLoader(JavaRuntime.LOADER).save(object.javaRuntime));
 			} catch (Exception e) {
 				LOGGER.warn("javaRuntime save failed: " + e.getMessage());
 			}
 			
 			try {
-				tag.put("memoryRange", NbtLoader.switchableLoader(MemoryRange.LOADER).save(object.memoryRange));
+				tag.put("memoryRange", Switchable.generateLoader(MemoryRange.LOADER).save(object.memoryRange));
 			} catch (Exception e) {
 				LOGGER.warn("memoryRange save failed: " + e.getMessage());
 			}
 			
 			try {
-				tag.put("javaArguments", NbtLoader.switchableLoader(NbtLoader.STRING_LIST_LOADER).save(object.javaArguments));
+				tag.put("javaArguments", Switchable.generateLoader(NbtLoader.STRING_LIST_LOADER).save(object.javaArguments));
 			} catch (Exception e) {
 				LOGGER.warn("javaArguments save failed: " + e.getMessage());
 			}
@@ -157,7 +157,7 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			}
 			
 			try {
-				tag.put("serverInfo", NbtLoader.switchableLoader(ServerInfo.LOADER).save(object.serverInfo));
+				tag.put("serverInfo", Switchable.generateLoader(ServerInfo.LOADER).save(object.serverInfo));
 			} catch (Exception e) {
 				LOGGER.warn("serverInfo save failed: " + e.getMessage());
 			}

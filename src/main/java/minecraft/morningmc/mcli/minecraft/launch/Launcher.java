@@ -36,7 +36,7 @@ public class Launcher {
 			
 			Profile profile;
 			try {
-				profile = ProfileCollection.resolve(tag.getString("profile").getValue());
+				profile = ProfileCollection.resolve(UUID.fromString(tag.getString("profile").getValue()));
 			} catch (Exception e) {
 				LOGGER.warn("Failed to load profile: " + e.getMessage());
 				profile = null;
@@ -56,7 +56,7 @@ public class Launcher {
 			CompoundTag tag = new CompoundTag();
 			
 			try {
-				tag.putString("profile", object.profile.getName());
+				tag.putString("profile", object.profileUUID.toString());
 			} catch (Exception e) {
 				LOGGER.warn("Failed to save profile: " + e.getMessage());
 			}
@@ -68,7 +68,7 @@ public class Launcher {
 	};
 	
 	private LaunchOptions options;
-	private Profile profile;
+	private UUID profileUUID;
 	
 	/**
 	 * Constructs a Launcher object with the specified launch options and profile.
@@ -78,7 +78,7 @@ public class Launcher {
 	 */
 	public Launcher(LaunchOptions options, Profile profile) {
 		this.options = options;
-		this.profile = profile;
+		this.profileUUID = profile != null ? profile.getUUID() : null;
 	}
 	
 	/**
@@ -88,7 +88,7 @@ public class Launcher {
 	 * @throws LaunchException If there is an issue launching the Minecraft client.
 	 */
 	public ProcessListener launch() throws LaunchException {
-		return launch(profile);
+		return launch(ProfileCollection.resolve(profileUUID));
 	}
 	
 	/**
@@ -140,7 +140,7 @@ public class Launcher {
 	 * @return The generated LaunchArguments.
 	 */
 	public LaunchArguments generateArguments() {
-		return generateArguments(profile);
+		return generateArguments(ProfileCollection.resolve(profileUUID));
 	}
 	
 	/**
@@ -169,7 +169,7 @@ public class Launcher {
 	 * @return The Profile object.
 	 */
 	public Profile getProfile() {
-		return profile;
+		return ProfileCollection.resolve(profileUUID);
 	}
 	
 	/**
@@ -187,6 +187,6 @@ public class Launcher {
 	 * @param profile The new Profile.
 	 */
 	public void setProfile(Profile profile) {
-		this.profile = profile;
+		this.profileUUID = profile.getUUID();
 	}
 }
