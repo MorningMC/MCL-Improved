@@ -117,7 +117,7 @@ public class JavaRuntimeCollection implements Runnable {
 	 */
 	public static void search() {
 		if (!isSearching()) {
-			instance.thread = new Thread(instance, "searchJava");
+			instance.thread = new Thread(instance, "java");
 			instance.thread.start();
 		}
 	}

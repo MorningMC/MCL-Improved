@@ -78,7 +78,7 @@ public class Launcher {
 	 */
 	public Launcher(LaunchOptions options, Profile profile) {
 		this.options = options;
-		this.profileUUID = profile != null ? profile.getUUID() : null;
+		this.profileUUID = profile != null ? profile.uuid() : null;
 	}
 	
 	/**
@@ -118,7 +118,7 @@ public class Launcher {
 		List<String> commandline = arguments.generateCommandline();
 		LOGGER.debug("Commandline: ");
 		for (String arg : commandline) {
-			LOGGER.debug(arg + ",");
+			LOGGER.debug(arg);
 		}
 		
 		ProcessBuilder builder = new ProcessBuilder(commandline);
@@ -137,7 +137,7 @@ public class Launcher {
 	/**
 	 * Generates the launch arguments based on the stored profile and options.
 	 *
-	 * @return The generated LaunchArguments.
+	 * @return The generated launch arguments.
 	 */
 	public LaunchArguments generateArguments() {
 		return generateArguments(ProfileCollection.resolve(profileUUID));
@@ -147,11 +147,11 @@ public class Launcher {
 	 * Generates the launch arguments based on the specified profile and stored options.
 	 *
 	 * @param profile The Minecraft profile to be used for generating launch arguments.
-	 * @return The generated LaunchArguments.
+	 * @return The generated launch arguments.
 	 * @throws NullPointerException If the profile is null.
 	 */
 	public LaunchArguments generateArguments(Profile profile) {
-		return new LaunchArguments(profile.getOptions().getIfEnabled(options), profile);
+		return new LaunchArguments(profile.options().getIfEnabled(options), profile);
 	}
 	
 	/**
@@ -187,6 +187,6 @@ public class Launcher {
 	 * @param profile The new Profile.
 	 */
 	public void setProfile(Profile profile) {
-		this.profileUUID = profile.getUUID();
+		this.profileUUID = profile.uuid();
 	}
 }

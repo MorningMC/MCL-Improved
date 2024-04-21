@@ -3,8 +3,7 @@ package minecraft.morningmc.mcli.minecraft.launch;
 import minecraft.morningmc.mcli.minecraft.client.directory.TargetMinecraftDirectory;
 import minecraft.morningmc.mcli.minecraft.java.JavaRuntime;
 import minecraft.morningmc.mcli.utils.*;
-import minecraft.morningmc.mcli.utils.containers.Modifiable;
-import minecraft.morningmc.mcli.utils.containers.Switchable;
+import minecraft.morningmc.mcli.utils.containers.*;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
@@ -23,8 +22,7 @@ import java.util.*;
  * @param memoryRange The {@code Switchable} object for memory range.
  * @param javaArguments The {@code Switchable} object for Java arguments.
  * @param useWaterMark The {@code Modifiable} object for whether to use the watermark.
- * @param gameDirPolicy The {@code Modifiable} object for the game directory policy.
- * @param gameDir The {@code Modifiable} object for the game directory.
+ * @param gameDir The {@code EnumSwitchable} object for the game directory.
  * @param windowSize The {@code Modifiable} object for the window size.
  * @param serverInfo The {@code Switchable} object for the server info.
  */
@@ -32,8 +30,7 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
                              Switchable<MemoryRange> memoryRange,
                              Switchable<List<String>> javaArguments,
                              Modifiable<Boolean> useWaterMark,
-                             Modifiable<TargetMinecraftDirectory.Policy> gameDirPolicy,
-                             Modifiable<TargetMinecraftDirectory> gameDir,
+                             EnumSwitchable<TargetMinecraftDirectory, TargetMinecraftDirectory.Policy> gameDir,
                              Modifiable<WindowSize> windowSize,
                              Switchable<ServerInfo> serverInfo) {
 	private static final Logger LOGGER = LogManager.getLogger();
@@ -47,7 +44,7 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			try {
 				javaRuntime = Switchable.generateLoader(JavaRuntime.LOADER).load(tag.getCompound("javaRuntime"));
 			} catch (Exception e) {
-				LOGGER.warn("javaRuntime load failed: " + e.getMessage());
+				LOGGER.warn("javaRuntime load failed: {}", e.getMessage());
 				javaRuntime = DEFAULT.javaRuntime;
 			}
 			
@@ -55,7 +52,7 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			try {
 				memoryRange = Switchable.generateLoader(MemoryRange.LOADER).load(tag.getCompound("memoryRange"));
 			} catch (Exception e) {
-				LOGGER.warn("memoryRange load failed: " + e.getMessage());
+				LOGGER.warn("memoryRange load failed: {}", e.getMessage());
 				memoryRange = DEFAULT.memoryRange;
 			}
 			
@@ -63,7 +60,7 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			try {
 				javaArguments = Switchable.generateLoader(NbtLoader.STRING_LIST_LOADER).load(tag.getCompound("javaArguments"));
 			} catch (Exception e) {
-				LOGGER.warn("javaArguments load failed: " + e.getMessage());
+				LOGGER.warn("javaArguments load failed: {}", e.getMessage());
 				javaArguments = DEFAULT.javaArguments;
 			}
 			
@@ -71,23 +68,15 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			try {
 				useWaterMark = Modifiable.of(tag.getByte("useWaterMark").getValue() != 0);
 			} catch (Exception e) {
-				LOGGER.warn("useWaterMark load failed: " + e.getMessage());
+				LOGGER.warn("useWaterMark load failed: {}", e.getMessage());
 				useWaterMark = DEFAULT.useWaterMark;
 			}
 			
-			Modifiable<TargetMinecraftDirectory.Policy> gameDirPolicy;
+			EnumSwitchable<TargetMinecraftDirectory, TargetMinecraftDirectory.Policy> gameDir;
 			try {
-				gameDirPolicy = Modifiable.of(TargetMinecraftDirectory.Policy.valueOf(tag.getString("gameDirPolicy").getValue()));
+				gameDir = EnumSwitchable.generateLoader(TargetMinecraftDirectory.LOADER, TargetMinecraftDirectory.Policy.class).load(tag.getCompound("gameDir"));
 			} catch (Exception e) {
-				LOGGER.warn("gameDirPolicy load failed: " + e.getMessage());
-				gameDirPolicy = DEFAULT.gameDirPolicy;
-			}
-			
-			Modifiable<TargetMinecraftDirectory> gameDir;
-			try {
-				gameDir = Modifiable.of(new TargetMinecraftDirectory(new File(tag.getString("gameDir").getValue())));
-			} catch (Exception e) {
-				LOGGER.warn("gameDir load failed: " + e.getMessage());
+				LOGGER.warn("gameDir load failed: {}", e.getMessage());
 				gameDir = DEFAULT.gameDir;
 			}
 			
@@ -95,7 +84,7 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			try {
 				windowSize = Modifiable.of(WindowSize.LOADER.load(tag.getCompound("windowSize")));
 			} catch (Exception e) {
-				LOGGER.warn("windowSize load failed: " + e.getMessage());
+				LOGGER.warn("windowSize load failed: {}", e.getMessage());
 				windowSize = DEFAULT.windowSize;
 			}
 			
@@ -103,11 +92,11 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			try {
 				serverInfo = Switchable.generateLoader(ServerInfo.LOADER).load(tag.getCompound("serverInfo"));
 			} catch (Exception e) {
-				LOGGER.warn("serverInfo load failed: " + e.getMessage());
+				LOGGER.warn("serverInfo load failed: {}", e.getMessage());
 				serverInfo = DEFAULT.serverInfo;
 			}
 			
-			return new LaunchOptions(javaRuntime, memoryRange, javaArguments, useWaterMark, gameDirPolicy, gameDir, windowSize, serverInfo);
+			return new LaunchOptions(javaRuntime, memoryRange, javaArguments, useWaterMark, gameDir, windowSize, serverInfo);
 		}
 		
 		@Override
@@ -117,49 +106,44 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			try {
 				tag.put("javaRuntime", Switchable.generateLoader(JavaRuntime.LOADER).save(object.javaRuntime));
 			} catch (Exception e) {
-				LOGGER.warn("javaRuntime save failed: " + e.getMessage());
+				LOGGER.warn("javaRuntime save failed: {}", e.getMessage());
 			}
 			
 			try {
 				tag.put("memoryRange", Switchable.generateLoader(MemoryRange.LOADER).save(object.memoryRange));
 			} catch (Exception e) {
-				LOGGER.warn("memoryRange save failed: " + e.getMessage());
+				LOGGER.warn("memoryRange save failed: {}", e.getMessage());
 			}
 			
 			try {
 				tag.put("javaArguments", Switchable.generateLoader(NbtLoader.STRING_LIST_LOADER).save(object.javaArguments));
 			} catch (Exception e) {
-				LOGGER.warn("javaArguments save failed: " + e.getMessage());
+				LOGGER.warn("javaArguments save failed: {}", e.getMessage());
 			}
 			
 			try {
 				tag.putByte("useWaterMark", (byte) (object.useWaterMark.get() ? 1 : 0));
 			} catch (Exception e) {
-				LOGGER.warn("useWaterMark save failed: " + e.getMessage());
+				LOGGER.warn("useWaterMark save failed: {}", e.getMessage());
 			}
 			
 			try {
-				tag.putString("gameDirPolicy", object.gameDirPolicy.get().name());
+				
+				tag.put("gameDir", EnumSwitchable.generateLoader(TargetMinecraftDirectory.LOADER, TargetMinecraftDirectory.Policy.class).save(object.gameDir));
 			} catch (Exception e) {
-				LOGGER.warn("gameDirPolicy save failed: " + e.getMessage());
-			}
-			
-			try {
-				tag.putString("gameDir", object.gameDir.get().getRoot().getAbsolutePath());
-			} catch (Exception e) {
-				LOGGER.warn("gameDir save failed: " + e.getMessage());
+				LOGGER.warn("gameDir save failed: {}", e.getMessage());
 			}
 			
 			try {
 				tag.put("windowSize", WindowSize.LOADER.save(object.windowSize.get()));
 			} catch (Exception e) {
-				LOGGER.warn("windowSize save failed: " + e.getMessage());
+				LOGGER.warn("windowSize save failed: {}", e.getMessage());
 			}
 			
 			try {
 				tag.put("serverInfo", Switchable.generateLoader(ServerInfo.LOADER).save(object.serverInfo));
 			} catch (Exception e) {
-				LOGGER.warn("serverInfo save failed: " + e.getMessage());
+				LOGGER.warn("serverInfo save failed: {}", e.getMessage());
 			}
 			
 			return tag;
@@ -172,8 +156,7 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			Switchable.ofDisabled(MemoryRange.of(2048)),
 			Switchable.ofDisabled(List.of("-XX:+UnlockExperimentalVMOptions", "-XX:+UseG1GC", "-XX:G1NewSizePercent=20", "-XX:G1ReservePercent=20", "-XX:MaxGCPauseMillis=50", "-XX:G1HeapRegionSize=32M")),
 			Modifiable.of(false),
-			Modifiable.of(TargetMinecraftDirectory.Policy.SOURCE),
-			Modifiable.of(TargetMinecraftDirectory.STANDARD),
+			EnumSwitchable.of(TargetMinecraftDirectory.STANDARD, TargetMinecraftDirectory.Policy.SOURCE),
 			Modifiable.of(WindowSize.window(1024, 768)),
 			Switchable.ofDisabled(null)
 	);

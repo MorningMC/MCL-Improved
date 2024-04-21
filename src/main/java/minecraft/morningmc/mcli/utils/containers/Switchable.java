@@ -1,9 +1,10 @@
 package minecraft.morningmc.mcli.utils.containers;
 
-import dev.dewy.nbt.api.Tag;
-import dev.dewy.nbt.tags.collection.CompoundTag;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
+
+import dev.dewy.nbt.api.Tag;
+import dev.dewy.nbt.tags.collection.CompoundTag;
 
 /**
  * A container object that allows to switch on or off and modify the value at the same time.
@@ -62,7 +63,7 @@ public class Switchable<T> extends Modifiable<T> {
 	}
 	
 	/**
-	 * Creates a {@code Switchable} loader from a loader.
+	 * Generates a {@code Switchable} loader from a loader.
 	 *
 	 * @param loader The loader to be wrapped in a {@code Switchable} loader.
 	 * @return The {@code Switchable} loader.
@@ -122,15 +123,15 @@ public class Switchable<T> extends Modifiable<T> {
 	
 	/**
 	 * Returns the value of the {@code Switchable} object if it is enabled,
-	 * or {@code defaultObject} otherwise.
+	 * or {@code defaultValue} otherwise.
 	 *
-	 * @param defaultObject The default value to be returned if the {@code Switchable}
+	 * @param defaultValue The default value to be returned if the {@code Switchable}
 	 *        is disabled.
 	 * @return The value of the {@code Switchable} object if it is enabled,
-	 *         or {@code defaultObject} otherwise.
+	 *         or {@code defaultValue} otherwise.
 	 */
-	public T getIfEnabled(T defaultObject) {
-		return enabled ? value : defaultObject;
+	public T getIfEnabled(T defaultValue) {
+		return enabled ? value : defaultValue;
 	}
 	
 	/**

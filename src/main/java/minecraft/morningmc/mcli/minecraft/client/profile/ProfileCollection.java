@@ -99,7 +99,7 @@ public class ProfileCollection {
 	 * @param profile The profile to be added.
 	 */
 	public static void add(Profile profile) {
-		instance.profiles.put(profile.getUUID(), profile);
+		instance.profiles.put(profile.uuid(), profile);
 	}
 	
 	/**
@@ -108,7 +108,7 @@ public class ProfileCollection {
 	 * @param profile The profile to be removed.
 	 */
 	public static void remove(Profile profile) {
-		instance.profiles.remove(profile.getUUID());
+		instance.profiles.remove(profile.uuid());
 	}
 	
 	/**

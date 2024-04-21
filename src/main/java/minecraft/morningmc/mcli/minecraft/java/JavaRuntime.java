@@ -134,45 +134,6 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	}
 	
 	/**
-	 * Parses the Java version string into an integer.
-	 *
-	 * @param version The version string to be parsed.
-	 * @return The parsed Java version, or -1 if an error occurs.
-	 */
-	private static int parseVersion(String version) {
-		if (version != null) {
-			Matcher matcher = Pattern.compile("^(?<version>[0-9]+)").matcher(version);
-			
-			if (matcher.find()) {
-				int head;
-				try {
-					head = Integer.parseInt(matcher.group());
-				} catch (NumberFormatException e) {
-					head = -1;
-				}
-				
-				if (head > 1) {
-					return head;
-				}
-			}
-			
-			// using 1.x format
-			if (version.contains("1.8")) {
-				return 8;
-			} else if (version.contains("1.7")) {
-				return 7;
-			} else if (version.contains("1.6")) {
-				return 6;
-			} else {
-				LOGGER.warn("Failed to parse Java version: " + version);
-				return -1;
-			}
-		}
-		
-		return -1;
-	}
-	
-	/**
 	 * Retrieves a system property from the given content.
 	 *
 	 * @param content The given content.
@@ -198,16 +159,13 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) {
+		if (o == this) {
 			return true;
 		}
-		
-		if (o == null || getClass() != o.getClass()) {
-			return false;
+		if (o instanceof JavaRuntime that) {
+			return executable.equals(that.executable);
 		}
-		
-		JavaRuntime that = (JavaRuntime) o;
-		return Objects.equals(executable, that.executable);
+		return false;
 	}
 	
 	@Override
