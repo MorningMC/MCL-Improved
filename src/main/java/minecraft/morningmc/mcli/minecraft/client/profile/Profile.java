@@ -3,6 +3,7 @@ package minecraft.morningmc.mcli.minecraft.client.profile;
 import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
 import minecraft.morningmc.mcli.minecraft.client.Version;
 import minecraft.morningmc.mcli.minecraft.launch.LaunchOptions;
+import minecraft.morningmc.mcli.utils.interfaces.UniqueObject;
 import minecraft.morningmc.mcli.utils.containers.Modifiable;
 import minecraft.morningmc.mcli.utils.containers.Switchable;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
@@ -21,7 +22,7 @@ public record Profile(Modifiable<String> name,
                       Modifiable<String> icon,
                       Modifiable<Version> version,
                       Switchable<LaunchOptions> options,
-                      UUID uuid) implements Comparable<Profile> {
+                      UUID identifier) implements Comparable<Profile>, UniqueObject {
 	
 	/** NbtLoader for loading and saving {@code Profile} objects from/to NBT data. */
 	public static final NbtLoader<Profile, CompoundTag> LOADER = new NbtLoader<>() {
@@ -33,7 +34,7 @@ public record Profile(Modifiable<String> name,
 					Modifiable.of(tag.getString("icon").getValue()),
 					Modifiable.of(Version.LOADER.load(tag.getCompound("version"))),
 					Switchable.generateLoader(LaunchOptions.LOADER).load(tag.getCompound("options")),
-					UUID.fromString(tag.getString("uuid").getValue())
+					UUID.fromString(tag.getString("identifier").getValue())
 			);
 		}
 		
@@ -49,7 +50,7 @@ public record Profile(Modifiable<String> name,
 			tag.putString("icon", object.icon.get());
 			tag.put("version", Version.LOADER.save(object.version.get()));
 			tag.put("options", Switchable.generateLoader(LaunchOptions.LOADER).save(object.options));
-			tag.putString("uuid", object.uuid.toString());
+			tag.putString("identifier", object.identifier.toString());
 			
 			return tag;
 		}
@@ -82,17 +83,6 @@ public record Profile(Modifiable<String> name,
 	}
 	
 	// Overrides
-	@Override
-	public boolean equals(Object o) {
-		if (o == this) {
-			return true;
-		}
-		if (o instanceof Profile that) {
-			return uuid.equals(that.uuid);
-		}
-		return false;
-	}
-	
 	@Override
 	public int compareTo(Profile o) {
 		return name.get().compareTo(o.name.get());

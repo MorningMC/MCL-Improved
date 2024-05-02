@@ -1,5 +1,7 @@
 package minecraft.morningmc.mcli.minecraft.auth;
 
+import minecraft.morningmc.mcli.utils.interfaces.UniqueObject;
+
 import java.util.*;
 
 /**
@@ -17,5 +19,10 @@ public record Account(String username,
                       UUID uuid,
                       Map<String, String> properties,
                       String userType,
-                      String xboxUserId) {
+                      String xboxUserId,
+                      UUID identifier) implements UniqueObject {
+	
+	public static Account of(String username, String token, UUID uuid, Map<String, String> properties, String userType, String xboxUserId) {
+		return new Account(username, token, uuid, properties, userType, xboxUserId, UUID.randomUUID());
+	}
 }

@@ -7,10 +7,10 @@ import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.exceptions.LaunchException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
+import dev.dewy.nbt.tags.collection.CompoundTag;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import dev.dewy.nbt.tags.collection.CompoundTag;
 
 import java.util.*;
 
@@ -34,15 +34,23 @@ public class Launcher {
 		public Launcher load(CompoundTag tag) throws IllegalNbtException {
 			LaunchOptions options = LaunchOptions.LOADER.load(tag.getCompound("options"));
 			
-			Profile profile;
+			UUID profile;
 			try {
-				profile = ProfileCollection.resolve(UUID.fromString(tag.getString("profile").getValue()));
+				profile = UUID.fromString(tag.getString("profile").getValue());
 			} catch (Exception e) {
-				LOGGER.warn("Failed to load profile: " + e.getMessage());
+				LOGGER.warn("Failed to load profile: {}", e.getMessage());
 				profile = null;
 			}
 			
-			return new Launcher(options, profile);
+			UUID account;
+			try {
+				account = UUID.fromString(tag.getString("account").getValue());
+			} catch (Exception e) {
+				LOGGER.warn("Failed to load account: {}", e.getMessage());
+				account = null;
+			}
+			
+			return new Launcher(options, profile, account);
 		}
 		
 		/**
@@ -56,9 +64,15 @@ public class Launcher {
 			CompoundTag tag = new CompoundTag();
 			
 			try {
-				tag.putString("profile", object.profileUUID.toString());
+				tag.putString("profile", object.profile.toString());
 			} catch (Exception e) {
-				LOGGER.warn("Failed to save profile: " + e.getMessage());
+				LOGGER.warn("Failed to save profile: {}", e.getMessage());
+			}
+			
+			try {
+				tag.putString("account", object.account.toString());
+			} catch (Exception e) {
+				LOGGER.warn("Failed to save account: {}", e.getMessage());
 			}
 			
 			tag.put("options", LaunchOptions.LOADER.save(object.options));
@@ -68,17 +82,20 @@ public class Launcher {
 	};
 	
 	private LaunchOptions options;
-	private UUID profileUUID;
+	private UUID profile;
+	private UUID account;
 	
 	/**
 	 * Constructs a Launcher object with the specified launch options and profile.
 	 *
 	 * @param options The launch options for the Minecraft client.
-	 * @param profile The Minecraft profile to be used for launching.
+	 * @param profile The UUID of Minecraft profile to be used for launching.
+	 * @param account The UUID of Minecraft account to be used for launching.
 	 */
-	public Launcher(LaunchOptions options, Profile profile) {
+	public Launcher(LaunchOptions options, UUID profile, UUID account) {
 		this.options = options;
-		this.profileUUID = profile != null ? profile.uuid() : null;
+		this.profile = profile;
+		this.account = account;
 	}
 	
 	/**
@@ -88,7 +105,7 @@ public class Launcher {
 	 * @throws LaunchException If there is an issue launching the Minecraft client.
 	 */
 	public ProcessListener launch() throws LaunchException {
-		return launch(ProfileCollection.resolve(profileUUID));
+		return launch(ProfileCollection.resolve(profile));
 	}
 	
 	/**
@@ -140,7 +157,7 @@ public class Launcher {
 	 * @return The generated launch arguments.
 	 */
 	public LaunchArguments generateArguments() {
-		return generateArguments(ProfileCollection.resolve(profileUUID));
+		return generateArguments(ProfileCollection.resolve(profile));
 	}
 	
 	/**
@@ -169,7 +186,7 @@ public class Launcher {
 	 * @return The Profile object.
 	 */
 	public Profile getProfile() {
-		return ProfileCollection.resolve(profileUUID);
+		return ProfileCollection.resolve(profile);
 	}
 	
 	/**
@@ -187,6 +204,6 @@ public class Launcher {
 	 * @param profile The new Profile.
 	 */
 	public void setProfile(Profile profile) {
-		this.profileUUID = profile.uuid();
+		this.profile = profile.identifier();
 	}
 }

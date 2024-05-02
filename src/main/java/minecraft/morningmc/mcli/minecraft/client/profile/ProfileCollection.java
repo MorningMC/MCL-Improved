@@ -38,7 +38,7 @@ public class ProfileCollection {
 						     try {
 							     return Stream.of(Profile.LOADER.load(subTag));
 						     } catch (IllegalNbtException e) {
-							     LOGGER.warn("Failed to load profile from NBT: " + e.getMessage());
+							     LOGGER.warn("Failed to load profile from NBT: {}", e.getMessage());
 							     return Stream.empty();
 						     }
 					     })
@@ -99,7 +99,7 @@ public class ProfileCollection {
 	 * @param profile The profile to be added.
 	 */
 	public static void add(Profile profile) {
-		instance.profiles.put(profile.uuid(), profile);
+		instance.profiles.put(profile.identifier(), profile);
 	}
 	
 	/**
@@ -108,7 +108,7 @@ public class ProfileCollection {
 	 * @param profile The profile to be removed.
 	 */
 	public static void remove(Profile profile) {
-		instance.profiles.remove(profile.uuid());
+		instance.profiles.remove(profile.identifier());
 	}
 	
 	/**

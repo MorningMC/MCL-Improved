@@ -44,7 +44,7 @@ public class JavaRuntimeCollection implements Runnable {
 						     try {
 							     return Stream.of(JavaRuntime.LOADER.load(subTag));
 						     } catch (IllegalNbtException e) {
-								 LOGGER.warn("Failed to load Java runtime from NBT: " + e.getMessage());
+							     LOGGER.warn("Failed to load Java runtime from NBT: {}", e.getMessage());
 							     return Stream.empty();
 						     }
 					     })
@@ -70,10 +70,7 @@ public class JavaRuntimeCollection implements Runnable {
 		}
 	};
 	@SuppressWarnings("unchecked")
-	private static final Comparator<JavaRuntime> COMPARATOR = ((Comparator<JavaRuntime>) Comparator.naturalOrder())
-			                                                              .thenComparingInt(runtime -> runtime.platform().architecture().bits())
-			                                                              .reversed()
-			                                                              .thenComparingInt(JavaRuntime::hashCode);
+	private static final Comparator<JavaRuntime> COMPARATOR = ((Comparator<JavaRuntime>) Comparator.reverseOrder()).thenComparingInt(JavaRuntime::hashCode);
 	
 	public static JavaRuntimeCollection instance = null;
 	
@@ -295,7 +292,7 @@ public class JavaRuntimeCollection implements Runnable {
 							.filter(bin -> bin.getName().equals("bin"))
 							.map(bin -> new File(bin, JavaRuntime.JAVA))
 							.flatMap(executable -> {
-								LOGGER.trace("Query executable in PATH: " + executable);
+								LOGGER.trace("Query executable in PATH: {}", executable);
 								try {
 									return Stream.of(JavaRuntime.fromPath(executable));
 								} catch (IllegalJavaException e) {
@@ -305,7 +302,7 @@ public class JavaRuntimeCollection implements Runnable {
 							.forEach(potentialRuntimes::add);
 					
 				} catch (Exception e) {
-					LOGGER.warn("Failed to parse PATH: " + e.getMessage());
+					LOGGER.warn("Failed to parse PATH: {}", e.getMessage());
 				}
 				
 				if (JavaRuntime.CURRENT != null) {
@@ -314,8 +311,8 @@ public class JavaRuntimeCollection implements Runnable {
 				
 				long stopTime = System.currentTimeMillis();
 				
-				LOGGER.info("Finish searching potential Java runtimes. Found " + potentialRuntimes.size());
-				LOGGER.info("Used " + (stopTime - startTime) + " ms");
+				LOGGER.info("Finish searching potential Java runtimes. Found {}", potentialRuntimes.size());
+				LOGGER.info("Used {} ms", stopTime - startTime);
 				
 				runtimes.addAll(potentialRuntimes);
 				
@@ -324,7 +321,7 @@ public class JavaRuntimeCollection implements Runnable {
 			}
 			
 			// list found runtimes
-			LOGGER.debug("Found " + runtimes.size() + " Java runtimes in total:");
+			LOGGER.debug("Found {} Java runtimes in total:", runtimes.size());
 			for (JavaRuntime runtime : runtimes) {
 				LOGGER.debug(runtime.toString());
 			}
@@ -374,7 +371,7 @@ public class JavaRuntimeCollection implements Runnable {
 					try {
 						homes.add(JavaRuntime.fromHome(new File(home)));
 					} catch (InvalidPathException | IllegalJavaException e) {
-						LOGGER.warn("Invalid Java path in system registry: " + home);
+						LOGGER.warn("Invalid Java path in system registry: {}", home);
 					}
 				}
 			}

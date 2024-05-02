@@ -25,6 +25,6 @@ public class OfflineAuthenticator implements Authenticator {
 	
 	@Override
 	public Account auth() throws AuthenticationException {
-		return new Account(username, uuid.toString(), uuid, Map.of(), "legacy", "");
+		return Account.of(username, uuid.toString(), uuid, Map.of(), "legacy", "");
 	}
 }

@@ -87,7 +87,7 @@ public class Main extends Application {
 			launcher = Launcher.LOADER.load(config.getCompound("launcher"));
 		} catch (Exception e) {
 			LOGGER.warn("Failed to load launcher: " + e.getMessage());
-			launcher = new Launcher(LaunchOptions.DEFAULT, null);
+			launcher = new Launcher(LaunchOptions.DEFAULT, null, null);
 		}
 		
 		// Preparing scenes

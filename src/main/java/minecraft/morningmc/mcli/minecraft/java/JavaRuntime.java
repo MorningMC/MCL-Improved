@@ -15,6 +15,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represents a Java runtime, providing methods for retrieving Java version and executable information.
  */
@@ -174,7 +176,9 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	}
 	
 	@Override
-	public int compareTo(JavaRuntime o) {
-		return version.compareTo(o.version);
+	public int compareTo(@NotNull JavaRuntime o) {
+		return Comparator.comparing(JavaRuntime::version)
+				       .thenComparingInt(runtime -> runtime.platform.architecture().bits())
+				       .compare(this, o);
 	}
 }
