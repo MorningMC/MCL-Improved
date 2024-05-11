@@ -8,7 +8,7 @@
 
 <AnchorPane prefHeight="632" prefWidth="1024" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="minecraft.morningmc.mcli.ui.controller.LaunchSceneController">
    <ImageView id="banner" fitHeight="632" fitWidth="1024">
-      <Image url="@/assets/banner.png" />
+      <Image url="@/assets/backgrounds/banner.png" />
    </ImageView>
 
    <VBox prefHeight="632.0" prefWidth="250.0">

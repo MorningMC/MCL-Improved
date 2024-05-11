@@ -21,9 +21,9 @@ public class Startup {
      */
     public Startup() {
         LOGGER.info(LauncherMetadata.LONG_FULL_NAME);
-        LOGGER.info("System platform: " + Platform.SYSTEM);
-        LOGGER.info("Current platform: " + Platform.CURRENT);
-        LOGGER.info("Working root: " + FileMetadata.WORKING_ROOT);
+	    LOGGER.info("System platform: {}", Platform.SYSTEM);
+	    LOGGER.info("Current platform: {}", Platform.CURRENT);
+	    LOGGER.info("Working root: {}", FileMetadata.WORKING_ROOT);
         
         if (!LauncherMetadata.VERSION.isStable()) {
             LOGGER.warn("This is a development build. There may be some issues.");

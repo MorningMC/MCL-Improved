@@ -46,7 +46,7 @@ public class Main extends Application {
 		
 		try {
 			int created = FileMetadata.completeFiles();
-			LOGGER.debug("Completed " + created + " files.");
+			LOGGER.debug("Completed {} files.", created);
 			
 		} catch (IOException e) {
 			LOGGER.error("Complete files failed: ", e);
@@ -57,28 +57,28 @@ public class Main extends Application {
 		try {
 			config = new Nbt().fromFile(FileMetadata.CONFIG);
 		} catch (IOException e) {
-			LOGGER.warn("Failed to load config: " + e.getMessage());
+			LOGGER.warn("Failed to load config: {}", e.getMessage());
 			config = new CompoundTag();
 		}
 		
 		try {
 			GlobalSettings.LOADER.load(config.getCompound("globalSettings"));
 		} catch (Exception e) {
-			LOGGER.warn("Failed to load globalSettings: " + e.getMessage());
+			LOGGER.warn("Failed to load globalSettings: {}", e.getMessage());
 			GlobalSettings.init(GlobalSettings.DEFAULT);
 		}
 		
 		try {
 			ProfileCollection.LOADER.load(config.getList("profileCollection"));
 		} catch (Exception e) {
-			LOGGER.warn("Failed to load profileCollection: " + e.getMessage());
+			LOGGER.warn("Failed to load profileCollection: {}", e.getMessage());
 			ProfileCollection.init(Set.of());
 		}
 		
 		try {
 			JavaRuntimeCollection.LOADER.load(config.getList("javaRuntimeCollection"));
 		} catch (Exception e) {
-			LOGGER.warn("Failed to load javaRuntimeCollection: " + e.getMessage());
+			LOGGER.warn("Failed to load javaRuntimeCollection: {}", e.getMessage());
 			JavaRuntimeCollection.init(Set.of());
 		}
 		JavaRuntimeCollection.search();
@@ -86,7 +86,7 @@ public class Main extends Application {
 		try {
 			launcher = Launcher.LOADER.load(config.getCompound("launcher"));
 		} catch (Exception e) {
-			LOGGER.warn("Failed to load launcher: " + e.getMessage());
+			LOGGER.warn("Failed to load launcher: {}", e.getMessage());
 			launcher = new Launcher(LaunchOptions.DEFAULT, null, null);
 		}
 		
