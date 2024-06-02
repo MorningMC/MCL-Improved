@@ -1,11 +1,9 @@
 package minecraft.morningmc.mcli.launcher.metadata;
 
-import minecraft.morningmc.mcli.minecraft.client.directory.TargetMinecraftDirectory;
+import minecraft.morningmc.mcli.minecraft.client.MinecraftDirectory;
 import minecraft.morningmc.mcli.utils.Platform;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * Utility class for managing file and directory metadata in the MCLI launcher.
@@ -54,8 +52,8 @@ public class FileMetadata {
 				WORKING_ROOT,
 				CACHE_ROOT,
 				
-				TargetMinecraftDirectory.STANDARD.getRoot(),
-				TargetMinecraftDirectory.ISOLATE_ROOT
+				MinecraftDirectory.STANDARD.root(),
+				MinecraftDirectory.ISOLATE_ROOT
 		};
 		File[] files = {
 				CONFIG
@@ -81,5 +79,19 @@ public class FileMetadata {
 	 */
 	public static InputStream getResource(String path) {
 		return FileMetadata.class.getClassLoader().getResourceAsStream(path);
+	}
+	
+	/**
+	 * Retrieves an input stream for the specified file.
+	 *
+	 * @param file The file to retrieve an input stream for.
+	 * @return An InputStream for the specified file.
+	 */
+	public static InputStream getFileResource(File file) {
+		try {
+			return new FileInputStream(file);
+		} catch (FileNotFoundException e) {
+			return FileInputStream.nullInputStream();
+		}
 	}
 }

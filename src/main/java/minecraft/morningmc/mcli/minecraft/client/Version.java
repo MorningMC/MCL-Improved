@@ -1,13 +1,11 @@
 package minecraft.morningmc.mcli.minecraft.client;
 
-import minecraft.morningmc.mcli.minecraft.client.directory.SourceMinecraftDirectory;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
-public record Version(SourceMinecraftDirectory source,
-					  String version,
+public record Version(String version,
                       Type type,
                       String mainClass) {
 	/**

@@ -65,11 +65,15 @@ public record GlobalSettings(Modifiable<Integer> maxThreads,
 	
 	public static GlobalSettings instance = null;
 	
+	/**
+	 * Initializes the global settings.
+	 *
+	 * @param settings The global settings.
+	 */
 	public static void init(GlobalSettings settings) {
 		if (instance != null) {
 			throw new IllegalStateException("GlobalSettings already initialized");
 		}
-		
 		instance = settings;
 	}
 }

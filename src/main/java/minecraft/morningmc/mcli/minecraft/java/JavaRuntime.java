@@ -143,13 +143,10 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	 * @return The value of the system property, or {@code null} if not found.
 	 */
 	private static String getProperty(String content, String key) {
-		key = key.replace(".", "\\.");
-		Matcher matcher = Pattern.compile(key + " = (?<value>.*)").matcher(content);
-
+		Matcher matcher = Pattern.compile(key.replace(".", "\\.") + " = (?<value>.*)").matcher(content);
 		if (matcher.find()) {
-			return matcher.group(1);
+			return matcher.group("value");
 		}
-
 		return null;
 	}
 	

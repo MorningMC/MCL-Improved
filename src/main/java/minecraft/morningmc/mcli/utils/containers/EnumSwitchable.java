@@ -6,6 +6,8 @@ import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 import dev.dewy.nbt.api.Tag;
 import dev.dewy.nbt.tags.collection.CompoundTag;
 
+import java.util.function.*;
+
 /**
  * A container object that allows to switch between different enums and modify the value at the same time.
  *
@@ -91,8 +93,8 @@ public class EnumSwitchable<T, E extends Enum<E>> extends Modifiable<T> {
 	 * @param switcher The switcher to be used.
 	 * @return The value based on the switcher.
 	 */
-	public T get(Switcher<T, E> switcher) {
-		return switcher.switchPolicy(value, policy);
+	public T get(BiFunction<T, E, T> switcher) {
+		return switcher.apply(value, policy);
 	}
 	
 	/**
@@ -136,24 +138,5 @@ public class EnumSwitchable<T, E extends Enum<E>> extends Modifiable<T> {
 	 */
 	public void setPolicy(E policy) {
 		this.policy = policy;
-	}
-	
-	/**
-	 * A functional interface that allows to switch the value based on a policy.
-	 *
-	 * @param <T> The type of the value.
-	 * @param <E> The type of the policy.
-	 */
-	@FunctionalInterface
-	public interface Switcher<T, E extends Enum<E>> {
-		
-		/**
-		 * Switches the value based on the policy.
-		 *
-		 * @param value The value to be switched.
-		 * @param policy The policy to be used.
-		 * @return The switched value.
-		 */
-		T switchPolicy(T value, E policy);
 	}
 }

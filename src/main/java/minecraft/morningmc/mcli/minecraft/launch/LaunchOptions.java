@@ -1,6 +1,6 @@
 package minecraft.morningmc.mcli.minecraft.launch;
 
-import minecraft.morningmc.mcli.minecraft.client.directory.TargetMinecraftDirectory;
+import minecraft.morningmc.mcli.minecraft.client.MinecraftDirectory;
 import minecraft.morningmc.mcli.minecraft.java.JavaRuntime;
 import minecraft.morningmc.mcli.utils.*;
 import minecraft.morningmc.mcli.utils.containers.*;
@@ -12,7 +12,6 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.util.*;
 
 /**
@@ -30,7 +29,7 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
                              Switchable<MemoryRange> memoryRange,
                              Switchable<List<String>> javaArguments,
                              Modifiable<Boolean> useWaterMark,
-                             EnumSwitchable<TargetMinecraftDirectory, TargetMinecraftDirectory.Policy> gameDir,
+                             EnumSwitchable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir,
                              Modifiable<WindowSize> windowSize,
                              Switchable<ServerInfo> serverInfo) {
 	private static final Logger LOGGER = LogManager.getLogger();
@@ -72,9 +71,9 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 				useWaterMark = DEFAULT.useWaterMark;
 			}
 			
-			EnumSwitchable<TargetMinecraftDirectory, TargetMinecraftDirectory.Policy> gameDir;
+			EnumSwitchable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir;
 			try {
-				gameDir = EnumSwitchable.generateLoader(TargetMinecraftDirectory.LOADER, TargetMinecraftDirectory.Policy.class).load(tag.getCompound("gameDir"));
+				gameDir = EnumSwitchable.generateLoader(MinecraftDirectory.LOADER, MinecraftDirectory.Policy.class).load(tag.getCompound("gameDir"));
 			} catch (Exception e) {
 				LOGGER.warn("gameDir load failed: {}", e.getMessage());
 				gameDir = DEFAULT.gameDir;
@@ -129,7 +128,7 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			
 			try {
 				
-				tag.put("gameDir", EnumSwitchable.generateLoader(TargetMinecraftDirectory.LOADER, TargetMinecraftDirectory.Policy.class).save(object.gameDir));
+				tag.put("gameDir", EnumSwitchable.generateLoader(MinecraftDirectory.LOADER, MinecraftDirectory.Policy.class).save(object.gameDir));
 			} catch (Exception e) {
 				LOGGER.warn("gameDir save failed: {}", e.getMessage());
 			}
@@ -156,7 +155,7 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			Switchable.ofDisabled(MemoryRange.of(2048)),
 			Switchable.ofDisabled(List.of("-XX:+UnlockExperimentalVMOptions", "-XX:+UseG1GC", "-XX:G1NewSizePercent=20", "-XX:G1ReservePercent=20", "-XX:MaxGCPauseMillis=50", "-XX:G1HeapRegionSize=32M")),
 			Modifiable.of(false),
-			EnumSwitchable.of(TargetMinecraftDirectory.STANDARD, TargetMinecraftDirectory.Policy.SOURCE),
+			EnumSwitchable.of(MinecraftDirectory.STANDARD, MinecraftDirectory.Policy.STANDARD),
 			Modifiable.of(WindowSize.window(1024, 768)),
 			Switchable.ofDisabled(null)
 	);

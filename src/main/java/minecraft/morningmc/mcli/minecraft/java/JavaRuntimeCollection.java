@@ -86,7 +86,6 @@ public class JavaRuntimeCollection implements Runnable {
 		if (instance != null) {
 			throw new IllegalStateException("JavaRuntimeCollection already initialized");
 		}
-		
 		instance = new JavaRuntimeCollection();
 		instance.runtimes.addAll(runtimes);
 	}

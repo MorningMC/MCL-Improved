@@ -1,8 +1,8 @@
 package minecraft.morningmc.mcli.launcher.main;
 
 import minecraft.morningmc.mcli.launcher.GlobalSettings;
+import minecraft.morningmc.mcli.launcher.Translation;
 import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
-import minecraft.morningmc.mcli.launcher.metadata.LauncherMetadata;
 import minecraft.morningmc.mcli.minecraft.java.JavaRuntimeCollection;
 import minecraft.morningmc.mcli.minecraft.client.profile.ProfileCollection;
 import minecraft.morningmc.mcli.minecraft.launch.LaunchOptions;
@@ -10,10 +10,8 @@ import minecraft.morningmc.mcli.minecraft.launch.Launcher;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import javafx.scene.image.Image;
-import javafx.scene.Scene;
-import javafx.fxml.FXMLLoader;
 
+import minecraft.morningmc.mcli.ui.UIManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,8 +30,7 @@ public class Main extends Application {
 	private static final Logger LOGGER = LogManager.getLogger();
 	
 	private Launcher launcher;
-	
-	private final Map<String, Scene> scenes = new HashMap<>();
+	private UIManager manager;
 	
 	/**
 	 * Initializes the application. Completes files, loads configuration.
@@ -90,13 +87,12 @@ public class Main extends Application {
 			launcher = new Launcher(LaunchOptions.DEFAULT, null, null);
 		}
 		
-		// Preparing scenes
-		LOGGER.info("Preparing scenes...");
-		
-		FXMLLoader loader = new FXMLLoader();
-		
-		Scene launch = new Scene(loader.load(FileMetadata.getResource("fxmls/LaunchScene.fxml")));
-		scenes.put("launch", launch);
+		try {
+			Translation.LOADER.load(config.getString("translation"));
+		} catch (Exception e) {
+			LOGGER.warn("Failed to load translation: {}", e.getMessage());
+			Translation.init("en");
+		}
 	}
 	
 	/**
@@ -109,10 +105,7 @@ public class Main extends Application {
 	public void start(Stage mainStage) throws Exception {
 		LOGGER.info("Starting launcher lifecycle...");
 		
-		mainStage.getIcons().add(new Image(FileMetadata.getResource("assets/icon.png")));
-		mainStage.setTitle(LauncherMetadata.FULL_NAME);
-		
-		mainStage.setScene(scenes.get("launch"));
+		manager = new UIManager(mainStage);
 		
 		mainStage.show();
 	}
@@ -133,6 +126,7 @@ public class Main extends Application {
 		config.put("profileCollection", ProfileCollection.LOADER.save(ProfileCollection.instance));
 		config.put("javaRuntimeCollection", JavaRuntimeCollection.LOADER.save(JavaRuntimeCollection.instance));
 		config.put("launcher", Launcher.LOADER.save(launcher));
+		config.put("translation", Translation.LOADER.save(Translation.instance));
 		
 		try {
 			new Nbt().toFile(config, FileMetadata.CONFIG);

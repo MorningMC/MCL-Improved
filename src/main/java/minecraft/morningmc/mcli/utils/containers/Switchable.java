@@ -47,7 +47,7 @@ public class Switchable<T> extends Modifiable<T> {
 	 * @param <T> The type of the value.
 	 */
 	public static <T> Switchable<T> ofEnabled(T value) {
-		return new Switchable<>(value, true);
+		return of(value, true);
 	}
 	
 	/**
@@ -59,7 +59,7 @@ public class Switchable<T> extends Modifiable<T> {
 	 * @param <T> The type of the value.
 	 */
 	public static <T> Switchable<T> ofDisabled(T value) {
-		return new Switchable<>(value, false);
+		return of(value, false);
 	}
 	
 	/**

@@ -45,7 +45,7 @@ public class ProcessListener {
 		stdErrListener.start();
 		exitChecker.start();
 		
-		LOGGER.info("Started listening for Minecraft instance " + pid);
+		LOGGER.info("Started listening for Minecraft instance {}", pid);
 		ProcessListenerCollection.add(this);
 	}
 	
@@ -73,12 +73,12 @@ public class ProcessListener {
 			String line;
 			
 			while (running && (line = reader.readLine()) != null) {
-				LOGGER.info("[Minecraft Log #" + pid + "] " + line);
+				LOGGER.info("[Minecraft Log #{}] {}", pid, line);
 				minecraftLogs.add(line);
 			}
 			
 		} catch (IOException e) {
-			LOGGER.error("Error while reading Minecraft stream " + Thread.currentThread().getName() + ": ", e);
+			LOGGER.error("Error while reading Minecraft stream {}: ", Thread.currentThread().getName(), e);
 		}
 	}
 	
@@ -88,7 +88,7 @@ public class ProcessListener {
 	private void exitChecker() {
 		try {
 			int exitCode = minecraftInstance.waitFor();
-			LOGGER.info("Minecraft process exited with code: " + exitCode);
+			LOGGER.info("Minecraft process exited with code: {}", exitCode);
 			
 			running = false;
 			ProcessListenerCollection.remove(this);

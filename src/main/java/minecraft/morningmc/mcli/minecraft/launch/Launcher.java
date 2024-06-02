@@ -139,7 +139,7 @@ public class Launcher {
 		}
 		
 		ProcessBuilder builder = new ProcessBuilder(commandline);
-		builder.directory(arguments.getDirectory().getRoot());
+		builder.directory(arguments.getDirectory().root());
 		
 		Process process;
 		try {

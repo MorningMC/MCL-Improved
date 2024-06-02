@@ -1,11 +1,17 @@
 package minecraft.morningmc.mcli.minecraft.launch;
 
-import minecraft.morningmc.mcli.minecraft.client.directory.TargetMinecraftDirectory;
+import minecraft.morningmc.mcli.minecraft.client.MinecraftDirectory;
 import minecraft.morningmc.mcli.minecraft.client.profile.Profile;
 
 import java.io.File;
 import java.util.*;
 
+/**
+ * Represents the arguments to be passed to the Minecraft client.
+ *
+ * @param options the launch options.
+ * @param profile the profile to be launched.
+ */
 public record LaunchArguments(LaunchOptions options, Profile profile) {
 	
 	public LaunchArguments(LaunchOptions options, Profile profile) {
@@ -14,18 +20,17 @@ public record LaunchArguments(LaunchOptions options, Profile profile) {
 	}
 	
 	public List<String> generateCommandline() {
-		return List.of();
+		return List.of(); // TODO complete launch statement
 	}
 	
-	public TargetMinecraftDirectory getDirectory() {
-		TargetMinecraftDirectory directory = options.gameDir().get((value, policy) -> switch (policy) {
-			case ISOLATED -> new TargetMinecraftDirectory(new File(TargetMinecraftDirectory.ISOLATE_ROOT, profile.identifier().toString()));
+	public MinecraftDirectory getDirectory() {
+		MinecraftDirectory directory = options.gameDir().get((value, policy) -> switch (policy) {
+			case ISOLATED -> new MinecraftDirectory(new File(MinecraftDirectory.ISOLATE_ROOT, profile.identifier().toString()));
 			case CUSTOM -> value;
-			case STANDARD -> TargetMinecraftDirectory.STANDARD;
-			default -> profile.version().get().source().toTarget();
+			default -> MinecraftDirectory.STANDARD;
 		});
 		
-		directory.getRoot().mkdirs();
+		directory.root().mkdirs();
 		return directory;
 	}
 }
