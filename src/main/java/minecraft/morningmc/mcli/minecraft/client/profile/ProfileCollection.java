@@ -19,10 +19,10 @@ import java.util.stream.*;
  */
 @ObjectCollection
 public class ProfileCollection {
-	private static final Logger LOGGER = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	
 	/** NbtLoader for loading and saving {@code ProfileCollection} objects from/to NBT data. */
-	public static final NbtLoader<ProfileCollection, ListTag<CompoundTag>> LOADER = new NbtLoader<>() {
+	public static final NbtLoader<ProfileCollection, ListTag<CompoundTag>> loader = new NbtLoader<>() {
 		
 		/**
 		 * Loads a {@code ProfileCollection} object from a list of NBT compound tags.
@@ -36,9 +36,9 @@ public class ProfileCollection {
 			init(tag.getValue().stream()
 					     .flatMap(subTag -> {
 						     try {
-							     return Stream.of(Profile.LOADER.load(subTag));
+							     return Stream.of(Profile.loader.load(subTag));
 						     } catch (IllegalNbtException e) {
-							     LOGGER.warn("Failed to load profile from NBT: {}", e.getMessage());
+							     logger.warn("Failed to load profile from NBT: {}", e.getMessage());
 							     return Stream.empty();
 						     }
 					     })
@@ -57,7 +57,7 @@ public class ProfileCollection {
 			ListTag<CompoundTag> tag = new ListTag<>();
 			
 			object.profiles.values().stream()
-					.map(Profile.LOADER::save)
+					.map(Profile.loader::save)
 					.forEach(tag::add);
 			
 			return tag;

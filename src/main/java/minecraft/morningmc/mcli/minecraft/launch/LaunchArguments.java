@@ -25,9 +25,9 @@ public record LaunchArguments(LaunchOptions options, Profile profile) {
 	
 	public MinecraftDirectory getDirectory() {
 		MinecraftDirectory directory = options.gameDir().get((value, policy) -> switch (policy) {
-			case ISOLATED -> new MinecraftDirectory(new File(MinecraftDirectory.ISOLATE_ROOT, profile.identifier().toString()));
+			case ISOLATED -> new MinecraftDirectory(new File(MinecraftDirectory.isolateRoot, profile.identifier().toString()));
 			case CUSTOM -> value;
-			default -> MinecraftDirectory.STANDARD;
+			default -> MinecraftDirectory.standard;
 		});
 		
 		directory.root().mkdirs();

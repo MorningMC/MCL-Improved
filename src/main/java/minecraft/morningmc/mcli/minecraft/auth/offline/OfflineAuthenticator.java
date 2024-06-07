@@ -7,8 +7,8 @@ import minecraft.morningmc.mcli.utils.exceptions.AuthenticationException;
 import java.util.*;
 
 public class OfflineAuthenticator implements Authenticator {
-	String username;
-	UUID uuid;
+	private final String username;
+	private final UUID uuid;
 	
 	public OfflineAuthenticator(String username) {
 		this(username, UUID.randomUUID());

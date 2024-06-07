@@ -10,8 +10,7 @@ import javafx.stage.Stage;
  * A class to manage the UI of the launcher.
  */
 public class UIManager {
-	public static final Image ICON = new Image(FileMetadata.getResource(
-			LauncherMetadata.VERSION.isStable() ? "assets/textures/icons/stable.png" : "assets/textures/icons/dev.png"));
+	public static final Image icon = new Image(FileMetadata.getResource("assets/textures/icon.png"));
 	
 	private final Stage mainStage;
 	
@@ -23,11 +22,11 @@ public class UIManager {
 	public UIManager(Stage mainStage) {
 		this.mainStage = mainStage;
 		
-		mainStage.setTitle(LauncherMetadata.FULL_NAME);
-		mainStage.getIcons().add(ICON);
+		mainStage.setTitle(LauncherMetadata.fullName);
+		mainStage.getIcons().add(icon);
 		
-		mainStage.setWidth(1536);
-		mainStage.setHeight(949);
+		mainStage.setWidth(1024);
+		mainStage.setHeight(632);
 		
 		mainStage.show();
 	}

@@ -1,5 +1,7 @@
 package minecraft.morningmc.mcli.launcher.metadata;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 
 /**
@@ -10,26 +12,26 @@ import java.util.*;
 public final class LauncherMetadata {
 	// Constants
 	/** Represents the name of the launcher. */
-	public static final String NAME = "MCL Improved";
+	public static final String name = "MCL Improved";
 	
 	/** Represents the long name of the launcher. */
-	public static final String LONG_NAME = "Minecraft Launcher Improved";
+	public static final String longName = "Minecraft Launcher Improved";
 	
 	/** Represents the short name of the launcher. */
-	public static final String SHORT_NAME = "MCLI";
+	public static final String shortName = "MCLI";
 	
 	/** Represents the version of the launcher. */
-	public static final Version VERSION = new Version(0, 5, 2, 0);
+	public static final Version version = new Version(0, 5, 2, 0);
 	
 	// Auto-complete
 	/** Represents the full name of the launcher including name and version. */
-	public static final String FULL_NAME = NAME + " " + VERSION;
+	public static final String fullName = name + " " + version;
 	
 	/** Represents the long full name of the launcher including long name and detailed version information. */
-	public static final String LONG_FULL_NAME = LONG_NAME + " " + VERSION.toFullString();
+	public static final String longFullName = longName + " " + version.toFullString();
 	
 	/** Represents the short full name of the launcher including short name and version. */
-	public static final String SHORT_FULL_NAME = SHORT_NAME + " " + VERSION;
+	public static final String shortFullName = shortName + " " + version;
 	
 	/**
 	 * Represents the launcher version.
@@ -70,7 +72,7 @@ public final class LauncherMetadata {
 		}
 		
 		@Override
-		public int compareTo(Version o) {
+		public int compareTo(@NotNull Version o) {
 			return Comparator.comparingInt(Version::version)
 					       .thenComparingInt(Version::branch)
 					       .thenComparingInt(Version::build)

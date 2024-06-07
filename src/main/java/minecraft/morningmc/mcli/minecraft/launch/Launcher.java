@@ -18,10 +18,10 @@ import java.util.*;
  * The Launcher class is responsible for launching the Minecraft client with specified options and profiles.
  */
 public class Launcher {
-	private static final Logger LOGGER = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	
 	/** NbtLoader for loading and saving {@code Launcher} objects from/to NBT data. */
-	public static final NbtLoader<Launcher, CompoundTag> LOADER = new NbtLoader<>() {
+	public static final NbtLoader<Launcher, CompoundTag> loader = new NbtLoader<>() {
 		
 		/**
 		 * Loads a Launcher object from an NBT compound tag.
@@ -32,13 +32,13 @@ public class Launcher {
 		 */
 		@Override
 		public Launcher load(CompoundTag tag) throws IllegalNbtException {
-			LaunchOptions options = LaunchOptions.LOADER.load(tag.getCompound("options"));
+			LaunchOptions options = LaunchOptions.loader.load(tag.getCompound("options"));
 			
 			UUID profile;
 			try {
 				profile = UUID.fromString(tag.getString("profile").getValue());
 			} catch (Exception e) {
-				LOGGER.warn("Failed to load profile: {}", e.getMessage());
+				logger.warn("Failed to load profile: {}", e.getMessage());
 				profile = null;
 			}
 			
@@ -46,7 +46,7 @@ public class Launcher {
 			try {
 				account = UUID.fromString(tag.getString("account").getValue());
 			} catch (Exception e) {
-				LOGGER.warn("Failed to load account: {}", e.getMessage());
+				logger.warn("Failed to load account: {}", e.getMessage());
 				account = null;
 			}
 			
@@ -66,16 +66,16 @@ public class Launcher {
 			try {
 				tag.putString("profile", object.profile.toString());
 			} catch (Exception e) {
-				LOGGER.warn("Failed to save profile: {}", e.getMessage());
+				logger.warn("Failed to save profile: {}", e.getMessage());
 			}
 			
 			try {
 				tag.putString("account", object.account.toString());
 			} catch (Exception e) {
-				LOGGER.warn("Failed to save account: {}", e.getMessage());
+				logger.warn("Failed to save account: {}", e.getMessage());
 			}
 			
-			tag.put("options", LaunchOptions.LOADER.save(object.options));
+			tag.put("options", LaunchOptions.loader.save(object.options));
 			
 			return tag;
 		}
@@ -129,13 +129,13 @@ public class Launcher {
 	private ProcessListener launch(LaunchArguments arguments) throws LaunchException {
 		Objects.requireNonNull(arguments);
 		
-		LOGGER.info("Launching Minecraft...");
+		logger.info("Launching Minecraft...");
 		
 		// log commandline
 		List<String> commandline = arguments.generateCommandline();
-		LOGGER.debug("Commandline: ");
+		logger.debug("Commandline: ");
 		for (String arg : commandline) {
-			LOGGER.debug(arg);
+			logger.debug(arg);
 		}
 		
 		ProcessBuilder builder = new ProcessBuilder(commandline);

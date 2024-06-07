@@ -14,19 +14,19 @@ import org.apache.logging.log4j.Logger;
  * The entry point for launching the MCL Improved.
  */
 public class Startup {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
     
     /**
      * Constructs a new instance of {@code Startup}, logging launcher information.
      */
     public Startup() {
-        LOGGER.info(LauncherMetadata.LONG_FULL_NAME);
-	    LOGGER.info("System platform: {}", Platform.SYSTEM);
-	    LOGGER.info("Current platform: {}", Platform.CURRENT);
-	    LOGGER.info("Working root: {}", FileMetadata.WORKING_ROOT);
+        logger.info(LauncherMetadata.longFullName);
+	    logger.info("System platform: {}", Platform.system);
+	    logger.info("Current platform: {}", Platform.current);
+	    logger.info("Working root: {}", FileMetadata.workingRoot);
         
-        if (!LauncherMetadata.VERSION.isStable()) {
-            LOGGER.warn("This is a development build. There may be some issues.");
+        if (!LauncherMetadata.version.isStable()) {
+            logger.warn("This is a development build. There may be some issues.");
         }
     }
     
@@ -36,17 +36,17 @@ public class Startup {
      * @param args Command-line arguments.
      */
     public static void main(String... args) {
-        LOGGER.info("Starting launcher...");
+        logger.info("Starting launcher...");
         
         try {
             new Startup().run(args);
             
         } catch (Throwable t) {
-            LOGGER.fatal("Launcher crashed: ", t);
+            logger.fatal("Launcher crashed: ", t);
             System.exit(-1);
             
         } finally {
-            LOGGER.info("Launcher quit.");
+            logger.info("Launcher quit.");
         }
     }
     

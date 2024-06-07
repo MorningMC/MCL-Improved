@@ -13,7 +13,7 @@ public record WindowSize(boolean fullScreen,
                          int height) {
 	
 	/** NbtLoader for loading and saving {@code WindowSize} objects from/to NBT data. */
-	public static final NbtLoader<WindowSize, CompoundTag> LOADER = new NbtLoader<>() {
+	public static final NbtLoader<WindowSize, CompoundTag> loader = new NbtLoader<>() {
 		
 		/**
 		 * Loads a WindowSize object from an NBT CompoundTag.

@@ -11,7 +11,7 @@ public record Version(String version,
 	/**
 	 * NbtLoader for loading and saving {@code Version} objects from/to NBT data.
 	 */
-	public static final NbtLoader<Version, CompoundTag> LOADER = new NbtLoader<>() {
+	public static final NbtLoader<Version, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
 		public Version load(CompoundTag tag) throws IllegalNbtException {

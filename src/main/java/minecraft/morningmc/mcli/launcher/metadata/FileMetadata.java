@@ -12,16 +12,16 @@ import java.io.*;
  */
 public class FileMetadata {
 	/** The root directory for application data. */
-	public static final File APPDATA = resolveAppData();
+	public static final File appdata = resolveAppData();
 	
 	/** The working root directory for MCLI. */
-	public static final File WORKING_ROOT = new File(APPDATA, ".mcli");
+	public static final File workingRoot = new File(appdata, ".mcli");
 	
 	/** The root directory for caching MCLI-related data. */
-	public static final File CACHE_ROOT = new File(WORKING_ROOT, "cache");
+	public static final File cacheRoot = new File(workingRoot, "cache");
 
 	/** The configuration file for MCLI. */
-	public static final File CONFIG = new File(WORKING_ROOT, "config.nbt");
+	public static final File config = new File(workingRoot, "config.nbt");
 
 	/**
 	 * Resolves the root directory for application data.
@@ -30,7 +30,7 @@ public class FileMetadata {
 	 */
 	private static File resolveAppData() {
 		try {
-			return switch (Platform.CURRENT.operatingSystem()) {
+			return switch (Platform.current.operatingSystem()) {
 				case WINDOWS -> new File(System.getenv("AppData"));
 				case MACOS -> new File(System.getProperty("user.home"), "Library/Application Support");
 				case LINUX -> new File(System.getProperty("user.home"), ".config");
@@ -49,14 +49,14 @@ public class FileMetadata {
 	 */
 	public static int completeFiles() throws IOException {
 		File[] directories = {
-				WORKING_ROOT,
-				CACHE_ROOT,
+				workingRoot,
+				cacheRoot,
 				
-				MinecraftDirectory.STANDARD.root(),
-				MinecraftDirectory.ISOLATE_ROOT
+				MinecraftDirectory.standard.root(),
+				MinecraftDirectory.isolateRoot
 		};
 		File[] files = {
-				CONFIG
+				config
 		};
 		
 		int created = 0;
@@ -79,19 +79,5 @@ public class FileMetadata {
 	 */
 	public static InputStream getResource(String path) {
 		return FileMetadata.class.getClassLoader().getResourceAsStream(path);
-	}
-	
-	/**
-	 * Retrieves an input stream for the specified file.
-	 *
-	 * @param file The file to retrieve an input stream for.
-	 * @return An InputStream for the specified file.
-	 */
-	public static InputStream getFileResource(File file) {
-		try {
-			return new FileInputStream(file);
-		} catch (FileNotFoundException e) {
-			return FileInputStream.nullInputStream();
-		}
 	}
 }

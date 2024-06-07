@@ -14,7 +14,7 @@ import java.util.*;
  */
 @LauncherProcess("launch")
 public class ProcessListener {
-	private static final Logger LOGGER = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	
 	private final Process minecraftInstance;
 	private final long pid;
@@ -45,7 +45,7 @@ public class ProcessListener {
 		stdErrListener.start();
 		exitChecker.start();
 		
-		LOGGER.info("Started listening for Minecraft instance {}", pid);
+		logger.info("Started listening for Minecraft instance {}", pid);
 		ProcessListenerCollection.add(this);
 	}
 	
@@ -59,7 +59,7 @@ public class ProcessListener {
 		stdErrListener.interrupt();
 		
 		minecraftInstance.destroy();
-		LOGGER.info("Stopped Minecraft instance " + minecraftInstance.pid());
+		logger.info("Stopped Minecraft instance " + minecraftInstance.pid());
 	}
 	
 	// Thread Operations
@@ -73,12 +73,12 @@ public class ProcessListener {
 			String line;
 			
 			while (running && (line = reader.readLine()) != null) {
-				LOGGER.info("[Minecraft Log #{}] {}", pid, line);
+				logger.info("[Minecraft Log #{}] {}", pid, line);
 				minecraftLogs.add(line);
 			}
 			
 		} catch (IOException e) {
-			LOGGER.error("Error while reading Minecraft stream {}: ", Thread.currentThread().getName(), e);
+			logger.error("Error while reading Minecraft stream {}: ", Thread.currentThread().getName(), e);
 		}
 	}
 	
@@ -88,13 +88,13 @@ public class ProcessListener {
 	private void exitChecker() {
 		try {
 			int exitCode = minecraftInstance.waitFor();
-			LOGGER.info("Minecraft process exited with code: {}", exitCode);
+			logger.info("Minecraft process exited with code: {}", exitCode);
 			
 			running = false;
 			ProcessListenerCollection.remove(this);
 			
 		} catch (InterruptedException e) {
-			LOGGER.error("exitChecker interrupted: ", e);
+			logger.error("exitChecker interrupted: ", e);
 		}
 	}
 	

@@ -25,10 +25,10 @@ import java.util.stream.*;
  */
 @ObjectCollection
 public class JavaRuntimeCollection implements Runnable {
-	private static final Logger LOGGER = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	
 	/** NbtLoader for loading and saving {@code JavaRuntimeCollection} objects from/to NBT data. */
-	public static final NbtLoader<JavaRuntimeCollection, ListTag<StringTag>> LOADER = new NbtLoader<>() {
+	public static final NbtLoader<JavaRuntimeCollection, ListTag<StringTag>> loader = new NbtLoader<>() {
 		
 		/**
 		 * Load {@code JavaRuntimeCollection} from an NBT list tag.
@@ -42,9 +42,9 @@ public class JavaRuntimeCollection implements Runnable {
 			init(tag.getValue().parallelStream()
 					     .flatMap(subTag -> {
 						     try {
-							     return Stream.of(JavaRuntime.LOADER.load(subTag));
+							     return Stream.of(JavaRuntime.loader.load(subTag));
 						     } catch (IllegalNbtException e) {
-							     LOGGER.warn("Failed to load Java runtime from NBT: {}", e.getMessage());
+							     logger.warn("Failed to load Java runtime from NBT: {}", e.getMessage());
 							     return Stream.empty();
 						     }
 					     })
@@ -63,18 +63,18 @@ public class JavaRuntimeCollection implements Runnable {
 			ListTag<StringTag> tag = new ListTag<>();
 			
 			object.runtimes.parallelStream()
-					.map(JavaRuntime.LOADER::save)
+					.map(JavaRuntime.loader::save)
 					.forEach(tag::add);
 			
 			return tag;
 		}
 	};
 	@SuppressWarnings("unchecked")
-	private static final Comparator<JavaRuntime> COMPARATOR = ((Comparator<JavaRuntime>) Comparator.reverseOrder()).thenComparingInt(JavaRuntime::hashCode);
+	private static final Comparator<JavaRuntime> comparator = ((Comparator<JavaRuntime>) Comparator.reverseOrder()).thenComparingInt(JavaRuntime::hashCode);
 	
 	public static JavaRuntimeCollection instance = null;
 	
-	private final Set<JavaRuntime> runtimes = new TreeSet<>(COMPARATOR);
+	private final Set<JavaRuntime> runtimes = new TreeSet<>(comparator);
 	private Thread thread = null;
 	
 	/**
@@ -138,7 +138,7 @@ public class JavaRuntimeCollection implements Runnable {
 				try {
 					runtime.refresh();
 				} catch (IllegalJavaException e) {
-					LOGGER.warn("Expired Java runtime: " + runtime, e);
+					logger.warn("Expired Java runtime: {}", runtime, e);
 					return true;
 				}
 				
@@ -146,11 +146,11 @@ public class JavaRuntimeCollection implements Runnable {
 			});
 			
 			// search potential runtimes
-			LOGGER.info("Start searching for potential Java runtimes...");
+			logger.info("Start searching for potential Java runtimes...");
 			
 			try {
 				long startTime = System.currentTimeMillis();
-				Set<JavaRuntime> potentialRuntimes = new TreeSet<>(COMPARATOR);
+				Set<JavaRuntime> potentialRuntimes = new TreeSet<>(comparator);
 				
 				// Add order:
 				// 1. System-defined locations
@@ -158,7 +158,7 @@ public class JavaRuntimeCollection implements Runnable {
 				// 3. PATH
 				
 				// System-defined locations
-				switch (Platform.CURRENT.operatingSystem()) {
+				switch (Platform.current.operatingSystem()) {
 					case WINDOWS -> {
 						potentialRuntimes.addAll(queryJavaHomesInRegistryKey("HKEY_LOCAL_MACHINE\\SOFTWARE\\JavaSoft\\Java Runtime Environment\\"));
 						potentialRuntimes.addAll(queryJavaHomesInRegistryKey("HKEY_LOCAL_MACHINE\\SOFTWARE\\JavaSoft\\Java Development Kit\\"));
@@ -191,13 +191,13 @@ public class JavaRuntimeCollection implements Runnable {
 								if (file.isDirectory()) {
 									File home = new File(file, "Contents/Home");
 									if (home.exists()) {
-										LOGGER.trace("Query home: " + home.getAbsolutePath());
+										logger.trace("Query home: " + home.getAbsolutePath());
 										potentialRuntimes.add(JavaRuntime.fromHome(home));
 									}
 									
 									home = new File(home, "jre");
 									if (home.exists()) {
-										LOGGER.trace("Query home: " + home.getAbsolutePath());
+										logger.trace("Query home: " + home.getAbsolutePath());
 										potentialRuntimes.add(JavaRuntime.fromHome(home));
 									}
 								}
@@ -209,7 +209,7 @@ public class JavaRuntimeCollection implements Runnable {
 								if (file.isDirectory()) {
 									File home = new File(file, "Contents/Home");
 									if (home.exists()) {
-										LOGGER.trace("Query home: " + home.getAbsolutePath());
+										logger.trace("Query home: " + home.getAbsolutePath());
 										potentialRuntimes.add(JavaRuntime.fromHome(home));
 									}
 								}
@@ -228,7 +228,7 @@ public class JavaRuntimeCollection implements Runnable {
 				
 				// Minecraft-installed locations
 				Set<File> minecraftLocations = new HashSet<>();
-				switch (Platform.CURRENT.operatingSystem()) {
+				switch (Platform.current.operatingSystem()) {
 					case WINDOWS -> {
 						File file = new File(System.getenv("LocalAppData"), "Packages\\Microsoft.4297127D64EC6_8wekyb3d8bbwe\\LocalCache\\Local\\runtime");
 						if (file.exists()) {
@@ -274,7 +274,7 @@ public class JavaRuntimeCollection implements Runnable {
 									for (File file : Objects.requireNonNull(dir.listFiles())) {
 										File home = new File(file, component);
 										
-										LOGGER.trace("Query home: " + home.getAbsolutePath());
+										logger.trace("Query home: " + home.getAbsolutePath());
 										potentialRuntimes.add(JavaRuntime.fromHome(home));
 									}
 								} catch (Exception ignored) {}
@@ -285,13 +285,13 @@ public class JavaRuntimeCollection implements Runnable {
 				
 				// PATH
 				try {
-					Arrays.stream(System.getenv("PATH").split(Platform.CURRENT.pathSeparator()))
+					Arrays.stream(System.getenv("PATH").split(Platform.current.pathSeparator()))
 							.parallel()
 							.map(File::new)
 							.filter(bin -> bin.getName().equals("bin"))
-							.map(bin -> new File(bin, JavaRuntime.JAVA))
+							.map(bin -> new File(bin, JavaRuntime.java))
 							.flatMap(executable -> {
-								LOGGER.trace("Query executable in PATH: {}", executable);
+								logger.trace("Query executable in PATH: {}", executable);
 								try {
 									return Stream.of(JavaRuntime.fromPath(executable));
 								} catch (IllegalJavaException e) {
@@ -301,28 +301,28 @@ public class JavaRuntimeCollection implements Runnable {
 							.forEach(potentialRuntimes::add);
 					
 				} catch (Exception e) {
-					LOGGER.warn("Failed to parse PATH: {}", e.getMessage());
+					logger.warn("Failed to parse PATH: {}", e.getMessage());
 				}
 				
-				if (JavaRuntime.CURRENT != null) {
-					potentialRuntimes.add(JavaRuntime.CURRENT);
+				if (JavaRuntime.current != null) {
+					potentialRuntimes.add(JavaRuntime.current);
 				}
 				
 				long stopTime = System.currentTimeMillis();
 				
-				LOGGER.info("Finish searching potential Java runtimes. Found {}", potentialRuntimes.size());
-				LOGGER.info("Used {} ms", stopTime - startTime);
+				logger.info("Finish searching potential Java runtimes. Found {}", potentialRuntimes.size());
+				logger.info("Used {} ms", stopTime - startTime);
 				
 				runtimes.addAll(potentialRuntimes);
 				
 			} catch (Exception e) {
-				LOGGER.error("Failed to search potential Java runtimes: ", e);
+				logger.error("Failed to search potential Java runtimes: ", e);
 			}
 			
 			// list found runtimes
-			LOGGER.debug("Found {} Java runtimes in total:", runtimes.size());
+			logger.debug("Found {} Java runtimes in total:", runtimes.size());
 			for (JavaRuntime runtime : runtimes) {
-				LOGGER.debug(runtime.toString());
+				logger.debug(runtime.toString());
 			}
 		}
 	}
@@ -344,7 +344,7 @@ public class JavaRuntimeCollection implements Runnable {
 	}
 	
 	private static Stream<JavaRuntime> parseHome(File home) {
-		LOGGER.trace("Query home: " + home.getAbsolutePath());
+		logger.trace("Query home: " + home.getAbsolutePath());
 		
 		try {
 			return Stream.of(JavaRuntime.fromHome(home));
@@ -370,7 +370,7 @@ public class JavaRuntimeCollection implements Runnable {
 					try {
 						homes.add(JavaRuntime.fromHome(new File(home)));
 					} catch (InvalidPathException | IllegalJavaException e) {
-						LOGGER.warn("Invalid Java path in system registry: {}", home);
+						logger.warn("Invalid Java path in system registry: {}", home);
 					}
 				}
 			}

@@ -10,7 +10,7 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
  */
 public record ServerInfo(String host, int port) {
 	/** NbtLoader for loading and saving {@code ServerInfo} objects from/to NBT data. */
-	public static final NbtLoader<ServerInfo, CompoundTag> LOADER = new NbtLoader<>() {
+	public static final NbtLoader<ServerInfo, CompoundTag> loader = new NbtLoader<>() {
 		
 		/**
 		 * Loads a {@code ServerInfo} object from an NBT compound tag.

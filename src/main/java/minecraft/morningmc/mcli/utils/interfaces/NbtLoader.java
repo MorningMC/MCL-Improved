@@ -17,7 +17,7 @@ import java.util.List;
 public interface NbtLoader<C, T extends Tag> {
 	
 	/** Loader instance for handling lists of strings in NBT format. */
-	NbtLoader<List<String>, ListTag<StringTag>> STRING_LIST_LOADER = new NbtLoader<>() {
+	NbtLoader<List<String>, ListTag<StringTag>> stringListLoader = new NbtLoader<>() {
 		
 		/**
 		 * Load a list of strings from an NBT list tag.

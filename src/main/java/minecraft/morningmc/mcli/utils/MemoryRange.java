@@ -17,7 +17,7 @@ import java.util.regex.*;
  */
 public record MemoryRange(long minimum, long maximum) {
 	/** NbtLoader for loading and saving {@code MemoryRange} objects from/to NBT data. */
-	public static final NbtLoader<MemoryRange, CompoundTag> LOADER = new NbtLoader<>() {
+	public static final NbtLoader<MemoryRange, CompoundTag> loader = new NbtLoader<>() {
 		
 		/**
 		 * Loads a {@code MemoryRange} object from an NBT compound tag.
@@ -91,7 +91,7 @@ public record MemoryRange(long minimum, long maximum) {
 	 */
 	public static MemoryRange recommendMemoryRange() {
 		long totalMemory = -1;
-		if (Platform.SYSTEM.operatingSystem() == Platform.OperatingSystem.LINUX) {
+		if (Platform.system.operatingSystem() == Platform.OperatingSystem.LINUX) {
 			try (BufferedReader reader = new BufferedReader(new FileReader("/proc/meminfo"))) {
 				for (String line; ( line = reader.readLine() ) != null; ) {
 					Matcher matcher = Pattern.compile("^(?<key>.*?):\\s+(?<value>\\d+) kB?$").matcher(line);

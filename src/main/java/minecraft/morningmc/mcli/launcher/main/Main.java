@@ -27,7 +27,7 @@ import java.util.*;
  * and handles the lifecycle of the application.
  */
 public class Main extends Application {
-	private static final Logger LOGGER = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	
 	private Launcher launcher;
 	private UIManager manager;
@@ -39,58 +39,58 @@ public class Main extends Application {
 	 */
 	@Override
 	public void init() throws Exception {
-		LOGGER.info("Initializing launcher...");
+		logger.info("Initializing launcher...");
 		
 		try {
 			int created = FileMetadata.completeFiles();
-			LOGGER.debug("Completed {} files.", created);
+			logger.debug("Completed {} files.", created);
 			
 		} catch (IOException e) {
-			LOGGER.error("Complete files failed: ", e);
+			logger.error("Complete files failed: ", e);
 		}
 		
 		// Load config
 		CompoundTag config;
 		try {
-			config = new Nbt().fromFile(FileMetadata.CONFIG);
+			config = new Nbt().fromFile(FileMetadata.config);
 		} catch (IOException e) {
-			LOGGER.warn("Failed to load config: {}", e.getMessage());
+			logger.warn("Failed to load config: {}", e.getMessage());
 			config = new CompoundTag();
 		}
 		
 		try {
-			GlobalSettings.LOADER.load(config.getCompound("globalSettings"));
+			GlobalSettings.loader.load(config.getCompound("globalSettings"));
 		} catch (Exception e) {
-			LOGGER.warn("Failed to load globalSettings: {}", e.getMessage());
+			logger.warn("Failed to load globalSettings: {}", e.getMessage());
 			GlobalSettings.init(GlobalSettings.DEFAULT);
 		}
 		
 		try {
-			ProfileCollection.LOADER.load(config.getList("profileCollection"));
+			ProfileCollection.loader.load(config.getList("profileCollection"));
 		} catch (Exception e) {
-			LOGGER.warn("Failed to load profileCollection: {}", e.getMessage());
+			logger.warn("Failed to load profileCollection: {}", e.getMessage());
 			ProfileCollection.init(Set.of());
 		}
 		
 		try {
-			JavaRuntimeCollection.LOADER.load(config.getList("javaRuntimeCollection"));
+			JavaRuntimeCollection.loader.load(config.getList("javaRuntimeCollection"));
 		} catch (Exception e) {
-			LOGGER.warn("Failed to load javaRuntimeCollection: {}", e.getMessage());
+			logger.warn("Failed to load javaRuntimeCollection: {}", e.getMessage());
 			JavaRuntimeCollection.init(Set.of());
 		}
 		JavaRuntimeCollection.search();
 		
 		try {
-			launcher = Launcher.LOADER.load(config.getCompound("launcher"));
+			launcher = Launcher.loader.load(config.getCompound("launcher"));
 		} catch (Exception e) {
-			LOGGER.warn("Failed to load launcher: {}", e.getMessage());
+			logger.warn("Failed to load launcher: {}", e.getMessage());
 			launcher = new Launcher(LaunchOptions.DEFAULT, null, null);
 		}
 		
 		try {
-			Translation.LOADER.load(config.getString("translation"));
+			Translation.loader.load(config.getString("translation"));
 		} catch (Exception e) {
-			LOGGER.warn("Failed to load translation: {}", e.getMessage());
+			logger.warn("Failed to load translation: {}", e.getMessage());
 			Translation.init("en");
 		}
 	}
@@ -103,7 +103,7 @@ public class Main extends Application {
 	 */
 	@Override
 	public void start(Stage mainStage) throws Exception {
-		LOGGER.info("Starting launcher lifecycle...");
+		logger.info("Starting launcher lifecycle...");
 		
 		manager = new UIManager(mainStage);
 		
@@ -117,21 +117,21 @@ public class Main extends Application {
 	 */
 	@Override
 	public void stop() throws Exception {
-		LOGGER.info("Stopping launcher...");
+		logger.info("Stopping launcher...");
 		
 		// Save config
 		CompoundTag config = new CompoundTag();
 		
-		config.put("globalSettings", GlobalSettings.LOADER.save(GlobalSettings.instance));
-		config.put("profileCollection", ProfileCollection.LOADER.save(ProfileCollection.instance));
-		config.put("javaRuntimeCollection", JavaRuntimeCollection.LOADER.save(JavaRuntimeCollection.instance));
-		config.put("launcher", Launcher.LOADER.save(launcher));
-		config.put("translation", Translation.LOADER.save(Translation.instance));
+		config.put("globalSettings", GlobalSettings.loader.save(GlobalSettings.instance));
+		config.put("profileCollection", ProfileCollection.loader.save(ProfileCollection.instance));
+		config.put("javaRuntimeCollection", JavaRuntimeCollection.loader.save(JavaRuntimeCollection.instance));
+		config.put("launcher", Launcher.loader.save(launcher));
+		config.put("translation", Translation.loader.save(Translation.instance));
 		
 		try {
-			new Nbt().toFile(config, FileMetadata.CONFIG);
-		} catch (IOException e) {
-			LOGGER.error("Failed to save config: ", e);
+			new Nbt().toFile(config, FileMetadata.config);
+		} catch (Exception e) {
+			logger.error("Failed to save config: ", e);
 		}
 	}
 }

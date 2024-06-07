@@ -2,9 +2,6 @@ package minecraft.morningmc.mcli.minecraft.launch.listener;
 
 import minecraft.morningmc.mcli.utils.annotations.ObjectCollection;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.util.*;
 
 /**
@@ -12,8 +9,6 @@ import java.util.*;
  */
 @ObjectCollection
 public class ProcessListenerCollection {
-	private static final Logger LOGGER = LogManager.getLogger();
-	
 	public static ProcessListenerCollection instance = new ProcessListenerCollection();
 	
 	public Map<Long, ProcessListener> listeners;

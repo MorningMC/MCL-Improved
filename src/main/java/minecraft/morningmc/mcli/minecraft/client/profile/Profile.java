@@ -25,15 +25,15 @@ public record Profile(Modifiable<String> name,
                       UUID identifier) implements Comparable<Profile>, UniqueObject {
 	
 	/** NbtLoader for loading and saving {@code Profile} objects from/to NBT data. */
-	public static final NbtLoader<Profile, CompoundTag> LOADER = new NbtLoader<>() {
+	public static final NbtLoader<Profile, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
 		public Profile load(CompoundTag tag) throws IllegalNbtException {
 			return new Profile(
 					Modifiable.of(tag.getString("name").getValue()),
 					Modifiable.of(tag.getString("icon").getValue()),
-					Modifiable.of(Version.LOADER.load(tag.getCompound("version"))),
-					Switchable.generateLoader(LaunchOptions.LOADER).load(tag.getCompound("options")),
+					Modifiable.of(Version.loader.load(tag.getCompound("version"))),
+					Switchable.generateLoader(LaunchOptions.loader).load(tag.getCompound("options")),
 					UUID.fromString(tag.getString("identifier").getValue())
 			);
 		}
@@ -48,8 +48,8 @@ public record Profile(Modifiable<String> name,
 			
 			tag.putString("name", object.name.get());
 			tag.putString("icon", object.icon.get());
-			tag.put("version", Version.LOADER.save(object.version.get()));
-			tag.put("options", Switchable.generateLoader(LaunchOptions.LOADER).save(object.options));
+			tag.put("version", Version.loader.save(object.version.get()));
+			tag.put("options", Switchable.generateLoader(LaunchOptions.loader).save(object.options));
 			tag.putString("identifier", object.identifier.toString());
 			
 			return tag;

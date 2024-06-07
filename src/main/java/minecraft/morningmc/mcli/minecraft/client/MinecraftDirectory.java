@@ -12,7 +12,7 @@ import java.io.File;
  */
 public class MinecraftDirectory {
 	/** NbtLoader for loading and saving {@code MinecraftDirectory} objects from/to NBT data. */
-	public static final NbtLoader<MinecraftDirectory, StringTag> LOADER = new NbtLoader<>() {
+	public static final NbtLoader<MinecraftDirectory, StringTag> loader = new NbtLoader<>() {
 		
 		@Override
 		public MinecraftDirectory load(StringTag tag) {
@@ -25,8 +25,8 @@ public class MinecraftDirectory {
 		}
 	};
 	
-	public static final MinecraftDirectory STANDARD = new MinecraftDirectory(new File(FileMetadata.APPDATA, ".minecraft"));
-	public static final File ISOLATE_ROOT = new File(STANDARD.root(), "isolate");
+	public static final MinecraftDirectory standard = new MinecraftDirectory(new File(FileMetadata.appdata, ".minecraft"));
+	public static final File isolateRoot = new File(standard.root(), "isolate");
 	
 	/**  The root directory for Minecraft-related files. */
 	protected final File root;

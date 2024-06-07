@@ -21,10 +21,10 @@ import org.jetbrains.annotations.NotNull;
  * Represents a Java runtime, providing methods for retrieving Java version and executable information.
  */
 public record JavaRuntime(File executable, Runtime.Version version, Platform platform) implements Comparable<JavaRuntime> {
-	private static final Logger LOGGER = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	
 	/** NbtLoader for loading and saving {@code JavaRuntime} objects from/to NBT data. */
-	public static final NbtLoader<JavaRuntime, StringTag> LOADER = new NbtLoader<>() {
+	public static final NbtLoader<JavaRuntime, StringTag> loader = new NbtLoader<>() {
 		
 		@Override
 		public JavaRuntime load(StringTag tag) throws IllegalNbtException {
@@ -42,10 +42,10 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	};
 	
 	/** The default executable name for Java. */
-	public static final String JAVA = Platform.SYSTEM.operatingSystem() == Platform.OperatingSystem.WINDOWS ? "java.exe" : "java";
+	public static final String java = Platform.system.operatingSystem() == Platform.OperatingSystem.WINDOWS ? "java.exe" : "java";
 	
 	/** The current Java runtime based on the system properties. */
-	public static final JavaRuntime CURRENT = resolveCurrent();
+	public static final JavaRuntime current = resolveCurrent();
 	
 	/**
 	 * Creates a {@code JavaRuntime} instance from the given executable path.
@@ -104,7 +104,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	 * @throws IllegalJavaException If an error occurs during Java version retrieval.
 	 */
 	public static JavaRuntime fromHome(File home) throws IllegalJavaException {
-		return fromPath(new File(home, "bin/" + JAVA));
+		return fromPath(new File(home, "bin/" + java));
 	}
 	
 	/**
@@ -130,7 +130,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 			return fromHome(new File(System.getProperty("java.home")));
 			
 		} catch (IllegalJavaException e) {
-			LOGGER.warn("Failed to get current Java runtime: ", e);
+			logger.warn("Failed to get current Java runtime: ", e);
 			return null;
 		}
 	}

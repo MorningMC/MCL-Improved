@@ -9,7 +9,7 @@ import java.util.*;
 
 @ObjectCollection
 public class AccountCollection {
-	private static final Logger LOGGER = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	
 	public static AccountCollection instance = null;
 	

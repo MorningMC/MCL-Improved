@@ -32,34 +32,34 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
                              EnumSwitchable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir,
                              Modifiable<WindowSize> windowSize,
                              Switchable<ServerInfo> serverInfo) {
-	private static final Logger LOGGER = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	
 	/** NbtLoader for loading and saving {@code LaunchOptions} objects from/to NBT data. */
-	public static final NbtLoader<LaunchOptions, CompoundTag> LOADER = new NbtLoader<>() {
+	public static final NbtLoader<LaunchOptions, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
 		public LaunchOptions load(CompoundTag tag) throws IllegalNbtException {
 			Switchable<JavaRuntime> javaRuntime;
 			try {
-				javaRuntime = Switchable.generateLoader(JavaRuntime.LOADER).load(tag.getCompound("javaRuntime"));
+				javaRuntime = Switchable.generateLoader(JavaRuntime.loader).load(tag.getCompound("javaRuntime"));
 			} catch (Exception e) {
-				LOGGER.warn("javaRuntime load failed: {}", e.getMessage());
+				logger.warn("javaRuntime load failed: {}", e.getMessage());
 				javaRuntime = DEFAULT.javaRuntime;
 			}
 			
 			Switchable<MemoryRange> memoryRange;
 			try {
-				memoryRange = Switchable.generateLoader(MemoryRange.LOADER).load(tag.getCompound("memoryRange"));
+				memoryRange = Switchable.generateLoader(MemoryRange.loader).load(tag.getCompound("memoryRange"));
 			} catch (Exception e) {
-				LOGGER.warn("memoryRange load failed: {}", e.getMessage());
+				logger.warn("memoryRange load failed: {}", e.getMessage());
 				memoryRange = DEFAULT.memoryRange;
 			}
 			
 			Switchable<List<String>> javaArguments;
 			try {
-				javaArguments = Switchable.generateLoader(NbtLoader.STRING_LIST_LOADER).load(tag.getCompound("javaArguments"));
+				javaArguments = Switchable.generateLoader(NbtLoader.stringListLoader).load(tag.getCompound("javaArguments"));
 			} catch (Exception e) {
-				LOGGER.warn("javaArguments load failed: {}", e.getMessage());
+				logger.warn("javaArguments load failed: {}", e.getMessage());
 				javaArguments = DEFAULT.javaArguments;
 			}
 			
@@ -67,31 +67,31 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			try {
 				useWaterMark = Modifiable.of(tag.getByte("useWaterMark").getValue() != 0);
 			} catch (Exception e) {
-				LOGGER.warn("useWaterMark load failed: {}", e.getMessage());
+				logger.warn("useWaterMark load failed: {}", e.getMessage());
 				useWaterMark = DEFAULT.useWaterMark;
 			}
 			
 			EnumSwitchable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir;
 			try {
-				gameDir = EnumSwitchable.generateLoader(MinecraftDirectory.LOADER, MinecraftDirectory.Policy.class).load(tag.getCompound("gameDir"));
+				gameDir = EnumSwitchable.generateLoader(MinecraftDirectory.loader, MinecraftDirectory.Policy.class).load(tag.getCompound("gameDir"));
 			} catch (Exception e) {
-				LOGGER.warn("gameDir load failed: {}", e.getMessage());
+				logger.warn("gameDir load failed: {}", e.getMessage());
 				gameDir = DEFAULT.gameDir;
 			}
 			
 			Modifiable<WindowSize> windowSize;
 			try {
-				windowSize = Modifiable.of(WindowSize.LOADER.load(tag.getCompound("windowSize")));
+				windowSize = Modifiable.of(WindowSize.loader.load(tag.getCompound("windowSize")));
 			} catch (Exception e) {
-				LOGGER.warn("windowSize load failed: {}", e.getMessage());
+				logger.warn("windowSize load failed: {}", e.getMessage());
 				windowSize = DEFAULT.windowSize;
 			}
 			
 			Switchable<ServerInfo> serverInfo;
 			try {
-				serverInfo = Switchable.generateLoader(ServerInfo.LOADER).load(tag.getCompound("serverInfo"));
+				serverInfo = Switchable.generateLoader(ServerInfo.loader).load(tag.getCompound("serverInfo"));
 			} catch (Exception e) {
-				LOGGER.warn("serverInfo load failed: {}", e.getMessage());
+				logger.warn("serverInfo load failed: {}", e.getMessage());
 				serverInfo = DEFAULT.serverInfo;
 			}
 			
@@ -103,46 +103,46 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 			CompoundTag tag = new CompoundTag();
 			
 			try {
-				tag.put("javaRuntime", Switchable.generateLoader(JavaRuntime.LOADER).save(object.javaRuntime));
+				tag.put("javaRuntime", Switchable.generateLoader(JavaRuntime.loader).save(object.javaRuntime));
 			} catch (Exception e) {
-				LOGGER.warn("javaRuntime save failed: {}", e.getMessage());
+				logger.warn("javaRuntime save failed: {}", e.getMessage());
 			}
 			
 			try {
-				tag.put("memoryRange", Switchable.generateLoader(MemoryRange.LOADER).save(object.memoryRange));
+				tag.put("memoryRange", Switchable.generateLoader(MemoryRange.loader).save(object.memoryRange));
 			} catch (Exception e) {
-				LOGGER.warn("memoryRange save failed: {}", e.getMessage());
+				logger.warn("memoryRange save failed: {}", e.getMessage());
 			}
 			
 			try {
-				tag.put("javaArguments", Switchable.generateLoader(NbtLoader.STRING_LIST_LOADER).save(object.javaArguments));
+				tag.put("javaArguments", Switchable.generateLoader(NbtLoader.stringListLoader).save(object.javaArguments));
 			} catch (Exception e) {
-				LOGGER.warn("javaArguments save failed: {}", e.getMessage());
+				logger.warn("javaArguments save failed: {}", e.getMessage());
 			}
 			
 			try {
 				tag.putByte("useWaterMark", (byte) (object.useWaterMark.get() ? 1 : 0));
 			} catch (Exception e) {
-				LOGGER.warn("useWaterMark save failed: {}", e.getMessage());
+				logger.warn("useWaterMark save failed: {}", e.getMessage());
 			}
 			
 			try {
 				
-				tag.put("gameDir", EnumSwitchable.generateLoader(MinecraftDirectory.LOADER, MinecraftDirectory.Policy.class).save(object.gameDir));
+				tag.put("gameDir", EnumSwitchable.generateLoader(MinecraftDirectory.loader, MinecraftDirectory.Policy.class).save(object.gameDir));
 			} catch (Exception e) {
-				LOGGER.warn("gameDir save failed: {}", e.getMessage());
+				logger.warn("gameDir save failed: {}", e.getMessage());
 			}
 			
 			try {
-				tag.put("windowSize", WindowSize.LOADER.save(object.windowSize.get()));
+				tag.put("windowSize", WindowSize.loader.save(object.windowSize.get()));
 			} catch (Exception e) {
-				LOGGER.warn("windowSize save failed: {}", e.getMessage());
+				logger.warn("windowSize save failed: {}", e.getMessage());
 			}
 			
 			try {
-				tag.put("serverInfo", Switchable.generateLoader(ServerInfo.LOADER).save(object.serverInfo));
+				tag.put("serverInfo", Switchable.generateLoader(ServerInfo.loader).save(object.serverInfo));
 			} catch (Exception e) {
-				LOGGER.warn("serverInfo save failed: {}", e.getMessage());
+				logger.warn("serverInfo save failed: {}", e.getMessage());
 			}
 			
 			return tag;
@@ -151,11 +151,11 @@ public record LaunchOptions (Switchable<JavaRuntime> javaRuntime,
 	
 	/** The default launch options. */
 	public static final LaunchOptions DEFAULT = new LaunchOptions(
-			Switchable.ofDisabled(JavaRuntime.CURRENT),
+			Switchable.ofDisabled(JavaRuntime.current),
 			Switchable.ofDisabled(MemoryRange.of(2048)),
 			Switchable.ofDisabled(List.of("-XX:+UnlockExperimentalVMOptions", "-XX:+UseG1GC", "-XX:G1NewSizePercent=20", "-XX:G1ReservePercent=20", "-XX:MaxGCPauseMillis=50", "-XX:G1HeapRegionSize=32M")),
 			Modifiable.of(false),
-			EnumSwitchable.of(MinecraftDirectory.STANDARD, MinecraftDirectory.Policy.STANDARD),
+			EnumSwitchable.of(MinecraftDirectory.standard, MinecraftDirectory.Policy.STANDARD),
 			Modifiable.of(WindowSize.window(1024, 768)),
 			Switchable.ofDisabled(null)
 	);

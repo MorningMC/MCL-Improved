@@ -18,10 +18,10 @@ import java.util.regex.*;
  * It loads translation files and provides methods to retrieve translated strings.
  */
 public class Translation {
-	private static final Logger LOGGER = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 	
 	/** NbtLoader for loading and saving {@code Translation} objects from/to NBT data. */
-	public static final NbtLoader<Translation, StringTag> LOADER = new NbtLoader<>() {
+	public static final NbtLoader<Translation, StringTag> loader = new NbtLoader<>() {
 		
 		@Override
 		public Translation load(StringTag tag) throws IllegalNbtException {
@@ -53,19 +53,19 @@ public class Translation {
 		this.language = language;
 		
 		// Load translations
-		LOGGER.info("Loading translations for language: {}", language);
+		logger.info("Loading translations for language: {}", language);
 		
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(FileMetadata.getResource("assets/lang/%s.properties".formatted(language))))) {
 			for (String line; (line = reader.readLine()) != null; ) {
 				Matcher matcher = Pattern.compile("(?<key>.*)=(?<value>.*)").matcher(line);
 				if (matcher.matches()) {
-					LOGGER.trace("Loading translations key: {}", matcher.group("key"));
+					logger.trace("Loading translations key: {}", matcher.group("key"));
 					translations.put(matcher.group("key"), matcher.group("value"));
 				}
 			}
 			
 		} catch (IOException e) {
-			LOGGER.error("Failed to load translations for language: {}", language, e);
+			logger.error("Failed to load translations for language: {}", language, e);
 		}
 	}
 	
@@ -109,7 +109,7 @@ public class Translation {
 	public static String get(String key) {
 		String value =  instance.translations.get(key);
 		if (value == null) {
-			LOGGER.warn("Translation key not found: {}", key);
+			logger.warn("Translation key not found: {}", key);
             return key;
 		}
 		return value;

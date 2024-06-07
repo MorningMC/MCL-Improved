@@ -24,7 +24,7 @@ public record GlobalSettings(Modifiable<Integer> maxThreads,
                              Modifiable<Long> maxRecommendMemory) {
 	
 	/** NbtLoader for loading and saving {@code GlobalSettings} objects from/to NBT data. */
-	public static final NbtLoader<GlobalSettings, CompoundTag> LOADER = new NbtLoader<>() {
+	public static final NbtLoader<GlobalSettings, CompoundTag> loader = new NbtLoader<>() {
 		@Override
 		public GlobalSettings load(CompoundTag tag) throws IllegalNbtException {
 			init(new GlobalSettings(

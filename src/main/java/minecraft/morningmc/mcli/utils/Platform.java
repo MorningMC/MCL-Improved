@@ -23,10 +23,10 @@ public record Platform(OperatingSystem operatingSystem,
                        Charset encoding) {
     
     /** The system platform */
-    public static final Platform SYSTEM = resolveSystem();
+    public static final Platform system = resolveSystem();
     
     /** The current Java runtime platform */
-    public static final Platform CURRENT = JavaRuntime.CURRENT != null ? JavaRuntime.CURRENT.platform() : SYSTEM;
+    public static final Platform current = JavaRuntime.current != null ? JavaRuntime.current.platform() : system;
     
     /**
      * Resolves the system platform.
