@@ -79,9 +79,15 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 		}
 		
 		try {
+			// parse version
+			String versionString = Objects.requireNonNull(getProperty(content, "java.version"));
+			if (versionString.startsWith("1.")) {
+				versionString = versionString.substring(2);
+			}
+			
 			return new JavaRuntime(
 					path,
-					Runtime.Version.parse(Objects.requireNonNull(getProperty(content, "java.version"))),
+					Runtime.Version.parse(versionString.replace("_", ".")),
 					new Platform(
 							Platform.OperatingSystem.infer(getProperty(content, "os.name")),
 							Platform.Architecture.infer(getProperty(content, "sun.arch.data.model"), getProperty(content, "os.arch")),

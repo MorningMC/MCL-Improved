@@ -43,6 +43,7 @@
             <artifactId>javafx-web</artifactId>
             <version>21</version>
         </dependency>
+
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>

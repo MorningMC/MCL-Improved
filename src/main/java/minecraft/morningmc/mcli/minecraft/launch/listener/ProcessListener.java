@@ -16,16 +16,16 @@ import java.util.*;
 public class ProcessListener {
 	private static final Logger logger = LogManager.getLogger();
 	
-	private final Process minecraftInstance;
-	private final long pid;
+	public final Process minecraftInstance;
+	public final long pid;
 	
-	private volatile boolean running = true;
+	public volatile boolean running = true;
 	
-	private final Thread stdOutListener;
-	private final Thread stdErrListener;
-	private final Thread exitChecker;
+	public final Thread stdOutListener;
+	public final Thread stdErrListener;
+	public final Thread exitChecker;
 	
-	private final List<String> minecraftLogs;
+	public final List<String> logs;
 	
 	/**
 	 * Constructs a ProcessListener for the given Minecraft process.
@@ -39,7 +39,7 @@ public class ProcessListener {
 		stdOutListener = new Thread(() -> readerListener(minecraftInstance.inputReader()), "stdOutListener#" + pid);
 		stdErrListener = new Thread(() -> readerListener(minecraftInstance.errorReader()), "stdErrListener#" + pid);
 		exitChecker = new Thread(this::exitChecker, "exitChecker#" + pid);
-		minecraftLogs = List.of();
+		logs = List.of();
 		
 		stdOutListener.start();
 		stdErrListener.start();
@@ -59,7 +59,7 @@ public class ProcessListener {
 		stdErrListener.interrupt();
 		
 		minecraftInstance.destroy();
-		logger.info("Stopped Minecraft instance " + minecraftInstance.pid());
+		logger.info("Stopped Minecraft instance {}", minecraftInstance.pid());
 	}
 	
 	// Thread Operations
@@ -74,7 +74,7 @@ public class ProcessListener {
 			
 			while (running && (line = reader.readLine()) != null) {
 				logger.info("[Minecraft Log #{}] {}", pid, line);
-				minecraftLogs.add(line);
+				logs.add(line);
 			}
 			
 		} catch (IOException e) {
@@ -89,101 +89,9 @@ public class ProcessListener {
 		try {
 			int exitCode = minecraftInstance.waitFor();
 			logger.info("Minecraft process exited with code: {}", exitCode);
-			
 			running = false;
-			ProcessListenerCollection.remove(this);
-			
 		} catch (InterruptedException e) {
 			logger.error("exitChecker interrupted: ", e);
 		}
-	}
-	
-	// Getters
-	/**
-	 * Gets the Minecraft process being monitored.
-	 *
-	 * @return The Minecraft process.
-	 */
-	public Process getMinecraftInstance() {
-		return minecraftInstance;
-	}
-	
-	/**
-	 * Gets the process ID of the Minecraft process.
-	 *
-	 * @return the process ID of the Minecraft process
-	 */
-	public long getPid() {
-		return pid;
-	}
-	
-	/**
-	 * Checks if the ProcessListener is still running.
-	 *
-	 * @return {@code true} if running, {@code false} otherwise.
-	 */
-	public boolean isRunning() {
-		return running;
-	}
-	
-	/**
-	 * Gets the thread responsible for listening to stdout.
-	 *
-	 * @return The stdout listener thread.
-	 */
-	public Thread getStdOutListener() {
-		return stdOutListener;
-	}
-	
-	/**
-	 * Gets the thread responsible for listening to stderr.
-	 *
-	 * @return The stderr listener thread.
-	 */
-	public Thread getStdErrListener() {
-		return stdErrListener;
-	}
-	
-	/**
-	 * Gets the thread responsible for checking the process exit.
-	 *
-	 * @return The exit checker thread.
-	 */
-	public Thread getExitChecker() {
-		return exitChecker;
-	}
-	
-	/**
-	 * Gets the Minecraft logs collected during the process.
-	 *
-	 * @return The list of Minecraft logs.
-	 */
-	public List<String> getMinecraftLogs() {
-		return minecraftLogs;
-	}
-	
-	// Overrides
-	@Override
-	public String toString() {
-		return "Minecraft Instance " + minecraftInstance.pid();
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		
-		ProcessListener that = (ProcessListener) o;
-		return Objects.equals(minecraftInstance, that.minecraftInstance);
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(minecraftInstance);
 	}
 }

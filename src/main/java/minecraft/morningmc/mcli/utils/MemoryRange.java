@@ -121,6 +121,6 @@ public record MemoryRange(long minimum, long maximum) {
 		}
 			
 		long recommendMemory = Math.round(totalMemory * 1. / 4. / 128.) * 128;
-		return of(Math.min(recommendMemory, GlobalSettings.instance.maxRecommendMemory().get()));
+		return of(Math.min(recommendMemory, GlobalSettings.maxRecommendMemory));
 	}
 }

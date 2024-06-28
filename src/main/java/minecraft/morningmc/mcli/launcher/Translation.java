@@ -24,7 +24,7 @@ public class Translation {
 	public static final NbtLoader<Translation, StringTag> loader = new NbtLoader<>() {
 		
 		@Override
-		public Translation load(StringTag tag) throws IllegalNbtException {
+		public Translation load(StringTag tag) {
 			init(tag.getValue());
 			return instance;
 		}

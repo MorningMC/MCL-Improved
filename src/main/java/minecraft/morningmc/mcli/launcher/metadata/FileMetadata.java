@@ -52,7 +52,7 @@ public class FileMetadata {
 				workingRoot,
 				cacheRoot,
 				
-				MinecraftDirectory.standard.root(),
+				MinecraftDirectory.standard.root,
 				MinecraftDirectory.isolateRoot
 		};
 		File[] files = {

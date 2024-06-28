@@ -191,13 +191,13 @@ public class JavaRuntimeCollection implements Runnable {
 								if (file.isDirectory()) {
 									File home = new File(file, "Contents/Home");
 									if (home.exists()) {
-										logger.trace("Query home: " + home.getAbsolutePath());
+										logger.trace("Query home: {}", home.getAbsolutePath());
 										potentialRuntimes.add(JavaRuntime.fromHome(home));
 									}
 									
 									home = new File(home, "jre");
 									if (home.exists()) {
-										logger.trace("Query home: " + home.getAbsolutePath());
+										logger.trace("Query home: {}", home.getAbsolutePath());
 										potentialRuntimes.add(JavaRuntime.fromHome(home));
 									}
 								}
@@ -209,7 +209,7 @@ public class JavaRuntimeCollection implements Runnable {
 								if (file.isDirectory()) {
 									File home = new File(file, "Contents/Home");
 									if (home.exists()) {
-										logger.trace("Query home: " + home.getAbsolutePath());
+										logger.trace("Query home: {}", home.getAbsolutePath());
 										potentialRuntimes.add(JavaRuntime.fromHome(home));
 									}
 								}
@@ -274,7 +274,7 @@ public class JavaRuntimeCollection implements Runnable {
 									for (File file : Objects.requireNonNull(dir.listFiles())) {
 										File home = new File(file, component);
 										
-										logger.trace("Query home: " + home.getAbsolutePath());
+										logger.trace("Query home: {}", home.getAbsolutePath());
 										potentialRuntimes.add(JavaRuntime.fromHome(home));
 									}
 								} catch (Exception ignored) {}
@@ -311,7 +311,7 @@ public class JavaRuntimeCollection implements Runnable {
 				long stopTime = System.currentTimeMillis();
 				
 				logger.info("Finish searching potential Java runtimes. Found {}", potentialRuntimes.size());
-				logger.info("Used {} ms", stopTime - startTime);
+				logger.info("Used {} ms.", stopTime - startTime);
 				
 				runtimes.addAll(potentialRuntimes);
 				
@@ -344,7 +344,7 @@ public class JavaRuntimeCollection implements Runnable {
 	}
 	
 	private static Stream<JavaRuntime> parseHome(File home) {
-		logger.trace("Query home: " + home.getAbsolutePath());
+		logger.trace("Query home: {}", home.getAbsolutePath());
 		
 		try {
 			return Stream.of(JavaRuntime.fromHome(home));

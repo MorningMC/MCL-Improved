@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 public class UIManager {
 	public static final Image icon = new Image(FileMetadata.getResource("assets/textures/icon.png"));
 	
-	private final Stage mainStage;
+	public final Stage mainStage;
 	
 	/**
 	 * Constructs a new UIManager.
@@ -29,14 +29,5 @@ public class UIManager {
 		mainStage.setHeight(632);
 		
 		mainStage.show();
-	}
-	
-	/**
-	 * Gets the main stage of the launcher.
-	 *
-	 * @return the main stage of the launcher.
-	 */
-	public Stage mainStage() {
-		return mainStage;
 	}
 }

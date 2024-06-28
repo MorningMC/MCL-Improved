@@ -24,13 +24,13 @@ public record LaunchArguments(LaunchOptions options, Profile profile) {
 	}
 	
 	public MinecraftDirectory getDirectory() {
-		MinecraftDirectory directory = options.gameDir().get((value, policy) -> switch (policy) {
+		MinecraftDirectory directory = options.gameDir.get((value, policy) -> switch (policy) {
 			case ISOLATED -> new MinecraftDirectory(new File(MinecraftDirectory.isolateRoot, profile.identifier().toString()));
 			case CUSTOM -> value;
 			default -> MinecraftDirectory.standard;
 		});
 		
-		directory.root().mkdirs();
+		directory.root.mkdirs();
 		return directory;
 	}
 }

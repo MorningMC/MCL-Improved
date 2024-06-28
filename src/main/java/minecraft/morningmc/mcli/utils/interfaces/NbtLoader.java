@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Interface for loading and saving objects to and from NBT tags.
  *
- * @param <C> The type of object to load or save.
+ * @param <C> The type of object to load or singleplayer.
  * @param <T> The type of NBT tag.
  */
 public interface NbtLoader<C, T extends Tag> {

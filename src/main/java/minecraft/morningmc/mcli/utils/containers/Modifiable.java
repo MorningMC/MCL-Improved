@@ -10,7 +10,7 @@ import java.util.function.*;
  */
 public class Modifiable<T> {
 	protected T value;
-	protected Set<Consumer<T>> observers = new HashSet<>();
+	public Set<Consumer<T>> observers = new HashSet<>();
 	
 	/**
 	 * Constructs a new {@code Modifiable} instance with the specified initial value.
@@ -46,18 +46,8 @@ public class Modifiable<T> {
 	 *
 	 * @param value The new value to set.
 	 */
-	public void set(T value) {
+	public synchronized void set(T value) {
 		this.value = value;
-		
 		observers.parallelStream().forEach(observer -> observer.accept(value));
-	}
-	
-	/**
-	 * Returns the observer list.
-	 *
-	 * @return The observer list.
-	 */
-	public Set<Consumer<T>> observers() {
-		return observers;
 	}
 }

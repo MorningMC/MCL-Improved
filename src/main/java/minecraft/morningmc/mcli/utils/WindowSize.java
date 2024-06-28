@@ -38,7 +38,7 @@ public record WindowSize(boolean fullScreen,
 		/**
 		 * Saves a WindowSize object to an NBT CompoundTag.
 		 *
-		 * @param object The WindowSize object to save.
+		 * @param object The WindowSize object to singleplayer.
 		 * @return The resulting CompoundTag.
 		 */
 		@Override

@@ -15,19 +15,19 @@ import org.apache.logging.log4j.Logger;
 import java.util.*;
 
 /**
- * The Launcher class is responsible for launching the Minecraft client with specified options and profiles.
+ * The {@code Launcher} class is responsible for launching the Minecraft client with specified options and profiles.
  */
 public class Launcher {
 	private static final Logger logger = LogManager.getLogger();
 	
-	/** NbtLoader for loading and saving {@code Launcher} objects from/to NBT data. */
+	/** {@code NbtLoader} for loading and saving {@code Launcher} objects from/to NBT data. */
 	public static final NbtLoader<Launcher, CompoundTag> loader = new NbtLoader<>() {
 		
 		/**
-		 * Loads a Launcher object from an NBT compound tag.
+		 * Loads a {@code Launcher} object from an NBT compound tag.
 		 *
-		 * @param tag The NBT compound tag representing the Launcher object.
-		 * @return The loaded Launcher object.
+		 * @param tag The NBT compound tag representing the {@code Launcher} object.
+		 * @return The loaded {@code Launcher} object.
 		 * @throws IllegalNbtException If the NBT data is invalid or missing required information.
 		 */
 		@Override
@@ -54,10 +54,10 @@ public class Launcher {
 		}
 		
 		/**
-		 * Saves a Launcher object to an NBT compound tag.
+		 * Saves a {@code Launcher} object to an NBT compound tag.
 		 *
-		 * @param object The Launcher object to be saved.
-		 * @return The NBT compound tag representing the Launcher object.
+		 * @param object The {@code Launcher} object to be saved.
+		 * @return The NBT compound tag representing the {@code Launcher} object.
 		 */
 		@Override
 		public CompoundTag save(Launcher object) {
@@ -81,9 +81,9 @@ public class Launcher {
 		}
 	};
 	
-	private LaunchOptions options;
-	private UUID profile;
-	private UUID account;
+	public final LaunchOptions options;
+	public UUID profile;
+	public UUID account;
 	
 	/**
 	 * Constructs a Launcher object with the specified launch options and profile.
@@ -139,7 +139,7 @@ public class Launcher {
 		}
 		
 		ProcessBuilder builder = new ProcessBuilder(commandline);
-		builder.directory(arguments.getDirectory().root());
+		builder.directory(arguments.getDirectory().root);
 		
 		Process process;
 		try {
@@ -168,42 +168,6 @@ public class Launcher {
 	 * @throws NullPointerException If the profile is null.
 	 */
 	public LaunchArguments generateArguments(Profile profile) {
-		return new LaunchArguments(profile.options().getIfEnabled(options), profile);
-	}
-	
-	/**
-	 * Gets the stored launch options.
-	 *
-	 * @return The LaunchOptions object.
-	 */
-	public LaunchOptions getOptions() {
-		return options;
-	}
-	
-	/**
-	 * Gets the stored Minecraft profile.
-	 *
-	 * @return The Profile object.
-	 */
-	public Profile getProfile() {
-		return ProfileCollection.resolve(profile);
-	}
-	
-	/**
-	 * Sets the launch options for the Launcher.
-	 *
-	 * @param options The new LaunchOptions.
-	 */
-	public void setOptions(LaunchOptions options) {
-		this.options = options;
-	}
-	
-	/**
-	 * Sets the Minecraft profile for the Launcher.
-	 *
-	 * @param profile The new Profile.
-	 */
-	public void setProfile(Profile profile) {
-		this.profile = profile.identifier();
+		return new LaunchArguments(profile.options.getIfEnabled(options), profile);
 	}
 }

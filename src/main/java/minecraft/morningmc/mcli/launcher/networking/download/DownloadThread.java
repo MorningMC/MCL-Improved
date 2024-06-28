@@ -33,7 +33,7 @@ public class DownloadThread extends Thread {
 		try {
 			HttpURLConnection connection = (HttpURLConnection) source.openConnection();
 			connection.setRequestProperty("Range", "bytes=%d-%d".formatted(start, end));
-			connection.setConnectTimeout(GlobalSettings.instance.timeout().get());
+			connection.setConnectTimeout(GlobalSettings.timeout);
 			int responseCode = connection.getResponseCode();
 			
 			target.seek(start);

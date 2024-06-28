@@ -62,7 +62,7 @@ public class Main extends Application {
 			GlobalSettings.loader.load(config.getCompound("globalSettings"));
 		} catch (Exception e) {
 			logger.warn("Failed to load globalSettings: {}", e.getMessage());
-			GlobalSettings.init(GlobalSettings.DEFAULT);
+			GlobalSettings.initDefault();
 		}
 		
 		try {
@@ -122,7 +122,7 @@ public class Main extends Application {
 		// Save config
 		CompoundTag config = new CompoundTag();
 		
-		config.put("globalSettings", GlobalSettings.loader.save(GlobalSettings.instance));
+		config.put("globalSettings", GlobalSettings.loader.save(new GlobalSettings()));
 		config.put("profileCollection", ProfileCollection.loader.save(ProfileCollection.instance));
 		config.put("javaRuntimeCollection", JavaRuntimeCollection.loader.save(JavaRuntimeCollection.instance));
 		config.put("launcher", Launcher.loader.save(launcher));

@@ -21,15 +21,15 @@ public class MinecraftDirectory {
 
 		@Override
 		public StringTag save(MinecraftDirectory object) {
-			return new StringTag(object.root().getAbsolutePath());
+			return new StringTag(object.root.getAbsolutePath());
 		}
 	};
 	
 	public static final MinecraftDirectory standard = new MinecraftDirectory(new File(FileMetadata.appdata, ".minecraft"));
-	public static final File isolateRoot = new File(standard.root(), "isolate");
+	public static final File isolateRoot = new File(standard.root, "isolate");
 	
 	/**  The root directory for Minecraft-related files. */
-	protected final File root;
+	public final File root;
 	
 	/**
 	 * Constructs a {@code MinecraftDirectory} with the default root directory ".minecraft".
@@ -45,15 +45,6 @@ public class MinecraftDirectory {
 	 */
 	public MinecraftDirectory(File root) {
 		this.root = root;
-	}
-	
-	/**
-	 * Gets the root directory for Minecraft-related files.
-	 *
-	 * @return The root directory.
-	 */
-	public File root() {
-		return this.root;
 	}
 	
 	public enum Policy {
