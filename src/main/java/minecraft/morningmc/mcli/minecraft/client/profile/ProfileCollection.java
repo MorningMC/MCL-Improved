@@ -15,20 +15,20 @@ import java.util.*;
 import java.util.stream.*;
 
 /**
- * The {@code ProfileCollection} class manages a collection of Minecraft profiles.
+ * The {@link ProfileCollection} class manages a collection of Minecraft profiles.
  */
 @ObjectCollection
 public class ProfileCollection {
 	private static final Logger logger = LogManager.getLogger();
 	
-	/** NbtLoader for loading and saving {@code ProfileCollection} objects from/to NBT data. */
+	/** {@link NbtLoader} for loading and saving {@link ProfileCollection} objects from/to NBT data. */
 	public static final NbtLoader<ProfileCollection, ListTag<CompoundTag>> loader = new NbtLoader<>() {
 		
 		/**
-		 * Loads a {@code ProfileCollection} object from a list of NBT compound tags.
+		 * Loads a {@link ProfileCollection} object from a list of NBT compound tags.
 		 *
 		 * @param tag The list of NBT compound tags representing profiles.
-		 * @return The loaded ProfileCollection object.
+		 * @return The loaded {@link ProfileCollection} object.
 		 * @throws IllegalNbtException If the NBT data is invalid or missing required information.
 		 */
 		@Override
@@ -47,9 +47,9 @@ public class ProfileCollection {
 		}
 		
 		/**
-		 * Saves a {@code ProfileCollection} object to a list of NBT compound tags.
+		 * Saves a {@link ProfileCollection} object to a list of NBT compound tags.
 		 *
-		 * @param object The ProfileCollection object to be saved.
+		 * @param object The {@link ProfileCollection} object to be saved.
 		 * @return The list of NBT compound tags representing profiles.
 		 */
 		@Override
@@ -69,7 +69,7 @@ public class ProfileCollection {
 	private final Map<UUID, Profile> profiles = new HashMap<>();
 	
 	/**
-	 * Initializes the ProfileCollection with the given profiles.
+	 * Initializes the {@link ProfileCollection} with the given profiles.
 	 *
 	 * @param profiles The initial set of profiles for the collection.
 	 */
@@ -115,7 +115,7 @@ public class ProfileCollection {
 	 * Resolves a profile by name from the collection.
 	 *
 	 * @param uuid The UUID associated with the profile to be resolved.
-	 * @return The resolved Profile object, or null if not found.
+	 * @return The resolved profile, or {@code null} if not found.
 	 */
 	public static Profile resolve(UUID uuid) {
 		return instance.profiles.get(uuid);

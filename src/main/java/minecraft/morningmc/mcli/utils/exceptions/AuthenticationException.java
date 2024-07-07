@@ -7,36 +7,37 @@ package minecraft.morningmc.mcli.utils.exceptions;
 public class AuthenticationException extends LauncherException {
 	
 	/**
-	 * Constructs a new {@code AuthenticationException} with no detail message.
+	 * Constructs a new {@link AuthenticationException} with no detail message.
 	 */
 	public AuthenticationException() {
+		super();
 	}
 	
 	/**
-	 * Constructs a new {@code AuthenticationException} with the specified detail message and cause.
+	 * Constructs a new {@link AuthenticationException} with the specified detail message.
 	 *
-	 * @param message the detail message (which is saved for later retrieval by the getMessage() method).
-	 * @param cause   the cause (which is saved for later retrieval by the getCause() method).
-	 */
-	public AuthenticationException(String message, Throwable cause) {
-		super(message, cause);
-	}
-	
-	/**
-	 * Constructs a new {@code AuthenticationException} with the specified detail message.
-	 *
-	 * @param message the detail message (which is saved for later retrieval by the getMessage() method).
+	 * @param message The detail message (which is saved for later retrieval by the getMessage() method).
 	 */
 	public AuthenticationException(String message) {
 		super(message);
 	}
 	
 	/**
-	 * Constructs a new {@code AuthenticationException} with the specified cause.
+	 * Constructs a new {@link AuthenticationException} with the specified cause.
 	 *
-	 * @param cause the cause (which is saved for later retrieval by the getCause() method).
+	 * @param cause The cause of the exception (which is saved for later retrieval by the getCause() method).
 	 */
 	public AuthenticationException(Throwable cause) {
 		super(cause);
+	}
+	
+	/**
+	 * Constructs a new {@link AuthenticationException} with the specified detail message and cause.
+	 *
+	 * @param message The detail message (which is saved for later retrieval by the getMessage() method).
+	 * @param cause   The cause of the exception (which is saved for later retrieval by the getCause() method).
+	 */
+	public AuthenticationException(String message, Throwable cause) {
+		super(message, cause);
 	}
 }

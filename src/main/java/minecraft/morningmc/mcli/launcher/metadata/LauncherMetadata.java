@@ -6,8 +6,6 @@ import java.util.*;
 
 /**
  * This class provides metadata information about the MCL Improved (MCLI).
- *
- * @see FileMetadata
  */
 public final class LauncherMetadata {
 	// Constants

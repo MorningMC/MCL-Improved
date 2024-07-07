@@ -1,7 +1,6 @@
 package minecraft.morningmc.mcli.launcher;
 
 import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.primitive.StringTag;
@@ -14,13 +13,13 @@ import java.util.*;
 import java.util.regex.*;
 
 /**
- * The {@code Translation} class manages language translations for the application.
+ * The {@link Translation} class manages language translations for the application.
  * It loads translation files and provides methods to retrieve translated strings.
  */
 public class Translation {
 	private static final Logger logger = LogManager.getLogger();
 	
-	/** NbtLoader for loading and saving {@code Translation} objects from/to NBT data. */
+	/** {@link NbtLoader} for loading and saving {@link Translation} objects from/to NBT data. */
 	public static final NbtLoader<Translation, StringTag> loader = new NbtLoader<>() {
 		
 		@Override
@@ -35,7 +34,7 @@ public class Translation {
 		}
 	};
 	
-	/** The singleton instance of the {@code Translation} class. */
+	/** The singleton instance of the {@link Translation} class. */
 	public static Translation instance = null;
 	
 	/** The current language of the translations. */
@@ -45,7 +44,7 @@ public class Translation {
 	private final Map<String, String> translations = new HashMap<>();
 	
 	/**
-	 * Constructs a new {@code Translation} object and loads the translations for the specified language.
+	 * Constructs a new {@link Translation} object and loads the translations for the specified language.
 	 *
 	 * @param language the language code (e.g., "en", "zh") for which to load translations.
 	 */
@@ -55,7 +54,7 @@ public class Translation {
 		// Load translations
 		logger.info("Loading translations for language: {}", language);
 		
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(FileMetadata.getResource("assets/lang/%s.properties".formatted(language))))) {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(FileMetadata.getResource("assets/lang/lang_%s.properties".formatted(language))))) {
 			for (String line; (line = reader.readLine()) != null; ) {
 				Matcher matcher = Pattern.compile("(?<key>.*)=(?<value>.*)").matcher(line);
 				if (matcher.matches()) {
@@ -70,10 +69,10 @@ public class Translation {
 	}
 	
 	/**
-	 * Initializes the {@code Translation} instance with the specified language.
+	 * Initializes the {@link Translation} instance with the specified language.
 	 *
 	 * @param language the language code for which to initialize translations.
-	 * @throws IllegalStateException if the {@code Translation} instance is already initialized.
+	 * @throws IllegalStateException if the {@link Translation} instance is already initialized.
 	 */
 	public static void init(String language) {
 		if (instance != null) {

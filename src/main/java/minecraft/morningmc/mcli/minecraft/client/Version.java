@@ -9,7 +9,7 @@ public record Version(String version,
                       Type type,
                       String mainClass) {
 	/**
-	 * NbtLoader for loading and saving {@code Version} objects from/to NBT data.
+	 * {@link NbtLoader} for loading and saving {@link Version} objects from/to NBT data.
 	 */
 	public static final NbtLoader<Version, CompoundTag> loader = new NbtLoader<>() {
 		
@@ -23,7 +23,6 @@ public record Version(String version,
 			return null;
 		}
 	};
-	
 	
 	public enum Type {
 		RELEASE, SNAPSHOT, CUSTOM

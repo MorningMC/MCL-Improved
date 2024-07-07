@@ -6,7 +6,7 @@ import java.io.File;
 import java.nio.charset.Charset;
 
 /**
- * The {@code Platform} record represents a platform-specific configuration.
+ * Represents a platform-specific configuration.
  *
  * @param operatingSystem The operating system of the platform.
  * @param architecture The architecture of the platform.
@@ -82,7 +82,7 @@ public record Platform(OperatingSystem operatingSystem,
     }
     
     /**
-     * The {@code OperatingSystem} enum represents different operating systems and provides utility methods
+     * Emulates different operating systems and provides utility methods.
      */
     public enum OperatingSystem {
         WINDOWS, MACOS, LINUX, UNKNOWN;
@@ -113,7 +113,7 @@ public record Platform(OperatingSystem operatingSystem,
     }
     
     /**
-     * The {@code Architecture} enum represents different architectures and provides utility methods.
+     * Emulates different architectures and provides utility methods.
      */
     public enum Architecture {
         BIT32, BIT64, UNKNOWN;

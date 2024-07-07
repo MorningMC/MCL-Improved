@@ -13,7 +13,7 @@ public class Modifiable<T> {
 	public Set<Consumer<T>> observers = new HashSet<>();
 	
 	/**
-	 * Constructs a new {@code Modifiable} instance with the specified initial value.
+	 * Constructs a new {@link Modifiable} instance with the specified initial value.
 	 *
 	 * @param value The initial value.
 	 */
@@ -22,10 +22,10 @@ public class Modifiable<T> {
 	}
 	
 	/**
-	 * Creates a new {@code Modifiable} instance with the specified initial value.
+	 * Creates a new {@link Modifiable} instance with the specified initial value.
 	 *
 	 * @param value The initial value.
-	 * @return A new Modifiable instance.
+	 * @return A new {@link Modifiable} instance.
 	 * @param <T> The type of the value.
 	 */
 	public static <T> Modifiable<T> of(T value) {

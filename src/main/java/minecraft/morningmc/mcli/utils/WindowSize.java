@@ -8,18 +8,16 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
 /**
  * Represents the size and state (full-screen or windowed) of a window.
  */
-public record WindowSize(boolean fullScreen,
-                         int width,
-                         int height) {
+public record WindowSize(boolean fullScreen, int width, int height) {
 	
-	/** NbtLoader for loading and saving {@code WindowSize} objects from/to NBT data. */
+	/** {@link NbtLoader} for loading and saving {@link WindowSize} objects from/to NBT data. */
 	public static final NbtLoader<WindowSize, CompoundTag> loader = new NbtLoader<>() {
 		
 		/**
-		 * Loads a WindowSize object from an NBT CompoundTag.
+		 * Loads a {@link WindowSize} object from an NBT CompoundTag.
 		 *
-		 * @param tag The CompoundTag to load from.
-		 * @return The loaded WindowSize object.
+		 * @param tag The compound tag to load from.
+		 * @return The loaded {@link WindowSize} object.
 		 * @throws IllegalNbtException If there is an issue with the NBT data.
 		 */
 		@Override
@@ -36,10 +34,10 @@ public record WindowSize(boolean fullScreen,
 		}
 		
 		/**
-		 * Saves a WindowSize object to an NBT CompoundTag.
+		 * Saves a {@link WindowSize} object to an NBT CompoundTag.
 		 *
-		 * @param object The WindowSize object to singleplayer.
-		 * @return The resulting CompoundTag.
+		 * @param object The {@link WindowSize} object to be saved.
+		 * @return The resulting compound tag.
 		 */
 		@Override
 		public CompoundTag save(WindowSize object) {
@@ -58,23 +56,23 @@ public record WindowSize(boolean fullScreen,
 	};
 	
 	/**
-	 * Creates a WindowSize object representing a full-screen window.
+	 * Creates a {@link WindowSize} object representing a full-screen window.
 	 *
-	 * @return The WindowSize object for a full-screen window.
+	 * @return The {@link WindowSize} object for a full-screen window.
 	 */
-	public static WindowSize fullScreenWindow() {
+	public static WindowSize fullScreened() {
 		return new WindowSize(true, 0, 0);
 	}
 	
 	/**
-	 * Creates a WindowSize object representing a window with the specified width and height.
+	 * Creates a {@link WindowSize} object representing a window with the specified width and height.
 	 *
 	 * @param width  The width of the window.
 	 * @param height The height of the window.
-	 * @return The WindowSize object for a window with the specified width and height.
+	 * @return The {@link WindowSize} object for a window with the specified width and height.
 	 * @throws IndexOutOfBoundsException If width or height is negative.
 	 */
-	public static WindowSize window(int width, int height) {
+	public static WindowSize windowed(int width, int height) {
 		if (width < 0 || height < 0) {
 			throw new IndexOutOfBoundsException("width or height can't be negative");
 		}

@@ -112,11 +112,9 @@ public class Main extends Application {
 	
 	/**
 	 * Stops the application. Saves the configuration when the application is closed.
-	 *
-	 * @throws Exception If an error occurs during the shutdown of the application.
 	 */
 	@Override
-	public void stop() throws Exception {
+	public void stop() {
 		logger.info("Stopping launcher...");
 		
 		// Save config

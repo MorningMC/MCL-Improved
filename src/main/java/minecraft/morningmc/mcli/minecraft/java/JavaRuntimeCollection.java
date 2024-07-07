@@ -27,14 +27,14 @@ import java.util.stream.*;
 public class JavaRuntimeCollection implements Runnable {
 	private static final Logger logger = LogManager.getLogger();
 	
-	/** NbtLoader for loading and saving {@code JavaRuntimeCollection} objects from/to NBT data. */
+	/** {@link NbtLoader} for loading and saving {@link JavaRuntimeCollection} objects from/to NBT data. */
 	public static final NbtLoader<JavaRuntimeCollection, ListTag<StringTag>> loader = new NbtLoader<>() {
 		
 		/**
-		 * Load {@code JavaRuntimeCollection} from an NBT list tag.
+		 * Load {@link JavaRuntimeCollection} from an NBT list tag.
 		 *
 		 * @param tag The NBT list tag containing Java runtime paths.
-		 * @return The loaded {@code JavaRuntimeCollection}.
+		 * @return The loaded {@link JavaRuntimeCollection}.
 		 * @throws IllegalNbtException If there is an issue with the NBT data.
 		 */
 		@Override
@@ -53,9 +53,9 @@ public class JavaRuntimeCollection implements Runnable {
 		}
 		
 		/**
-		 * Save {@code JavaRuntimeCollection} to an NBT list tag.
+		 * Save {@link JavaRuntimeCollection} to an NBT list tag.
 		 *
-		 * @param object The {@code JavaRuntimeCollection} to be saved.
+		 * @param object The {@link JavaRuntimeCollection} to be saved.
 		 * @return The NBT list tag containing Java runtime paths.
 		 */
 		@Override
@@ -78,7 +78,7 @@ public class JavaRuntimeCollection implements Runnable {
 	private Thread thread = null;
 	
 	/**
-	 * Initialize the JavaRuntimeCollection with a collection of Java runtimes.
+	 * Initialize the {@link JavaRuntimeCollection} with a collection of Java runtimes.
 	 *
 	 * @param runtimes The collection of Java runtimes.
 	 */

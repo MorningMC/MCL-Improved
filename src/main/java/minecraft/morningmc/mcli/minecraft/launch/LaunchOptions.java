@@ -21,7 +21,7 @@ import java.util.*;
 public final class LaunchOptions {
 	private static final Logger logger = LogManager.getLogger();
 	
-	/** {@code NbtLoader} for loading and saving {@code LaunchOptions} objects from/to NBT data. */
+	/** {@link NbtLoader} for loading and saving {@link LaunchOptions} objects from/to NBT data. */
 	public static final NbtLoader<LaunchOptions, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
@@ -143,26 +143,26 @@ public final class LaunchOptions {
 			Switchable.ofDisabled(List.of("-XX:+UnlockExperimentalVMOptions", "-XX:+UseG1GC", "-XX:G1NewSizePercent=20", "-XX:G1ReservePercent=20", "-XX:MaxGCPauseMillis=50", "-XX:G1HeapRegionSize=32M")),
 			false,
 			EnumSwitchable.of(MinecraftDirectory.standard, MinecraftDirectory.Policy.STANDARD),
-			WindowSize.window(1024, 768),
+			WindowSize.windowed(1024, 768),
 			new QuickPlay(QuickPlay.Type.NONE, null, null)
 	);
 	
-	public final Switchable<JavaRuntime> javaRuntime;
-	public final Switchable<MemoryRange> memoryRange;
-	public final Switchable<List<String>> javaArguments;
+	public Switchable<JavaRuntime> javaRuntime;
+	public Switchable<MemoryRange> memoryRange;
+	public Switchable<List<String>> javaArguments;
 	public boolean useWatermark;
-	public final EnumSwitchable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir;
+	public EnumSwitchable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir;
 	public WindowSize windowSize;
 	public QuickPlay quickPlay;
 	
 	/**
-	 * @param javaRuntime   The {@code Switchable} object for Java runtime.
-	 * @param memoryRange   The {@code Switchable} object for memory range.
-	 * @param javaArguments The {@code Switchable} object for Java arguments.
+	 * @param javaRuntime   The {@link Switchable} object for Java runtime.
+	 * @param memoryRange   The {@link Switchable} object for memory range.
+	 * @param javaArguments The {@link Switchable} object for Java arguments.
 	 * @param useWatermark  Whether to use the watermark.
-	 * @param gameDir       The {@code EnumSwitchable} object for the game directory.
+	 * @param gameDir       The {@link EnumSwitchable} object for the game directory.
 	 * @param windowSize    The window size.
-	 * @param quickPlay    The {@code Switchable} object for the multiplayer info.
+	 * @param quickPlay     The Quick Play info.
 	 */
 	public LaunchOptions(Switchable<JavaRuntime> javaRuntime, Switchable<MemoryRange> memoryRange, Switchable<List<String>> javaArguments, boolean useWatermark, EnumSwitchable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir, WindowSize windowSize, QuickPlay quickPlay) {
 		this.javaRuntime = javaRuntime;

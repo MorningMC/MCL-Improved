@@ -17,7 +17,7 @@ public class Startup {
     private static final Logger logger = LogManager.getLogger();
     
     /**
-     * Constructs a new instance of {@code Startup}, logging launcher information.
+     * Constructs a new instance of {@link Startup}, logging launcher information.
      */
     public Startup() {
         logger.info(LauncherMetadata.longFullName);
@@ -55,7 +55,7 @@ public class Startup {
      *
      * @param args Command-line arguments.
      */
-    private void run(String... args) throws Throwable {
+    private void run(String... args) {
         Application.launch(Main.class, args);
     }
 }

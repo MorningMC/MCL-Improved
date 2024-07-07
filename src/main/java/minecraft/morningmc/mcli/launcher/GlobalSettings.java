@@ -9,9 +9,7 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
  */
 public final class GlobalSettings {
 	
-	/**
-	 * {@code NbtLoader} for loading and saving {@code GlobalSettings} objects from/to NBT data.
-	 */
+	/** {@link NbtLoader} for loading and saving {@link GlobalSettings} objects from/to NBT data. */
 	public static final NbtLoader<GlobalSettings, CompoundTag> loader = new NbtLoader<>() {
 		@Override
 		public GlobalSettings load(CompoundTag tag) {
@@ -21,6 +19,8 @@ public final class GlobalSettings {
 			timeout = tag.getInt("timeout").getValue();
 			maxRetries = tag.getInt("maxRetries").getValue();
 			maxRecommendMemory = tag.getLong("maxRecommendMemory").getValue();
+			timestampFormat = tag.getString("timestampFormat").getValue();
+			easterEggs = tag.getByte("easterEggs").getValue() == 1;
 			
 			return new GlobalSettings();
 		}
@@ -35,6 +35,8 @@ public final class GlobalSettings {
 			tag.putInt("timeout", timeout);
 			tag.putInt("maxRetries", maxRetries);
 			tag.putLong("maxRecommendMemory", maxRecommendMemory);
+			tag.putString("timestampFormat", timestampFormat);
+			tag.putByte("easterEggs", easterEggs ? (byte) 1 : (byte) 0);
 			
 			return tag;
 		}
@@ -58,6 +60,12 @@ public final class GlobalSettings {
 	/** The maximum recommended memory in MB. */
 	public static long maxRecommendMemory;
 	
+	/** The timestamp format. */
+	public static String timestampFormat;
+	
+	/** Whether to enable the Easter eggs. */
+	public static boolean easterEggs;
+	
 	/**
 	 * Initializes the global settings in default.
 	 */
@@ -68,5 +76,7 @@ public final class GlobalSettings {
 		timeout = 16000;
 		maxRetries = 8;
 		maxRecommendMemory = 8192L;
+		timestampFormat = "yyyy-MM-dd'T'HH:mm:ss:SSSZZ";
+		easterEggs = true;
 	}
 }

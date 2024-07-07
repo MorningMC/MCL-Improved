@@ -11,7 +11,7 @@ import java.io.File;
  * Represents a directory for Minecraft-related files.
  */
 public class MinecraftDirectory {
-	/** NbtLoader for loading and saving {@code MinecraftDirectory} objects from/to NBT data. */
+	/** {@link NbtLoader} for loading and saving {@link MinecraftDirectory} objects from/to NBT data. */
 	public static final NbtLoader<MinecraftDirectory, StringTag> loader = new NbtLoader<>() {
 		
 		@Override
@@ -32,14 +32,14 @@ public class MinecraftDirectory {
 	public final File root;
 	
 	/**
-	 * Constructs a {@code MinecraftDirectory} with the default root directory ".minecraft".
+	 * Constructs a {@link MinecraftDirectory} with the default root directory ".minecraft".
 	 */
 	public MinecraftDirectory() {
 		this.root = new File(".minecraft");
 	}
 	
 	/**
-	 * Constructs a {@code MinecraftDirectory} with a specified root directory.
+	 * Constructs a {@link MinecraftDirectory} with a specified root directory.
 	 *
 	 * @param root The root directory for Minecraft-related files.
 	 */
@@ -47,6 +47,9 @@ public class MinecraftDirectory {
 		this.root = root;
 	}
 	
+	/**
+	 * Emulates the directory structure for the specified policy.
+	 */
 	public enum Policy {
 		STANDARD, ISOLATED, CUSTOM
 	}

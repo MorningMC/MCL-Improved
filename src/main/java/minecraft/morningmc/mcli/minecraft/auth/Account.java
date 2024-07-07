@@ -24,7 +24,7 @@ public record Account(String username,
                       UUID identifier) implements UniqueObject {
 	
 	/**
-	 * Creates a new {@code Account} object with the specified attributes.
+	 * Creates a new {@link Account} object with the specified attributes.
 	 *
 	 * @param username The username of the account.
 	 * @param token The access token of the account.
@@ -32,7 +32,7 @@ public record Account(String username,
 	 * @param properties The properties of the account.
 	 * @param userType The type of the login.
 	 * @param xboxUserId The Xbox User ID (XUID).
-	 * @return A new {@code Account} object.
+	 * @return A new {@link Account} object.
 	 */
 	public static Account of(String username, String token, UUID uuid, Map<String, String> properties, UserType userType, String xboxUserId) {
 		return new Account(username, token, uuid, properties, userType, xboxUserId, UUID.randomUUID());
@@ -44,25 +44,15 @@ public record Account(String username,
 	public enum UserType {
 		MICROSOFT("msa"), YGGDRASIL("mojang"), OFFLINE("legacy");
 		
-		private final String name;
+		public final String name;
 		
 		/**
-		 * Creates a new {@code UserType} object with the specified name.
+		 * Creates a new {@link UserType} object with the specified name.
 		 *
 		 * @param name The name of the user type.
 		 */
 		UserType(String name) {
 			this.name = name;
-		}
-		
-		/**
-		 * Returns the name of the user type.
-		 *
-		 * @return The name of the user type.
-		 */
-		@Override
-		public String toString() {
-			return name;
 		}
 	}
 }

@@ -18,7 +18,7 @@ import java.util.*;
  * Represents a Minecraft profile, storing information such as name, icon, version, launch options, etc.
  */
 public final class Profile implements UniqueObject {
-	/** {@code NbtLoader} for loading and saving {@code Profile} objects from/to NBT data. */
+	/** {@link NbtLoader} for loading and saving {@link Profile} objects from/to NBT data. */
 	public static final NbtLoader<Profile, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
@@ -55,7 +55,7 @@ public final class Profile implements UniqueObject {
 	private final UUID identifier;
 	
 	/**
-	 * Constructs a new Profile instance.
+	 * Constructs a new {@link Profile} instance.
 	 *
 	 * @param name       The name of the profile.
 	 * @param icon       The icon representing the profile.
@@ -72,7 +72,7 @@ public final class Profile implements UniqueObject {
 	}
 	
 	/**
-	 * Constructs a new Profile instance.
+	 * Constructs a new {@link Profile} instance.
 	 *
 	 * @param name    The name of the profile.
 	 * @param icon    The icon representing the profile.

@@ -28,7 +28,7 @@ public class ProcessListener {
 	public final List<String> logs;
 	
 	/**
-	 * Constructs a ProcessListener for the given Minecraft process.
+	 * Constructs a {@link ProcessListener} for the given Minecraft process.
 	 *
 	 * @param minecraftInstance The Minecraft process to monitor.
 	 */
@@ -64,9 +64,9 @@ public class ProcessListener {
 	
 	// Thread Operations
 	/**
-	 * Listens to the provided {@code BufferedReader} and logs the lines to the console.
+	 * Listens to the provided {@link BufferedReader} and logs the lines to the console.
 	 *
-	 * @param reader The {@code BufferedReader} to listen to.
+	 * @param reader The {@link BufferedReader} to listen to.
 	 */
 	private void readerListener(BufferedReader reader) {
 		try {

@@ -18,9 +18,9 @@ public class EnumSwitchable<T, E extends Enum<E>> extends Modifiable<T> {
 	private E policy;
 	
 	/**
-	 * Constructs a new {@code EnumSwitchable} object.
+	 * Constructs a new {@link EnumSwitchable} object.
 	 *
-	 * @param value The value to be stored in the {@code EnumSwitchable} object.
+	 * @param value The value to be stored in the {@link EnumSwitchable} object.
 	 * @param policy The policy to be used.
 	 */
 	public EnumSwitchable(T value, E policy) {
@@ -29,11 +29,11 @@ public class EnumSwitchable<T, E extends Enum<E>> extends Modifiable<T> {
 	}
 	
 	/**
-	 * Creates a new {@code EnumSwitchable} object.
+	 * Creates a new {@link EnumSwitchable} object.
 	 *
-	 * @param value The value to be stored in the {@code EnumSwitchable} object.
+	 * @param value The value to be stored in the {@link EnumSwitchable} object.
 	 * @param policy The policy to be used.
-	 * @return A new {@code EnumSwitchable} object.
+	 * @return A new {@link EnumSwitchable} object.
 	 *
 	 * @param <T> The type of the value.
 	 * @param <E> The type of the policy.
@@ -43,10 +43,10 @@ public class EnumSwitchable<T, E extends Enum<E>> extends Modifiable<T> {
 	}
 	
 	/**
-	 * Generates a {@code EnumSwitchable} loader from a loader.
+	 * Generates a {@link EnumSwitchable} loader from a loader.
 	 *
-	 * @param loader The loader to be wrapped in a {@code EnumSwitchable} loader.
-	 * @return The {@code EnumSwitchable} loader.
+	 * @param loader The loader to be wrapped in a {@link EnumSwitchable} loader.
+	 * @return The {@link EnumSwitchable} loader.
 	 *
 	 * @param <C> The type of the value.
 	 * @param <E> The type of the policy.
@@ -56,10 +56,10 @@ public class EnumSwitchable<T, E extends Enum<E>> extends Modifiable<T> {
 		return new NbtLoader<>() {
 			
 			/**
-			 * Load a {@code EnumSwitchable} object from an NBT tag.
+			 * Load a {@link EnumSwitchable} object from an NBT tag.
 			 *
 			 * @param tag The NBT tag containing data to be loaded.
-			 * @return The loaded {@code EnumSwitchable} object.
+			 * @return The loaded {@link EnumSwitchable} object.
 			 * @throws IllegalNbtException If there is an issue with the NBT data.
 			 */
 			@Override
@@ -71,7 +71,7 @@ public class EnumSwitchable<T, E extends Enum<E>> extends Modifiable<T> {
 			}
 			
 			/**
-			 * Save a {@code EnumSwitchable} object to an NBT tag.
+			 * Save a {@link EnumSwitchable} object to an NBT tag.
 			 *
 			 * @param object The object to be saved.
 			 * @return The NBT tag containing the saved data.

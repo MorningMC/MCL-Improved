@@ -44,7 +44,7 @@ public class ProcessListenerCollection {
 	 * Resolves a process listener by process ID from the collection.
 	 *
 	 * @param pid The process ID of the process listener to be resolved.
-	 * @return The resolved {@code ProcessListener} object, or null if not found.
+	 * @return The resolved process listener, or {@code null} if not found.
 	 */
 	public static ProcessListener resolve(long pid) {
 		return instance.listeners.get(pid);

@@ -15,19 +15,19 @@ import org.apache.logging.log4j.Logger;
 import java.util.*;
 
 /**
- * The {@code Launcher} class is responsible for launching the Minecraft client with specified options and profiles.
+ * The {@link Launcher} class is responsible for launching the Minecraft client with specified options and profiles.
  */
 public class Launcher {
 	private static final Logger logger = LogManager.getLogger();
 	
-	/** {@code NbtLoader} for loading and saving {@code Launcher} objects from/to NBT data. */
+	/** {@link NbtLoader} for loading and saving {@link Launcher} objects from/to NBT data. */
 	public static final NbtLoader<Launcher, CompoundTag> loader = new NbtLoader<>() {
 		
 		/**
-		 * Loads a {@code Launcher} object from an NBT compound tag.
+		 * Loads a {@link Launcher} object from an NBT compound tag.
 		 *
-		 * @param tag The NBT compound tag representing the {@code Launcher} object.
-		 * @return The loaded {@code Launcher} object.
+		 * @param tag The NBT compound tag representing the {@link Launcher} object.
+		 * @return The loaded {@link Launcher} object.
 		 * @throws IllegalNbtException If the NBT data is invalid or missing required information.
 		 */
 		@Override
@@ -54,10 +54,10 @@ public class Launcher {
 		}
 		
 		/**
-		 * Saves a {@code Launcher} object to an NBT compound tag.
+		 * Saves a {@link Launcher} object to an NBT compound tag.
 		 *
-		 * @param object The {@code Launcher} object to be saved.
-		 * @return The NBT compound tag representing the {@code Launcher} object.
+		 * @param object The {@link Launcher} object to be saved.
+		 * @return The NBT compound tag representing the {@link Launcher} object.
 		 */
 		@Override
 		public CompoundTag save(Launcher object) {
@@ -86,7 +86,7 @@ public class Launcher {
 	public UUID account;
 	
 	/**
-	 * Constructs a Launcher object with the specified launch options and profile.
+	 * Constructs a {@link Launcher} object with the specified launch options and profile.
 	 *
 	 * @param options The launch options for the Minecraft client.
 	 * @param profile The UUID of Minecraft profile to be used for launching.
@@ -101,7 +101,7 @@ public class Launcher {
 	/**
 	 * Launches the Minecraft client using the stored profile and options.
 	 *
-	 * @return A ProcessListener for monitoring the launched process.
+	 * @return A {@link ProcessListener} for monitoring the launched process.
 	 * @throws LaunchException If there is an issue launching the Minecraft client.
 	 */
 	public ProcessListener launch() throws LaunchException {
@@ -112,7 +112,7 @@ public class Launcher {
 	 * Launches the Minecraft client using the specified profile and the stored options.
 	 *
 	 * @param profile The Minecraft profile to be used for launching.
-	 * @return A ProcessListener for monitoring the launched process.
+	 * @return A {@link ProcessListener} for monitoring the launched process.
 	 * @throws LaunchException If there is an issue launching the Minecraft client.
 	 */
 	public ProcessListener launch(Profile profile) throws LaunchException {
@@ -123,7 +123,7 @@ public class Launcher {
 	 * Launches the Minecraft client using the specified launch arguments.
 	 *
 	 * @param arguments The launch arguments for the Minecraft client.
-	 * @return A ProcessListener for monitoring the launched process.
+	 * @return A {@link ProcessListener} for monitoring the launched process.
 	 * @throws LaunchException If there is an issue launching the Minecraft client.
 	 */
 	private ProcessListener launch(LaunchArguments arguments) throws LaunchException {

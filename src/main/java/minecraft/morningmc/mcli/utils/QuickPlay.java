@@ -1,26 +1,28 @@
 package minecraft.morningmc.mcli.utils;
 
+import dev.dewy.nbt.tags.primitive.StringTag;
+import minecraft.morningmc.mcli.minecraft.client.resources.World;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
 
 /**
- * Represents a world entry in the client.
+ * Represents a Quick Play in the client.
  *
- * @param type The type of world entry.
- * @param singleplayer The singleplayer entry for the world.
- * @param multiplayer The multiplayer entry for the world.
+ * @param type The type of the Quick Play.
+ * @param singleplayer The singleplayer Quick Play.
+ * @param multiplayer The multiplayer Quick Play.
  */
 public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multiplayer) {
-	/** {@code NbtLoader} for loading and saving {@code QuickPlay} objects from/to NBT data. */
+	/** {@link NbtLoader} for loading and saving {@link QuickPlay} objects from/to NBT data. */
 	public static final NbtLoader<QuickPlay, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
 		public QuickPlay load(CompoundTag tag) throws IllegalNbtException {
 			return new QuickPlay(
 					Type.valueOf(tag.getString("type").getValue()),
-					Singleplayer.loader.load(tag.getCompound("singleplayer")),
+					Singleplayer.loader.load(tag.getString("singleplayer")),
 					Multiplayer.loader.load(tag.getCompound("multiplayer"))
 			);
 		}
@@ -44,44 +46,66 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 		NONE, SAVE, SERVER
 	}
 	
-	public record Singleplayer() {
-		/** {@code NbtLoader} for loading and saving {@code Singleplayer} objects from/to NBT data. */
-		public static final NbtLoader<Singleplayer, CompoundTag> loader = new NbtLoader<>() {
+	public record Singleplayer(String world) {
+		/** {@link NbtLoader} for loading and saving {@link Singleplayer} objects from/to NBT data. */
+		public static final NbtLoader<Singleplayer, StringTag> loader = new NbtLoader<>() {
 			
 			@Override
-			public Singleplayer load(CompoundTag tag) throws IllegalNbtException {
+			public Singleplayer load(StringTag tag) {
 				try {
-					return null;
+					return of(tag.getValue());
 				} catch (Exception e) {
 					return null;
 				}
 			}
 			
 			@Override
-			public CompoundTag save(Singleplayer object) {
-				CompoundTag tag = new CompoundTag();
-				
+			public StringTag save(Singleplayer object) {
 				if (object == null) {
-					return tag;
+					return null;
 				}
-				
-				return tag;
+				return new StringTag(object.world);
 			}
 		};
+		
+		/**
+		 * Creates a new {@link Singleplayer} object with the specified world.
+		 *
+		 * @param world The world of the singleplayer Quick Play.
+		 * @return A new {@link Singleplayer} object.
+		 */
+		public static Singleplayer of(World world) {
+			return of(world.folderName());
+		}
+		
+		/**
+		 * Creates a new {@link Singleplayer} object with the folder name of the specified world.
+		 *
+		 * @param world The folder name of the world of the singleplayer Quick Play.
+		 * @return A new {@link Singleplayer} object.
+		 */
+		public static Singleplayer of(String world) {
+			return new Singleplayer(world);
+		}
+		
+		@Override
+		public String toString() {
+			return world;
+		}
 	}
 	
 	/**
 	 * Represents information about a Minecraft multiplayer, including its host and port.
 	 */
 	public record Multiplayer(String host, int port) {
-		/** {@code NbtLoader} for loading and saving {@code Multiplayer} objects from/to NBT data. */
+		/** {@link NbtLoader} for loading and saving {@link Multiplayer} objects from/to NBT data. */
 		public static final NbtLoader<Multiplayer, CompoundTag> loader = new NbtLoader<>() {
 			
 			/**
-			 * Loads a {@code Multiplayer} object from an NBT compound tag.
+			 * Loads a {@link Multiplayer} object from an NBT compound tag.
 			 *
-			 * @param tag The NBT compound tag representing the {@code Multiplayer} object.
-			 * @return The loaded {@code Multiplayer} object, or null if an error occurs.
+			 * @param tag The NBT compound tag representing the {@link Multiplayer} object.
+			 * @return The loaded {@link Multiplayer} object, or null if an error occurs.
 			 */
 			@Override
 			public Multiplayer load(CompoundTag tag) throws IllegalNbtException {
@@ -96,10 +120,10 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 			}
 			
 			/**
-			 * Saves a {@code Multiplayer} object to an NBT compound tag.
+			 * Saves a {@link Multiplayer} object to an NBT compound tag.
 			 *
-			 * @param object The {@code Multiplayer} object to be saved.
-			 * @return The NBT compound tag representing the {@code Multiplayer} object.
+			 * @param object The {@link Multiplayer} object to be saved.
+			 * @return The NBT compound tag representing the {@link Multiplayer} object.
 			 */
 			@Override
 			public CompoundTag save(Multiplayer object) {
@@ -117,21 +141,21 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 		};
 		
 		/**
-		 * Constructs a {@code Multiplayer} object with the specified host and default port (25565).
+		 * Constructs a {@link Multiplayer} object with the specified host and default port (25565).
 		 *
 		 * @param host The host of the Minecraft multiplayer.
-		 * @return A new {@code Multiplayer} object.
+		 * @return A new {@link Multiplayer} object.
 		 */
 		public static Multiplayer of(String host) {
 			return of(host, 25565);
 		}
 		
 		/**
-		 * Constructs a {@code Multiplayer} object with the specified host and port.
+		 * Constructs a {@link Multiplayer} object with the specified host and port.
 		 *
 		 * @param host The host of the Minecraft multiplayer.
 		 * @param port The port of the Minecraft multiplayer.
-		 * @return A new {@code Multiplayer} object.
+		 * @return A new {@link Multiplayer} object.
 		 * @throws IndexOutOfBoundsException If the port is not within the valid range [0, 65535].
 		 */
 		public static Multiplayer of(String host, int port) {
@@ -143,9 +167,9 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 		}
 		
 		/**
-		 * Returns a string representation of the {@code Multiplayer} object in the format {@code "host:port"}.
+		 * Returns a string representation of the {@link Multiplayer} object in the format {@code "host:port"}.
 		 *
-		 * @return The string representation of the {@code Multiplayer} object.
+		 * @return The string representation of the {@link Multiplayer} object.
 		 */
 		@Override
 		public String toString() {

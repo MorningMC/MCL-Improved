@@ -15,7 +15,7 @@ public class UIManager {
 	public final Stage mainStage;
 	
 	/**
-	 * Constructs a new UIManager.
+	 * Constructs a new {@link UIManager}.
 	 *
 	 * @param mainStage the main stage of the launcher.
 	 */

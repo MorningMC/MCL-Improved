@@ -15,10 +15,10 @@ public class Switchable<T> extends Modifiable<T> {
 	private boolean enabled;
 	
 	/**
-	 * Constructs a new {@code Switchable} object.
+	 * Constructs a new {@link Switchable} object.
 	 *
-	 * @param value The value to be stored in the {@code Switchable} object.
-	 * @param enabled Whether the {@code Switchable} object is enabled.
+	 * @param value The value to be stored in the {@link Switchable} object.
+	 * @param enabled Whether the {@link Switchable} object is enabled.
 	 */
 	private Switchable(T value, boolean enabled) {
 		super(value);
@@ -26,11 +26,11 @@ public class Switchable<T> extends Modifiable<T> {
 	}
 	
 	/**
-	 * Constructs a new {@code Switchable} object.
+	 * Constructs a new {@link Switchable} object.
 	 *
-	 * @param value The value to be stored in the {@code Switchable} object.
-	 * @param enabled Whether the {@code Switchable} object is enabled.
-	 * @return A new {@code Switchable} object.
+	 * @param value The value to be stored in the {@link Switchable} object.
+	 * @param enabled Whether the {@link Switchable} object is enabled.
+	 * @return A new {@link Switchable} object.
 	 *
 	 * @param <T> The type of the value.
 	 */
@@ -39,10 +39,10 @@ public class Switchable<T> extends Modifiable<T> {
 	}
 	
 	/**
-	 * Constructs a new enabled {@code Switchable} object.
+	 * Constructs a new enabled {@link Switchable} object.
 	 *
-	 * @param value The value to be stored in the {@code Switchable} object.
-	 * @return A new {@code Switchable} object.
+	 * @param value The value to be stored in the {@link Switchable} object.
+	 * @return A new {@link Switchable} object.
 	 *
 	 * @param <T> The type of the value.
 	 */
@@ -51,10 +51,10 @@ public class Switchable<T> extends Modifiable<T> {
 	}
 	
 	/**
-	 * Constructs a new disabled {@code Switchable} object.
+	 * Constructs a new disabled {@link Switchable} object.
 	 *
-	 * @param value The value to be stored in the {@code Switchable} object.
-	 * @return A new {@code Switchable} object.
+	 * @param value The value to be stored in the {@link Switchable} object.
+	 * @return A new {@link Switchable} object.
 	 *
 	 * @param <T> The type of the value.
 	 */
@@ -63,10 +63,10 @@ public class Switchable<T> extends Modifiable<T> {
 	}
 	
 	/**
-	 * Generates a {@code Switchable} loader from a loader.
+	 * Generates a {@link Switchable} loader from a loader.
 	 *
-	 * @param loader The loader to be wrapped in a {@code Switchable} loader.
-	 * @return The {@code Switchable} loader.
+	 * @param loader The loader to be wrapped in a {@link Switchable} loader.
+	 * @return The {@link Switchable} loader.
 	 *
 	 * @param <C> The type of the value.
 	 * @param <T> The type of the NBT tag.
@@ -75,10 +75,10 @@ public class Switchable<T> extends Modifiable<T> {
 		return new NbtLoader<>() {
 			
 			/**
-			 * Load a {@code Switchable} object from an NBT tag.
+			 * Load a {@link Switchable} object from an NBT tag.
 			 *
 			 * @param tag The NBT tag containing data to be loaded.
-			 * @return The loaded {@code Switchable} object.
+			 * @return The loaded {@link Switchable} object.
 			 * @throws IllegalNbtException If there is an issue with the NBT data.
 			 */
 			@Override
@@ -90,7 +90,7 @@ public class Switchable<T> extends Modifiable<T> {
 			}
 			
 			/**
-			 * Save a {@code Switchable} object to an NBT tag.
+			 * Save a {@link Switchable} object to an NBT tag.
 			 *
 			 * @param object The object to be saved.
 			 * @return The NBT tag containing the saved data.
@@ -108,13 +108,13 @@ public class Switchable<T> extends Modifiable<T> {
 	}
 	
 	/**
-	 * Returns the value of the {@code Switchable} object if it is enabled,
-	 * or null otherwise.
+	 * Returns the value of the {@link Switchable} object if it is enabled,
+	 * or {@code null} otherwise.
 	 * <p>
 	 * This method is equivalent to {@code getIfEnabled(null)}
 	 *
-	 * @return The value of the {@code Switchable} object if it is enabled,
-	 *         or null otherwise.
+	 * @return The value of the {@link Switchable} object if it is enabled,
+	 *         or {@code null} otherwise.
 	 * @see #getIfEnabled(T)
 	 */
 	public T getIfEnabled() {
@@ -122,12 +122,12 @@ public class Switchable<T> extends Modifiable<T> {
 	}
 	
 	/**
-	 * Returns the value of the {@code Switchable} object if it is enabled,
+	 * Returns the value of the {@link Switchable} object if it is enabled,
 	 * or {@code defaultValue} otherwise.
 	 *
-	 * @param defaultValue The default value to be returned if the {@code Switchable}
+	 * @param defaultValue The default value to be returned if the {@link Switchable}
 	 *        is disabled.
-	 * @return The value of the {@code Switchable} object if it is enabled,
+	 * @return The value of the {@link Switchable} object if it is enabled,
 	 *         or {@code defaultValue} otherwise.
 	 */
 	public T getIfEnabled(T defaultValue) {
@@ -135,18 +135,18 @@ public class Switchable<T> extends Modifiable<T> {
 	}
 	
 	/**
-	 * Returns whether the {@code Switchable} object is enabled.
+	 * Returns whether the {@link Switchable} object is enabled.
 	 *
-	 * @return Whether the {@code Switchable} object is enabled.
+	 * @return Whether the {@link Switchable} object is enabled.
 	 */
 	public boolean isEnabled() {
 		return enabled;
 	}
 	
 	/**
-	 * Switches the {@code Switchable} object on or off.
+	 * Switches the {@link Switchable} object on or off.
 	 *
-	 * @param enabled Whether the {@code Switchable} object should be enabled.
+	 * @param enabled Whether the {@link Switchable} object should be enabled.
 	 */
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;

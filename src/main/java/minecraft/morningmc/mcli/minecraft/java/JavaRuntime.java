@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 public record JavaRuntime(File executable, Runtime.Version version, Platform platform) implements Comparable<JavaRuntime> {
 	private static final Logger logger = LogManager.getLogger();
 	
-	/** NbtLoader for loading and saving {@code JavaRuntime} objects from/to NBT data. */
+	/** {@link NbtLoader} for loading and saving {@link JavaRuntime} objects from/to NBT data. */
 	public static final NbtLoader<JavaRuntime, StringTag> loader = new NbtLoader<>() {
 		
 		@Override
@@ -48,10 +48,10 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	public static final JavaRuntime current = resolveCurrent();
 	
 	/**
-	 * Creates a {@code JavaRuntime} instance from the given executable path.
+	 * Creates a {@link JavaRuntime} instance from the given executable path.
 	 *
 	 * @param path The path to the Java executable.
-	 * @return The {@code JavaRuntime} instance.
+	 * @return The {@link JavaRuntime} instance.
 	 * @throws IllegalJavaException If an error occurs during Java version retrieval or the executable is illegal.
 	 */
 	public static JavaRuntime fromPath(File path) throws IllegalJavaException {
@@ -103,10 +103,10 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	}
 	
 	/**
-	 * Creates a {@code JavaRuntime} instance from the Java home directory.
+	 * Creates a {@link JavaRuntime} instance from the Java home directory.
 	 *
 	 * @param home The Java home directory.
-	 * @return The {@code JavaRuntime} instance.
+	 * @return The {@link JavaRuntime} instance.
 	 * @throws IllegalJavaException If an error occurs during Java version retrieval.
 	 */
 	public static JavaRuntime fromHome(File home) throws IllegalJavaException {
@@ -114,7 +114,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	}
 	
 	/**
-	 * Refreshes the {@code JavaRuntime} instance to check for changes.
+	 * Refreshes the {@link JavaRuntime} instance to check for changes.
 	 *
 	 * @throws IllegalJavaException If an error occurs during Java version retrieval or the executable is illegal.
 	 */

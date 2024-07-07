@@ -24,9 +24,9 @@ public interface UniqueObject {
 	}
 	
 	/**
-	 * Retrieves the UUID associated with this object.
+	 * Retrieves the {@link UUID} associated with this object.
 	 *
-	 * @return the UUID associated with this object.
+	 * @return the {@link UUID} associated with this object.
 	 */
 	UUID identifier();
 	
