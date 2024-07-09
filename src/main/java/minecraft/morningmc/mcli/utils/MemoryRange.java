@@ -26,7 +26,7 @@ public record MemoryRange(long minimum, long maximum) {
 		 * @return The loaded {@link MemoryRange} object, or null if an error occurs.
 		 */
 		@Override
-		public MemoryRange load(CompoundTag tag) throws IllegalNbtException {
+		public MemoryRange load(CompoundTag tag) {
 			long minimum = tag.getLong("minimum").getValue();
 			long maximum = tag.getLong("maximum").getValue();
 			

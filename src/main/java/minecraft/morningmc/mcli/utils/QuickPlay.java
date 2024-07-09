@@ -1,11 +1,13 @@
 package minecraft.morningmc.mcli.utils;
 
-import dev.dewy.nbt.tags.primitive.StringTag;
 import minecraft.morningmc.mcli.minecraft.client.resources.World;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
+import dev.dewy.nbt.tags.primitive.StringTag;
+
+import java.util.*;
 
 /**
  * Represents a Quick Play in the client.
@@ -43,7 +45,7 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 	 * Enumerates the types of the world entry.
 	 */
 	public enum Type {
-		NONE, SAVE, SERVER
+		NONE, SINGLEPLAYER, MULTIPLAYER
 	}
 	
 	public record Singleplayer(String world) {
@@ -52,17 +54,14 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 			
 			@Override
 			public Singleplayer load(StringTag tag) {
-				try {
-					return of(tag.getValue());
-				} catch (Exception e) {
-					return null;
-				}
+				String world = tag.getValue();
+				return world.isEmpty() ? null : of(world);
 			}
 			
 			@Override
 			public StringTag save(Singleplayer object) {
 				if (object == null) {
-					return null;
+					return new StringTag("");
 				}
 				return new StringTag(object.world);
 			}
@@ -83,9 +82,10 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 		 *
 		 * @param world The folder name of the world of the singleplayer Quick Play.
 		 * @return A new {@link Singleplayer} object.
+		 * @throws NullPointerException If the folder name of the world is null.
 		 */
 		public static Singleplayer of(String world) {
-			return new Singleplayer(world);
+			return new Singleplayer(Objects.requireNonNull(world));
 		}
 		
 		@Override
@@ -108,7 +108,7 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 			 * @return The loaded {@link Multiplayer} object, or null if an error occurs.
 			 */
 			@Override
-			public Multiplayer load(CompoundTag tag) throws IllegalNbtException {
+			public Multiplayer load(CompoundTag tag) {
 				try {
 					String host = tag.getString("host").getValue();
 					int port = tag.getInt("port").getValue();
@@ -145,6 +145,7 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 		 *
 		 * @param host The host of the Minecraft multiplayer.
 		 * @return A new {@link Multiplayer} object.
+		 * @throws NullPointerException If the host is null.
 		 */
 		public static Multiplayer of(String host) {
 			return of(host, 25565);
@@ -157,13 +158,14 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 		 * @param port The port of the Minecraft multiplayer.
 		 * @return A new {@link Multiplayer} object.
 		 * @throws IndexOutOfBoundsException If the port is not within the valid range [0, 65535].
+		 * @throws NullPointerException If the host is null.
 		 */
 		public static Multiplayer of(String host, int port) {
 			if (port < 0 || port > 65535) {
 				throw new IndexOutOfBoundsException("Port must be between 0 and 65535");
 			}
 			
-			return new Multiplayer(host, port);
+			return new Multiplayer(Objects.requireNonNull(host), port);
 		}
 		
 		/**

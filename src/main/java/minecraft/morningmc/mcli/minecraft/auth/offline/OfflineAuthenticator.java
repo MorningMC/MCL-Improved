@@ -24,7 +24,7 @@ public class OfflineAuthenticator implements Authenticator {
 	}
 	
 	@Override
-	public Account auth() throws AuthenticationException {
+	public Account auth() {
 		return Account.of(username, uuid.toString(), uuid, Map.of(), Account.UserType.OFFLINE, "");
 	}
 }

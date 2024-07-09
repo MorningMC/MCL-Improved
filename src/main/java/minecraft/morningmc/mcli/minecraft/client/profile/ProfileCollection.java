@@ -29,10 +29,9 @@ public class ProfileCollection {
 		 *
 		 * @param tag The list of NBT compound tags representing profiles.
 		 * @return The loaded {@link ProfileCollection} object.
-		 * @throws IllegalNbtException If the NBT data is invalid or missing required information.
 		 */
 		@Override
-		public ProfileCollection load(ListTag<CompoundTag> tag) throws IllegalNbtException {
+		public ProfileCollection load(ListTag<CompoundTag> tag) {
 			init(tag.getValue().stream()
 					     .flatMap(subTag -> {
 						     try {

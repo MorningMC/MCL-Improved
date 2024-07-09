@@ -82,7 +82,7 @@ public record Platform(OperatingSystem operatingSystem,
     }
     
     /**
-     * Emulates different operating systems and provides utility methods.
+     * Enumerates different operating systems and provides utility methods.
      */
     public enum OperatingSystem {
         WINDOWS, MACOS, LINUX, UNKNOWN;
@@ -113,7 +113,7 @@ public record Platform(OperatingSystem operatingSystem,
     }
     
     /**
-     * Emulates different architectures and provides utility methods.
+     * Enumerates different architectures and provides utility methods.
      */
     public enum Architecture {
         BIT32, BIT64, UNKNOWN;

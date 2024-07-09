@@ -1,11 +1,9 @@
 package minecraft.morningmc.mcli.minecraft.launch;
 
 import minecraft.morningmc.mcli.minecraft.client.MinecraftDirectory;
-import minecraft.morningmc.mcli.utils.QuickPlay;
 import minecraft.morningmc.mcli.minecraft.java.JavaRuntime;
 import minecraft.morningmc.mcli.utils.*;
 import minecraft.morningmc.mcli.utils.containers.*;
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
@@ -25,7 +23,7 @@ public final class LaunchOptions {
 	public static final NbtLoader<LaunchOptions, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
-		public LaunchOptions load(CompoundTag tag) throws IllegalNbtException {
+		public LaunchOptions load(CompoundTag tag) {
 			Switchable<JavaRuntime> javaRuntime;
 			try {
 				javaRuntime = Switchable.generateLoader(JavaRuntime.loader).load(tag.getCompound("javaRuntime"));

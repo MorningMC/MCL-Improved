@@ -39,7 +39,7 @@ public class ProcessListener {
 		stdOutListener = new Thread(() -> readerListener(minecraftInstance.inputReader()), "stdOutListener#" + pid);
 		stdErrListener = new Thread(() -> readerListener(minecraftInstance.errorReader()), "stdErrListener#" + pid);
 		exitChecker = new Thread(this::exitChecker, "exitChecker#" + pid);
-		logs = List.of();
+		logs = new ArrayList<>();
 		
 		stdOutListener.start();
 		stdErrListener.start();

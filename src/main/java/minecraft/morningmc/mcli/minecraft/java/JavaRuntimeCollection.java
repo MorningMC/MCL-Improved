@@ -35,10 +35,9 @@ public class JavaRuntimeCollection implements Runnable {
 		 *
 		 * @param tag The NBT list tag containing Java runtime paths.
 		 * @return The loaded {@link JavaRuntimeCollection}.
-		 * @throws IllegalNbtException If there is an issue with the NBT data.
 		 */
 		@Override
-		public JavaRuntimeCollection load(ListTag<StringTag> tag) throws IllegalNbtException {
+		public JavaRuntimeCollection load(ListTag<StringTag> tag) {
 			init(tag.getValue().parallelStream()
 					     .flatMap(subTag -> {
 						     try {
@@ -309,10 +308,7 @@ public class JavaRuntimeCollection implements Runnable {
 				}
 				
 				long stopTime = System.currentTimeMillis();
-				
-				logger.info("Finish searching potential Java runtimes. Found {}", potentialRuntimes.size());
-				logger.info("Used {} ms.", stopTime - startTime);
-				
+				logger.info("Finish searching potential Java runtimes. Found {}. Used {} ms.", potentialRuntimes.size(), stopTime - startTime);
 				runtimes.addAll(potentialRuntimes);
 				
 			} catch (Exception e) {
@@ -320,7 +316,7 @@ public class JavaRuntimeCollection implements Runnable {
 			}
 			
 			// list found runtimes
-			logger.debug("Found {} Java runtimes in total:", runtimes.size());
+			logger.debug("Found {} Java runtimes in total: ", runtimes.size());
 			for (JavaRuntime runtime : runtimes) {
 				logger.debug(runtime.toString());
 			}
@@ -339,10 +335,15 @@ public class JavaRuntimeCollection implements Runnable {
 		if (files != null) {
 			return Arrays.stream(files).filter(File::isDirectory);
 		}
-		
 		return Stream.empty();
 	}
 	
+	/**
+	 * Parses the given directory as a Java home directory.
+	 *
+	 * @param home The directory to be parsed.
+	 * @return The Java runtime corresponding to the given directory.
+	 */
 	private static Stream<JavaRuntime> parseHome(File home) {
 		logger.trace("Query home: {}", home.getAbsolutePath());
 		

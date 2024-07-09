@@ -10,7 +10,7 @@ import java.io.*;
  *
  * @see LauncherMetadata
  */
-public class FileMetadata {
+public final class FileMetadata {
 	/** The root directory for application data. */
 	public static final File appdata = resolveAppData();
 	
@@ -79,5 +79,16 @@ public class FileMetadata {
 	 */
 	public static InputStream getResource(String path) {
 		return FileMetadata.class.getClassLoader().getResourceAsStream(path);
+	}
+	
+	/**
+	 * Renames a file to a new name.
+	 *
+	 * @param file The file to be renamed.
+	 * @param name The new name for the file.
+	 * @return {@code true} if and only if the renaming succeeded, {@code false} otherwise.
+	 */
+	public static boolean renameFile(File file, String name) {
+		return file.renameTo(new File(file.getParentFile(), name));
 	}
 }

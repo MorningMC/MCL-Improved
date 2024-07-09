@@ -1,6 +1,5 @@
 package minecraft.morningmc.mcli.utils.interfaces;
 
-import minecraft.morningmc.mcli.minecraft.launch.LaunchOptions;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 
 import dev.dewy.nbt.api.Tag;
@@ -17,7 +16,7 @@ import java.util.List;
  */
 public interface NbtLoader<C, T extends Tag> {
 	
-	/** {@link NbtLoader} for loading and saving lists of strings from/to NBT data. */
+	/** {@link NbtLoader} for loading and saving a list of strings from/to NBT data. */
 	NbtLoader<List<String>, ListTag<StringTag>> stringListLoader = new NbtLoader<>() {
 		
 		/**
@@ -25,10 +24,9 @@ public interface NbtLoader<C, T extends Tag> {
 		 *
 		 * @param tag The NBT list tag containing string elements.
 		 * @return The loaded list of strings.
-		 * @throws IllegalNbtException If there is an issue with the NBT data.
 		 */
 		@Override
-		public List<String> load(ListTag<StringTag> tag) throws IllegalNbtException {
+		public List<String> load(ListTag<StringTag> tag) {
 			return tag.getValue().stream().map(StringTag::getValue).toList();
 		}
 		

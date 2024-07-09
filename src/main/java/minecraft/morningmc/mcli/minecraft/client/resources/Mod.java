@@ -1,12 +1,38 @@
 package minecraft.morningmc.mcli.minecraft.client.resources;
 
+import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
 import minecraft.morningmc.mcli.minecraft.client.resources.marker.Marker;
 import minecraft.morningmc.mcli.utils.containers.Modifiable;
 
 import java.io.File;
+import java.net.URL;
+import java.util.*;
 
-public record Mod(String name, String modid, String version, Loader loader,
-                  Marker marker, File file, Modifiable<Boolean> enabled) {
+/**
+ * Represents a Minecraft mod.
+ *
+ * @param name        The name of the mod.
+ * @param description The description of the mod.
+ * @param modid       The modid of the mod.
+ * @param version     The version of the mod.
+ * @param loader      The mod loader of the mod.
+ * @param authors     The authors of the mod.
+ * @param contact     The contact information of the mod.
+ * @param marker      The marker of the mod.
+ * @param file        The file of the mod.
+ * @param enabled     Whether the mod is enabled or not.
+ */
+public record Mod(String name,
+                  String description,
+                  String modid,
+                  String version,
+                  Loader loader,
+                  List<String> authors,
+                  Map<String, URL> contact,
+                  String icon,
+                  Marker marker,
+                  File file,
+                  Modifiable<Boolean> enabled) {
 	
 	/**
 	 * Creates a new {@link Mod} instance from a file.
@@ -27,21 +53,24 @@ public record Mod(String name, String modid, String version, Loader loader,
 	 */
 	public static Mod of(File file, Marker marker) {
 		
-		// Check if the mod is disabled
+		// Infer the mod loader of the mod
+		
+		
+		// Check if the mod is enabled
 		Modifiable<Boolean> enabled = Modifiable.of(!isDisabled(file));
 		enabled.observers.add(e -> {
 			if (e) {
 				if (isDisabled(file)) {
-					file.renameTo(new File(file.getParentFile(), file.getName().substring(0, file.getName().lastIndexOf('.'))));
+					FileMetadata.renameFile(file, file.getName().substring(0, file.getName().lastIndexOf('.')));
 				}
 			} else {
 				if (!isDisabled(file)) {
-					file.renameTo(new File(file.getParentFile(), file.getName() + ".disabled"));
+					FileMetadata.renameFile(file, file.getName() + ".disabled");
 				}
 			}
 		});
 		
-		return new Mod("", "", "", Loader.CUSTOM, marker, file, enabled);
+		return new Mod("", "", "", "", Loader.UNKNOWN, List.of(), Map.of(), "", marker, file, enabled);
 	}
 	
 	/**
@@ -58,6 +87,6 @@ public record Mod(String name, String modid, String version, Loader loader,
 	 * Enumerates the different mod loaders.
 	 */
 	public enum Loader {
-		FORGE, NEOFORGE, FABRIC, QUILT, RIFT, CUSTOM
+		FORGE, NEOFORGE, FABRIC, QUILT, LITELOADER, RIFT, UNKNOWN
 	}
 }

@@ -35,10 +35,9 @@ public class Main extends Application {
 	/**
 	 * Initializes the application. Completes files, loads configuration.
 	 *
-	 * @throws Exception If an error occurs during initialization.
 	 */
 	@Override
-	public void init() throws Exception {
+	public void init() {
 		logger.info("Initializing launcher...");
 		
 		try {
@@ -99,10 +98,9 @@ public class Main extends Application {
 	 * Starts the application. Sets up the main stage.
 	 *
 	 * @param mainStage The main stage of the application.
-	 * @throws Exception If an error occurs during the startup of the application.
 	 */
 	@Override
-	public void start(Stage mainStage) throws Exception {
+	public void start(Stage mainStage) {
 		logger.info("Starting launcher lifecycle...");
 		
 		manager = new UIManager(mainStage);

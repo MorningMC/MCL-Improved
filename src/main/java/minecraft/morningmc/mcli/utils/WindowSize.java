@@ -18,10 +18,9 @@ public record WindowSize(boolean fullScreen, int width, int height) {
 		 *
 		 * @param tag The compound tag to load from.
 		 * @return The loaded {@link WindowSize} object.
-		 * @throws IllegalNbtException If there is an issue with the NBT data.
 		 */
 		@Override
-		public WindowSize load(CompoundTag tag) throws IllegalNbtException {
+		public WindowSize load(CompoundTag tag) {
 			try {
 				boolean fullScreen = tag.getByte("fullScreen").getValue() != 0;
 				int width = tag.getInt("width").getValue();

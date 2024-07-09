@@ -14,7 +14,7 @@ public record Version(String version,
 	public static final NbtLoader<Version, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
-		public Version load(CompoundTag tag) throws IllegalNbtException {
+		public Version load(CompoundTag tag) {
 			return null;
 		}
 		

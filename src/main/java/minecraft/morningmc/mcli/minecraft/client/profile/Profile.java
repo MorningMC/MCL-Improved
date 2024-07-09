@@ -51,7 +51,7 @@ public final class Profile implements UniqueObject {
 	public String name;
 	public String icon;
 	public Version version;
-	public final Switchable<LaunchOptions> options;
+	public Switchable<LaunchOptions> options;
 	private final UUID identifier;
 	
 	/**
