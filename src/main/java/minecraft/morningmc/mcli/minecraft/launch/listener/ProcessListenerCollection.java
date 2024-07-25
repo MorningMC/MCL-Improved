@@ -28,7 +28,7 @@ public class ProcessListenerCollection {
 	 * @param listener The process listener to be added.
 	 */
 	public static void add(ProcessListener listener) {
-		instance.listeners.put(listener.pid, listener);
+		instance.listeners.put(listener.processID, listener);
 	}
 	
 	/**
@@ -37,7 +37,7 @@ public class ProcessListenerCollection {
 	 * @param listener The process listener to be removed.
 	 */
 	public static void remove(ProcessListener listener) {
-		instance.listeners.remove(listener.pid);
+		instance.listeners.remove(listener.processID);
 	}
 	
 	/**

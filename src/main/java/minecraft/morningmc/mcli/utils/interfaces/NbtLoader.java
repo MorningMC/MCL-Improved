@@ -3,10 +3,13 @@ package minecraft.morningmc.mcli.utils.interfaces;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 
 import dev.dewy.nbt.api.Tag;
+import dev.dewy.nbt.tags.collection.CompoundTag;
 import dev.dewy.nbt.tags.collection.ListTag;
 import dev.dewy.nbt.tags.primitive.StringTag;
 
-import java.util.List;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.util.*;
 
 /**
  * Interface for loading and saving objects to and from NBT tags.
@@ -42,6 +45,49 @@ public interface NbtLoader<C, T extends Tag> {
 			
 			for (String s : object) {
 				tag.add(new StringTag(s));
+			}
+			
+			return tag;
+		}
+	};
+	
+	/** {@link NbtLoader} for loading and saving a proxy from/to NBT data. */
+	NbtLoader<Proxy, CompoundTag> proxyLoader = new NbtLoader<>() {
+
+		/**
+		 * Load a proxy from an NBT compound tag.
+		 *
+		 * @param tag The NBT compound tag containing proxy data.
+		 * @return The loaded proxy.
+		 */
+		@Override
+		public Proxy load(CompoundTag tag) {
+			Proxy.Type type = Proxy.Type.valueOf(tag.getString("type").getValue());
+			
+			if (type == Proxy.Type.DIRECT) {
+				return Proxy.NO_PROXY;
+			}
+			
+			String address = tag.getString("address").getValue();
+			int port = tag.getInt("port").getValue();
+			return new Proxy(type, new InetSocketAddress(address, port));
+		}
+
+		/**
+		 * Save a proxy to an NBT compound tag.
+		 *
+		 * @param object The proxy to be saved.
+		 * @return The NBT compound tag containing the saved proxy data.
+		 */
+		@Override
+		public CompoundTag save(Proxy object) {
+			CompoundTag tag = new CompoundTag();
+			
+			tag.putString("type", object.type().name());
+			if (object.type() != Proxy.Type.DIRECT) {
+				InetSocketAddress address = (InetSocketAddress) object.address();
+				tag.putString("address", address.getHostString());
+				tag.putInt("port", address.getPort());
 			}
 			
 			return tag;

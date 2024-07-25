@@ -1,5 +1,7 @@
 package minecraft.morningmc.mcli.launcher.metadata;
 
+import minecraft.morningmc.mcli.utils.annotations.StaticClass;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -7,7 +9,8 @@ import java.util.*;
 /**
  * This class provides metadata information about the MCL Improved (MCLI).
  */
-public final class LauncherMetadata {
+@StaticClass
+public class LauncherMetadata {
 	// Constants
 	/** Represents the name of the launcher. */
 	public static final String name = "MCL Improved";
@@ -36,8 +39,8 @@ public final class LauncherMetadata {
 	 *
 	 * @param channel The release channel of the launcher.
 	 * @param version The version number of the launcher.
-	 * @param branch The branch number of the launcher.
-	 * @param build The build number of the launcher.
+	 * @param branch  The branch number of the launcher.
+	 * @param build   The build number of the launcher.
 	 */
 	public record Version(int channel, int version, int branch, int build) implements Comparable<Version> {
 		

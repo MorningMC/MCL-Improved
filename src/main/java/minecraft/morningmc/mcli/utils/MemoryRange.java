@@ -1,7 +1,6 @@
 package minecraft.morningmc.mcli.utils;
 
-import minecraft.morningmc.mcli.launcher.GlobalSettings;
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
+import minecraft.morningmc.mcli.launcher.settings.GlobalSettings;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
@@ -104,7 +103,8 @@ public record MemoryRange(long minimum, long maximum) {
 	}
 	
 	/**
-	 * Constructs a new {@link MemoryRange} object with a maximum of {@code maximum} MB and a minimum of {@code minimum} MB.
+	 * Constructs a new {@link MemoryRange} object with
+	 * a maximum of {@code maximum} MB and a minimum of {@code minimum} MB.
 	 *
 	 * @param minimum The minimum memory in MB.
 	 * @param maximum The maximum memory in MB.

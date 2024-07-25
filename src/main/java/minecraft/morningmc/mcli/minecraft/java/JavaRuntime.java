@@ -42,7 +42,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	};
 	
 	/** The default executable name for Java. */
-	public static final String java = Platform.system.operatingSystem() == Platform.OperatingSystem.WINDOWS ? "java.exe" : "java";
+	public static final String executableName = Platform.system.operatingSystem() == Platform.OperatingSystem.WINDOWS ? "java.exe" : "java";
 	
 	/** The current Java runtime based on the system properties. */
 	public static final JavaRuntime current = resolveCurrent();
@@ -110,20 +110,22 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	 * @throws IllegalJavaException If an error occurs during Java version retrieval.
 	 */
 	public static JavaRuntime fromHome(File home) throws IllegalJavaException {
-		return fromPath(new File(home, "bin/" + java));
+		return fromPath(new File(home, "bin/" + executableName));
 	}
 	
 	/**
 	 * Refreshes the {@link JavaRuntime} instance to check for changes.
 	 *
+	 * @return The refreshed {@link JavaRuntime} instance, or {@code null} if no changes were detected.
 	 * @throws IllegalJavaException If an error occurs during Java version retrieval or the executable is illegal.
 	 */
-	public void refresh() throws IllegalJavaException {
+	public JavaRuntime refresh() throws IllegalJavaException {
 		JavaRuntime newRuntime = fromPath(executable);
 		
 		if (this.compareTo(newRuntime) != 0) {
-			throw new IllegalJavaException(executable);
+			return newRuntime;
 		}
+		return null;
 	}
 	
 	/**
@@ -134,7 +136,6 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	private static JavaRuntime resolveCurrent() {
 		try {
 			return fromHome(new File(System.getProperty("java.home")));
-			
 		} catch (IllegalJavaException e) {
 			logger.warn("Failed to get current Java runtime: ", e);
 			return null;

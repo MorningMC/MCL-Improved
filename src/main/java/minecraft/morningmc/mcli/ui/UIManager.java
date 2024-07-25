@@ -2,6 +2,8 @@ package minecraft.morningmc.mcli.ui;
 
 import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
 import minecraft.morningmc.mcli.launcher.metadata.LauncherMetadata;
+import minecraft.morningmc.mcli.launcher.settings.UISettings;
+import minecraft.morningmc.mcli.utils.WindowSize;
 
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -25,9 +27,18 @@ public class UIManager {
 		mainStage.setTitle(LauncherMetadata.fullName);
 		mainStage.getIcons().add(icon);
 		
-		mainStage.setWidth(1024);
-		mainStage.setHeight(632);
+		refreshSize();
+		mainStage.widthProperty().addListener((obs, old, ne) -> UISettings.windowSize = WindowSize.windowed((int) ne, UISettings.windowSize.height()));
+		mainStage.heightProperty().addListener((obs, old, ne) -> UISettings.windowSize = WindowSize.windowed(UISettings.windowSize.width(), (int) ne));
 		
 		mainStage.show();
+	}
+	
+	/**
+	 * Refreshes the size of the main stage.
+	 */
+	public void refreshSize() {
+		mainStage.setWidth(UISettings.windowSize.width());
+		mainStage.setHeight(UISettings.windowSize.height());
 	}
 }

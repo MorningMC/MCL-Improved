@@ -12,6 +12,8 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * The entry point for launching the MCL Improved.
+ *
+ * @author MorningMC
  */
 public class Startup {
     private static final Logger logger = LogManager.getLogger();

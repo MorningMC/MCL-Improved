@@ -17,7 +17,7 @@ public class ProcessListener {
 	private static final Logger logger = LogManager.getLogger();
 	
 	public final Process minecraftInstance;
-	public final long pid;
+	public final long processID;
 	
 	public volatile boolean running = true;
 	
@@ -34,18 +34,19 @@ public class ProcessListener {
 	 */
 	public ProcessListener(Process minecraftInstance) {
 		this.minecraftInstance = minecraftInstance;
-		pid = minecraftInstance.pid();
+		processID = minecraftInstance.pid();
 		
-		stdOutListener = new Thread(() -> readerListener(minecraftInstance.inputReader()), "stdOutListener#" + pid);
-		stdErrListener = new Thread(() -> readerListener(minecraftInstance.errorReader()), "stdErrListener#" + pid);
-		exitChecker = new Thread(this::exitChecker, "exitChecker#" + pid);
+		stdOutListener = new Thread(() -> readerListener(minecraftInstance.inputReader()), "stdOutListener#" + processID);
+		stdErrListener = new Thread(() -> readerListener(minecraftInstance.errorReader()), "stdErrListener#" + processID);
+		exitChecker = new Thread(this::exitChecker, "exitChecker#" + processID);
 		logs = new ArrayList<>();
 		
 		stdOutListener.start();
 		stdErrListener.start();
 		exitChecker.start();
+		logger.info("Started listening for Minecraft instance {}", processID);
 		
-		logger.info("Started listening for Minecraft instance {}", pid);
+		// Add this listener to the collection of active listeners
 		ProcessListenerCollection.add(this);
 	}
 	
@@ -73,7 +74,7 @@ public class ProcessListener {
 			String line;
 			
 			while (running && (line = reader.readLine()) != null) {
-				logger.info("[Minecraft Log #{}] {}", pid, line);
+				logger.info("[Minecraft Log #{}] {}", processID, line);
 				logs.add(line);
 			}
 			
@@ -90,8 +91,6 @@ public class ProcessListener {
 			int exitCode = minecraftInstance.waitFor();
 			logger.info("Minecraft process exited with code: {}", exitCode);
 			running = false;
-		} catch (InterruptedException e) {
-			logger.error("exitChecker interrupted: ", e);
-		}
+		} catch (InterruptedException ignored) {} // this will return automatically
 	}
 }

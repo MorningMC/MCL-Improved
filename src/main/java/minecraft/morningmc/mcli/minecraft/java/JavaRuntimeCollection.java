@@ -126,22 +126,21 @@ public class JavaRuntimeCollection implements Runnable {
 		return instance.thread != null && instance.thread.isAlive();
 	}
 	
-	/**
-	 * Runnable implementation for searching and updating Java runtimes.
-	 */
 	@Override
 	public void run() {
 		synchronized (runtimes) {
 			// refresh old runtimes
-			runtimes.removeIf(runtime -> {
+			runtimes.parallelStream().forEach(runtime -> {
 				try {
-					runtime.refresh();
+					JavaRuntime newRuntime = runtime.refresh();
+					if (newRuntime != null) {
+						runtimes.remove(runtime);
+						runtimes.add(newRuntime);
+					}
 				} catch (IllegalJavaException e) {
-					logger.warn("Expired Java runtime: {}", runtime, e);
-					return true;
+					logger.warn("Expired Java runtime: {}", e.getMessage());
+					runtimes.remove(runtime);
 				}
-				
-				return false;
 			});
 			
 			// search potential runtimes
@@ -288,7 +287,7 @@ public class JavaRuntimeCollection implements Runnable {
 							.parallel()
 							.map(File::new)
 							.filter(bin -> bin.getName().equals("bin"))
-							.map(bin -> new File(bin, JavaRuntime.java))
+							.map(bin -> new File(bin, JavaRuntime.executableName))
 							.flatMap(executable -> {
 								logger.trace("Query executable in PATH: {}", executable);
 								try {

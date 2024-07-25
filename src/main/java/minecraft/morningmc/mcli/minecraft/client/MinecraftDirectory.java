@@ -48,7 +48,7 @@ public class MinecraftDirectory {
 	}
 	
 	/**
-	 * Emulates the directory structure for the specified policy.
+	 * Enumerates the directory structure for the specified policy.
 	 */
 	public enum Policy {
 		STANDARD, ISOLATED, CUSTOM

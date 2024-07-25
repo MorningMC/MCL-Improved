@@ -1,12 +1,15 @@
 package minecraft.morningmc.mcli.utils;
 
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
 
 /**
  * Represents the size and state (full-screen or windowed) of a window.
+ *
+ * @param fullScreen Whether the window is full-screen.
+ * @param width      The width of the window.
+ * @param height     The height of the window.
  */
 public record WindowSize(boolean fullScreen, int width, int height) {
 	

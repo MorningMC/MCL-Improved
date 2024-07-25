@@ -1,6 +1,7 @@
 package minecraft.morningmc.mcli.launcher.networking.download;
 
-import minecraft.morningmc.mcli.launcher.GlobalSettings;
+import minecraft.morningmc.mcli.launcher.settings.GlobalSettings;
+import minecraft.morningmc.mcli.launcher.settings.NetworkSettings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,7 +34,7 @@ public class DownloadThread extends Thread {
 		try {
 			HttpURLConnection connection = (HttpURLConnection) source.openConnection();
 			connection.setRequestProperty("Range", "bytes=%d-%d".formatted(start, end));
-			connection.setConnectTimeout(GlobalSettings.timeout);
+			connection.setConnectTimeout(NetworkSettings.timeout);
 			int responseCode = connection.getResponseCode();
 			
 			target.seek(start);

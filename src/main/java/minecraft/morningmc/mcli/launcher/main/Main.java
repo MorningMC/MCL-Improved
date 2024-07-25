@@ -1,10 +1,7 @@
 package minecraft.morningmc.mcli.launcher.main;
 
-import minecraft.morningmc.mcli.launcher.GlobalSettings;
-import minecraft.morningmc.mcli.launcher.Translation;
 import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
 import minecraft.morningmc.mcli.minecraft.java.JavaRuntimeCollection;
-import minecraft.morningmc.mcli.minecraft.client.profile.ProfileCollection;
 import minecraft.morningmc.mcli.minecraft.launch.LaunchOptions;
 import minecraft.morningmc.mcli.minecraft.launch.Launcher;
 
@@ -19,27 +16,32 @@ import dev.dewy.nbt.Nbt;
 import dev.dewy.nbt.tags.collection.CompoundTag;
 
 import java.io.IOException;
-import java.util.*;
 
 /**
  * The Main class represents the main entry point for the Minecraft launcher application.
  * It extends the JavaFX Application class and initializes the application, creates the main stage,
  * and handles the lifecycle of the application.
+ *
+ * @author MorningMC
  */
 public class Main extends Application {
 	private static final Logger logger = LogManager.getLogger();
 	
-	private Launcher launcher;
+	public static Main instance = null;
+	
+	public Launcher launcher;
 	private UIManager manager;
 	
 	/**
 	 * Initializes the application. Completes files, loads configuration.
-	 *
 	 */
 	@Override
 	public void init() {
+		instance = this;
+		
 		logger.info("Initializing launcher...");
 		
+		// complete files
 		try {
 			int created = FileMetadata.completeFiles();
 			logger.debug("Completed {} files.", created);
@@ -48,7 +50,7 @@ public class Main extends Application {
 			logger.error("Complete files failed: ", e);
 		}
 		
-		// Load config
+		// load config
 		CompoundTag config;
 		try {
 			config = new Nbt().fromFile(FileMetadata.config);
@@ -57,27 +59,7 @@ public class Main extends Application {
 			config = new CompoundTag();
 		}
 		
-		try {
-			GlobalSettings.loader.load(config.getCompound("globalSettings"));
-		} catch (Exception e) {
-			logger.warn("Failed to load globalSettings: {}", e.getMessage());
-			GlobalSettings.initDefault();
-		}
-		
-		try {
-			ProfileCollection.loader.load(config.getList("profileCollection"));
-		} catch (Exception e) {
-			logger.warn("Failed to load profileCollection: {}", e.getMessage());
-			ProfileCollection.init(Set.of());
-		}
-		
-		try {
-			JavaRuntimeCollection.loader.load(config.getList("javaRuntimeCollection"));
-		} catch (Exception e) {
-			logger.warn("Failed to load javaRuntimeCollection: {}", e.getMessage());
-			JavaRuntimeCollection.init(Set.of());
-		}
-		JavaRuntimeCollection.search();
+		ConfigHelper.loadConfigs(config);
 		
 		try {
 			launcher = Launcher.loader.load(config.getCompound("launcher"));
@@ -86,12 +68,8 @@ public class Main extends Application {
 			launcher = new Launcher(LaunchOptions.DEFAULT, null, null);
 		}
 		
-		try {
-			Translation.loader.load(config.getString("translation"));
-		} catch (Exception e) {
-			logger.warn("Failed to load translation: {}", e.getMessage());
-			Translation.init("en");
-		}
+		// start auto-save thread
+		ConfigHelper.startAutoSave();
 	}
 	
 	/**
@@ -101,11 +79,15 @@ public class Main extends Application {
 	 */
 	@Override
 	public void start(Stage mainStage) {
-		logger.info("Starting launcher lifecycle...");
-		
-		manager = new UIManager(mainStage);
-		
-		mainStage.show();
+		try {
+			logger.info("Starting launcher lifecycle...");
+			
+			manager = new UIManager(mainStage);
+			
+			mainStage.show();
+		} catch (Throwable t) {
+			logger.fatal("Failed in launcher lifecycle: ", t);
+		}
 	}
 	
 	/**
@@ -115,19 +97,15 @@ public class Main extends Application {
 	public void stop() {
 		logger.info("Stopping launcher...");
 		
-		// Save config
-		CompoundTag config = new CompoundTag();
-		
-		config.put("globalSettings", GlobalSettings.loader.save(new GlobalSettings()));
-		config.put("profileCollection", ProfileCollection.loader.save(ProfileCollection.instance));
-		config.put("javaRuntimeCollection", JavaRuntimeCollection.loader.save(JavaRuntimeCollection.instance));
-		config.put("launcher", Launcher.loader.save(launcher));
-		config.put("translation", Translation.loader.save(Translation.instance));
-		
-		try {
-			new Nbt().toFile(config, FileMetadata.config);
-		} catch (Exception e) {
-			logger.error("Failed to save config: ", e);
+		// wait other threads to finish
+		while (JavaRuntimeCollection.isSearching()) {
+			Thread.onSpinWait();
 		}
+		
+		// stop auto-save thread
+		ConfigHelper.stopAutoSave();
+		
+		// save config
+		ConfigHelper.saveAll();
 	}
 }

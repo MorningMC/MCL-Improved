@@ -1,9 +1,8 @@
 package minecraft.morningmc.mcli.minecraft.client;
 
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
+import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
-import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 public record Version(String version,
                       Type type,

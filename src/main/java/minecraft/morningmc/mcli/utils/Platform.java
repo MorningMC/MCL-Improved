@@ -44,8 +44,7 @@ public record Platform(OperatingSystem operatingSystem,
             arch = processorArch != null && processorArch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64")
                            ? Architecture.BIT64 : Architecture.BIT32;
         } else {
-            arch = System.getProperty("os.arch").contains("64")
-                           ? Architecture.BIT64 : Architecture.BIT32;
+            arch = System.getProperty("os.arch").contains("64") ? Architecture.BIT64 : Architecture.BIT32;
         }
         
         return new Platform(

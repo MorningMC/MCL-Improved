@@ -2,6 +2,7 @@ package minecraft.morningmc.mcli.launcher.metadata;
 
 import minecraft.morningmc.mcli.minecraft.client.MinecraftDirectory;
 import minecraft.morningmc.mcli.utils.Platform;
+import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 
 import java.io.*;
 
@@ -10,7 +11,8 @@ import java.io.*;
  *
  * @see LauncherMetadata
  */
-public final class FileMetadata {
+@StaticClass
+public class FileMetadata {
 	/** The root directory for application data. */
 	public static final File appdata = resolveAppData();
 	
@@ -75,10 +77,20 @@ public final class FileMetadata {
 	 * Retrieves an input stream for the specified resource path.
 	 *
 	 * @param path The path of the resource.
-	 * @return An InputStream for the specified resource.
+	 * @return An {@link InputStream} for the specified resource.
 	 */
 	public static InputStream getResource(String path) {
 		return FileMetadata.class.getClassLoader().getResourceAsStream(path);
+	}
+	
+	/**
+	 * Retrieves a buffered reader for the specified input stream.
+	 *
+	 * @param stream The specified input stream.
+	 * @return A {@link BufferedReader} for the specified input stream.
+	 */
+	public static BufferedReader getReader(InputStream stream) {
+		return new BufferedReader(new InputStreamReader(stream));
 	}
 	
 	/**
