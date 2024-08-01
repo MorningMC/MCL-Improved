@@ -5,8 +5,10 @@ import minecraft.morningmc.mcli.launcher.metadata.LauncherMetadata;
 import minecraft.morningmc.mcli.launcher.settings.UISettings;
 import minecraft.morningmc.mcli.utils.WindowSize;
 
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 
 /**
  * A class to manage the UI of the launcher.

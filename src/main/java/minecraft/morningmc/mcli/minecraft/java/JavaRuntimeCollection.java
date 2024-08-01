@@ -2,6 +2,7 @@ package minecraft.morningmc.mcli.minecraft.java;
 
 import minecraft.morningmc.mcli.utils.Platform;
 import minecraft.morningmc.mcli.utils.annotations.ObjectCollection;
+import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalJavaException;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
@@ -24,6 +25,7 @@ import java.util.stream.*;
  * A collection of Java runtimes managed by the launcher.
  */
 @ObjectCollection
+@StaticClass
 public class JavaRuntimeCollection implements Runnable {
 	private static final Logger logger = LogManager.getLogger();
 	

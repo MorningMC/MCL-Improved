@@ -1,6 +1,7 @@
 package minecraft.morningmc.mcli.minecraft.launch.listener;
 
 import minecraft.morningmc.mcli.utils.annotations.ObjectCollection;
+import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 
 import java.util.*;
 
@@ -8,6 +9,7 @@ import java.util.*;
  * A collection of process listeners.
  */
 @ObjectCollection
+@StaticClass
 public class ProcessListenerCollection {
 	public static ProcessListenerCollection instance = new ProcessListenerCollection();
 	

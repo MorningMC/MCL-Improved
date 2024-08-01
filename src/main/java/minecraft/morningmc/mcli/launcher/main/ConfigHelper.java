@@ -1,16 +1,17 @@
 package minecraft.morningmc.mcli.launcher.main;
 
-import dev.dewy.nbt.Nbt;
 import minecraft.morningmc.mcli.launcher.settings.GlobalSettings;
 import minecraft.morningmc.mcli.launcher.Translation;
 import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
 import minecraft.morningmc.mcli.launcher.settings.SettingsManager;
 import minecraft.morningmc.mcli.minecraft.client.profile.ProfileCollection;
 import minecraft.morningmc.mcli.minecraft.java.JavaRuntimeCollection;
+import minecraft.morningmc.mcli.minecraft.launch.Launcher;
+import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 
+import dev.dewy.nbt.Nbt;
 import dev.dewy.nbt.tags.collection.CompoundTag;
 
-import minecraft.morningmc.mcli.minecraft.launch.Launcher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,6 +20,7 @@ import java.util.*;
 /**
  * A Utility class for managing configurations.
  */
+@StaticClass
 public final class ConfigHelper implements Runnable {
 	private static final Logger logger = LogManager.getLogger();
 	

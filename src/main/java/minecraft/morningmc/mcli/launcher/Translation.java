@@ -3,6 +3,8 @@ package minecraft.morningmc.mcli.launcher;
 import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
+import minecraft.morningmc.mcli.utils.annotations.StaticClass;
+
 import dev.dewy.nbt.tags.primitive.StringTag;
 
 import org.apache.logging.log4j.LogManager;
@@ -16,6 +18,7 @@ import java.util.regex.*;
  * The {@link Translation} class manages language translations for the application.
  * It loads translation files and provides methods to retrieve translated strings.
  */
+@StaticClass
 public class Translation {
 	private static final Logger logger = LogManager.getLogger();
 	
