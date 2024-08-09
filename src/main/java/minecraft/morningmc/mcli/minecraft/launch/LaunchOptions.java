@@ -7,6 +7,7 @@ import minecraft.morningmc.mcli.utils.containers.*;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
+import dev.dewy.nbt.tags.primitive.StringTag;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,12 +49,12 @@ public final class LaunchOptions {
 				javaArguments = DEFAULT.javaArguments;
 			}
 			
-			boolean useWatermark;
+			Switchable<String> watermark;
 			try {
-				useWatermark = tag.getByte("useWatermark").getValue() != 0;
+				watermark = Switchable.generateLoader(NbtLoader.stringLoader).load(tag.getCompound("watermark"));
 			} catch (Exception e) {
-				logger.warn("useWatermark load failed: {}", e.getMessage());
-				useWatermark = DEFAULT.useWatermark;
+				logger.warn("watermark load failed: {}", e.getMessage());
+				watermark = DEFAULT.watermark;
 			}
 			
 			EnumSwitchable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir;
@@ -80,7 +81,15 @@ public final class LaunchOptions {
 				quickPlay = DEFAULT.quickPlay;
 			}
 			
-			return new LaunchOptions(javaRuntime, memoryRange, javaArguments, useWatermark, gameDir, windowSize, quickPlay);
+			boolean demo;
+			try {
+				demo = tag.getByte("demo").getValue() != 0;
+			} catch (Exception e) {
+				logger.warn("demo load failed: {}", e.getMessage());
+				demo = DEFAULT.demo;
+			}
+			
+			return new LaunchOptions(javaRuntime, memoryRange, javaArguments, watermark, gameDir, windowSize, quickPlay, demo);
 		}
 		
 		@Override
@@ -106,9 +115,9 @@ public final class LaunchOptions {
 			}
 			
 			try {
-				tag.putByte("useWatermark", (byte) ( object.useWatermark ? 1 : 0 ));
+				tag.put("watermark", Switchable.generateLoader(NbtLoader.stringLoader).save(object.watermark));
 			} catch (Exception e) {
-				logger.warn("useWatermark save failed: {}", e.getMessage());
+				logger.warn("watermark save failed: {}", e.getMessage());
 			}
 			
 			try {
@@ -130,6 +139,12 @@ public final class LaunchOptions {
 				logger.warn("quickPlay save failed: {}", e.getMessage());
 			}
 			
+			try {
+				tag.putByte("demo", object.demo ? (byte) 1 : (byte) 0);
+			} catch (Exception e) {
+				logger.warn("demo save failed: {}", e.getMessage());
+			}
+			
 			return tag;
 		}
 	};
@@ -139,36 +154,49 @@ public final class LaunchOptions {
 			Switchable.ofDisabled(JavaRuntime.current),
 			Switchable.ofDisabled(MemoryRange.of(2048)),
 			Switchable.ofDisabled(List.of("-XX:+UnlockExperimentalVMOptions", "-XX:+UseG1GC", "-XX:G1NewSizePercent=20", "-XX:G1ReservePercent=20", "-XX:MaxGCPauseMillis=50", "-XX:G1HeapRegionSize=32M")),
-			false,
+			Switchable.ofDisabled("MCLI"),
 			EnumSwitchable.of(MinecraftDirectory.standard, MinecraftDirectory.Policy.STANDARD),
 			WindowSize.windowed(1024, 768),
-			new QuickPlay(QuickPlay.Type.NONE, null, null)
+			QuickPlay.none(),
+			false
 	);
 	
 	public Switchable<JavaRuntime> javaRuntime;
 	public Switchable<MemoryRange> memoryRange;
 	public Switchable<List<String>> javaArguments;
-	public boolean useWatermark;
+	public Switchable<String> watermark;
 	public EnumSwitchable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir;
 	public WindowSize windowSize;
 	public QuickPlay quickPlay;
+	public boolean demo;
 	
 	/**
+	 * Constructs a new {@link LaunchOptions} object with the specified options.
+	 *
 	 * @param javaRuntime   The {@link Switchable} object for Java runtime.
 	 * @param memoryRange   The {@link Switchable} object for memory range.
 	 * @param javaArguments The {@link Switchable} object for Java arguments.
-	 * @param useWatermark  Whether to use the watermark.
+	 * @param watermark     The {@link Switchable} object for watermark.
 	 * @param gameDir       The {@link EnumSwitchable} object for the game directory.
 	 * @param windowSize    The window size.
 	 * @param quickPlay     The Quick Play info.
+	 * @param demo          Whether to run in demo mode.
 	 */
-	public LaunchOptions(Switchable<JavaRuntime> javaRuntime, Switchable<MemoryRange> memoryRange, Switchable<List<String>> javaArguments, boolean useWatermark, EnumSwitchable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir, WindowSize windowSize, QuickPlay quickPlay) {
+	public LaunchOptions(Switchable<JavaRuntime> javaRuntime,
+	                     Switchable<MemoryRange> memoryRange,
+	                     Switchable<List<String>> javaArguments,
+	                     Switchable<String> watermark,
+	                     EnumSwitchable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir,
+	                     WindowSize windowSize,
+	                     QuickPlay quickPlay,
+	                     boolean demo) {
 		this.javaRuntime = javaRuntime;
 		this.memoryRange = memoryRange;
 		this.javaArguments = javaArguments;
-		this.useWatermark = useWatermark;
+		this.watermark = watermark;
 		this.gameDir = gameDir;
 		this.windowSize = windowSize;
 		this.quickPlay = quickPlay;
+		this.demo = demo;
 	}
 }

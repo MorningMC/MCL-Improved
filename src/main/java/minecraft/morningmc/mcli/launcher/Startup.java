@@ -11,7 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * The entry point for launching the MCL Improved.
+ * The entry point for launching MCL Improved.
  *
  * @author MorningMC
  */

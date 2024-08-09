@@ -1,6 +1,9 @@
 package minecraft.morningmc.mcli.minecraft.auth;
 
+import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 import minecraft.morningmc.mcli.utils.interfaces.UniqueObject;
+
+import dev.dewy.nbt.tags.collection.CompoundTag;
 
 import java.util.*;
 
@@ -22,6 +25,19 @@ public record Account(String username,
                       UserType userType,
                       String xboxUserId,
                       UUID identifier) implements UniqueObject {
+	/** {@link NbtLoader} for loading and saving {@link Account} objects from/to NBT data. */
+	public static final NbtLoader<Account, CompoundTag> loader = new NbtLoader<>() {
+
+		@Override
+		public Account load(CompoundTag tag) {
+			return null;
+		}
+		
+		@Override
+		public CompoundTag save(Account account) {
+			return null;
+		}
+	};
 	
 	/**
 	 * Creates a new {@link Account} object with the specified attributes.

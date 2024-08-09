@@ -1,5 +1,6 @@
 package minecraft.morningmc.mcli.minecraft.launch;
 
+import minecraft.morningmc.mcli.minecraft.auth.AccountCollection;
 import minecraft.morningmc.mcli.minecraft.client.profile.Profile;
 import minecraft.morningmc.mcli.minecraft.client.profile.ProfileCollection;
 import minecraft.morningmc.mcli.minecraft.launch.listener.ProcessListener;
@@ -168,6 +169,6 @@ public class Launcher {
 	 * @throws NullPointerException If the profile is null.
 	 */
 	public LaunchArguments generateArguments(Profile profile) {
-		return new LaunchArguments(profile.options.getIfEnabled(options), profile);
+		return new LaunchArguments(profile.options.getIfEnabled(options), profile, AccountCollection.resolve(account));
 	}
 }

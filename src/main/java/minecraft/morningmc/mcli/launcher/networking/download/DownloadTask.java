@@ -56,9 +56,16 @@ public class DownloadTask implements UniqueObject {
 	
 	/**
 	 * Dispatches the download task to all the threads.
+	 *
+	 * @param threadCount The number of threads to use for the download.
 	 */
-	public void dispatch() {
+	private void dispatch(short threadCount) {
 	
+	}
+	
+	@Override
+	public UUID identifier() {
+		return identifier;
 	}
 	
 	/**
@@ -74,15 +81,7 @@ public class DownloadTask implements UniqueObject {
 			tempFile.createNewFile();
 			return new RandomAccessFile(tempFile, "rwd");
 		} catch (Exception e) {
-			logger.warn("Failed to create temp file, use destination file instead: {}", e.getMessage());
-			
-			try {
-				destination.createNewFile();
-				return new RandomAccessFile(destination, "rwd");
-			} catch (Exception ex) {
-				ex.addSuppressed(e);
-				throw new DownloadException("Failed to create temp file", ex);
-			}
+			throw new DownloadException("Failed to create temp file", e);
 		}
 	}
 	
@@ -93,15 +92,10 @@ public class DownloadTask implements UniqueObject {
 	 */
 	private long getLength() {
 		try {
-			return Requester.createConnection(source, Requester.Method.HEAD).getContentLengthLong();
+			return Requester.openConnection(source, Requester.Method.HEAD).getContentLengthLong();
 		} catch (IOException e) {
 			logger.warn("Failed to get the length of file: {}", e.getMessage());
 			return -1;
 		}
-	}
-	
-	@Override
-	public UUID identifier() {
-		return identifier;
 	}
 }

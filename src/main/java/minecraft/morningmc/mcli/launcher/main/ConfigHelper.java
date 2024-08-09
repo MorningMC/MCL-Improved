@@ -68,7 +68,7 @@ public final class ConfigHelper implements Runnable {
 	 * @param config The compound tag to save the configurations to.
 	 */
 	public static void saveConfigs(CompoundTag config) {
-		config.put("settingsManager", SettingsManager.loader.save(new SettingsManager()));
+		config.put("settingsManager", SettingsManager.loader.save(null));
 		config.put("profileCollection", ProfileCollection.loader.save(ProfileCollection.instance));
 		config.put("javaRuntimeCollection", JavaRuntimeCollection.loader.save(JavaRuntimeCollection.instance));
 		config.put("translation", Translation.loader.save(Translation.instance));

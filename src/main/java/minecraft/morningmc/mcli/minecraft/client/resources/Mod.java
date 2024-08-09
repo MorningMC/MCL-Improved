@@ -2,7 +2,6 @@ package minecraft.morningmc.mcli.minecraft.client.resources;
 
 import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
 import minecraft.morningmc.mcli.minecraft.client.resources.marker.Marker;
-import minecraft.morningmc.mcli.utils.containers.Modifiable;
 
 import java.io.File;
 import java.net.URL;
@@ -10,77 +9,113 @@ import java.util.*;
 
 /**
  * Represents a Minecraft mod.
- *
- * @param name        The name of the mod.
- * @param description The description of the mod.
- * @param modid       The modid of the mod.
- * @param version     The version of the mod.
- * @param loader      The mod loader of the mod.
- * @param authors     The authors of the mod.
- * @param contact     The contact information of the mod.
- * @param marker      The marker of the mod.
- * @param file        The file of the mod.
- * @param enabled     Whether the mod is enabled or not.
  */
-public record Mod(String name,
-                  String description,
-                  String modid,
-                  String version,
-                  Loader loader,
-                  List<String> authors,
-                  Map<String, URL> contact,
-                  String icon,
-                  Marker marker,
-                  File file,
-                  Modifiable<Boolean> enabled) {
+public class Mod {
+	public final Info info;
+	public final Loader loader;
+	public final File file;
+	public Marker marker;
 	
 	/**
-	 * Creates a new {@link Mod} instance from a file.
+	 * Constructs a new {@link Mod} instance from a file.
 	 *
 	 * @param file The mod file.
-	 * @return The created {@link Mod} instance.
 	 */
-	public static Mod of(File file) {
-		return of(file, null);
+	public Mod(File file) {
+		this(file, null);
 	}
 	
 	/**
-	 * Creates a new {@link Mod} instance from a file and a marker.
+	 * Constructs a new {@link Mod} instance from a file and a marker.
 	 *
 	 * @param file The mod file.
 	 * @param marker The marker.
-	 * @return The created {@link Mod} instance.
 	 */
-	public static Mod of(File file, Marker marker) {
+	public Mod(File file, Marker marker) {
+		// infer the mod loader
+		// TODO Implement mod loader inference logic
+		loader = Loader.UNKNOWN;
 		
-		// Infer the mod loader of the mod
+		// parse the mod info
+		// TODO Implement mod loading logic
+		switch(loader) {
+			default: info = null;
+		}
 		
-		
-		// Check if the mod is enabled
-		Modifiable<Boolean> enabled = Modifiable.of(!isDisabled(file));
-		enabled.observers.add(e -> {
-			if (e) {
-				if (isDisabled(file)) {
-					FileMetadata.renameFile(file, file.getName().substring(0, file.getName().lastIndexOf('.')));
-				}
-			} else {
-				if (!isDisabled(file)) {
-					FileMetadata.renameFile(file, file.getName() + ".disabled");
-				}
-			}
-		});
-		
-		return new Mod("", "", "", "", Loader.UNKNOWN, List.of(), Map.of(), "", marker, file, enabled);
+		this.file = file;
+		this.marker = marker;
 	}
 	
 	/**
-	 * Checks if a mod file is disabled.
+	 * Checks if a mod file is enabled.
 	 *
-	 * @param file The mod file to be checked.
-	 * @return {@code true} if the mod file is disabled, {@code false} otherwise.
+	 * @return {@code true} if the mod file is enabled, {@code false} otherwise.
 	 */
-	private static boolean isDisabled(File file) {
-		return file.getName().endsWith(".disabled") || file.getName().endsWith(".disable");
+	public boolean isEnabled() {
+		return !file.getName().endsWith(".disabled") && !file.getName().endsWith(".disable");
+	}
+	
+	/**
+	 * Enables the mod file.
+	 * If the mod file is already enabled, this method does nothing.
+	 */
+	public void enable() {
+		if (!isEnabled()) {
+			FileMetadata.renameFile(file, file.getName().substring(0, file.getName().lastIndexOf('.')));
+		}
+	}
+	
+	/**
+	 * Disables the mod file.
+	 * If the mod file is already disabled, this method does nothing.
+	 */
+	public void disable() {
+		if (isEnabled()) {
+			FileMetadata.renameFile(file, file.getName() + ".disabled");
+		}
+	}
+	
+	/**
+	 * Represents the information of a mod.
+	 *
+	 * @param schemaVersion   The schema version of the mod.
+	 * @param modid           The mod ID.
+	 * @param version         The version of the mod.
+	 * @param name            The name of the mod.
+	 * @param authors         The authors of the mod.
+	 * @param contact         The contact information of the mod.
+	 * @param license         The license of the mod.
+	 * @param environment     The environment of the mod.
+	 * @param entrypoints     The entrypoints of the mod.
+	 * @param dependencies    The dependencies of the mod.
+	 * @param recommendations The recommendations of the mod.
+	 * @param accessWidener   The access widener of the mod.
+	 * @param mixins          The mixins of the mod.
+	 * @param jars            The jars of the mod.
+	 */
+	public record Info(int schemaVersion,
+	                   String modid,
+	                   String version,
+	                   String name,
+	                   String description,
+	                   String icon,
+	                   List<String> authors,
+	                   Map<String, URL> contact,
+	                   String license,
+	                   Environment environment,
+	                   Map<String, List<String>> entrypoints,
+	                   Map<String, String> dependencies,
+	                   Map<String, String> recommendations,
+	                   String accessWidener,
+	                   List<String> mixins,
+	                   List<Map<String, String>> jars) {
+		
+		/**
+		 * Enumerates the different mod environments.
+		 */
+		public enum Environment {
+			CLIENT, SERVER, BOTH
+		}
 	}
 	
 	/**

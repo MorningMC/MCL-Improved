@@ -15,18 +15,7 @@ public interface Builder<T> {
 	 * @return A builder that returns the provided object.
 	 */
 	static <T> Builder<T> of(final T object) {
-		return new Builder<>() {
-			
-			@Override
-			public T build() {
-				return object;
-			}
-			
-			@Override
-			public T buildDefault() {
-				return object;
-			}
-		};
+		return () -> object;
 	}
 	
 	/**
@@ -35,13 +24,4 @@ public interface Builder<T> {
 	 * @return The built object of type {@code T}.
 	 */
 	T build();
-	
-	/**
-	 * Builds and returns a default instance of type {@code T}.
-	 *
-	 * @return The default built object of type {@code T}.
-	 */
-	default T buildDefault() {
-		return null;
-	}
 }

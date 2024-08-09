@@ -12,24 +12,24 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
 @StaticClass
 public class SettingsManager {
 	/** {@link NbtLoader} for loading and saving {@link SettingsManager} objects from/to NBT data. */
-	public static final NbtLoader<SettingsManager, CompoundTag> loader = new NbtLoader<>() {
+	public static final NbtLoader<Void, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
-		public SettingsManager load(CompoundTag tag) throws IllegalNbtException {
+		public Void load(CompoundTag tag) throws IllegalNbtException {
 			GlobalSettings.loader.load(tag.getCompound("globalSettings"));
 			NetworkSettings.loader.load(tag.getCompound("networkSettings"));
 			UISettings.loader.load(tag.getCompound("uiSettings"));
 			
-			return new SettingsManager();
+			return null;
 		}
 		
 		@Override
-		public CompoundTag save(SettingsManager object) {
+		public CompoundTag save(Void object) {
 			CompoundTag tag = new CompoundTag();
 			
-			tag.put("globalSettings", GlobalSettings.loader.save(new GlobalSettings()));
-			tag.put("networkSettings", NetworkSettings.loader.save(new NetworkSettings()));
-			tag.put("uiSettings", UISettings.loader.save(new UISettings()));
+			tag.put("globalSettings", GlobalSettings.loader.save(null));
+			tag.put("networkSettings", NetworkSettings.loader.save(null));
+			tag.put("uiSettings", UISettings.loader.save(null));
 			
 			return tag;
 		}

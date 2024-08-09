@@ -26,7 +26,7 @@ public final class Profile implements UniqueObject {
 			return new Profile(
 					tag.getString("name").getValue(),
 					tag.getString("icon").getValue(),
-					Version.loader.load(tag.getCompound("version")),
+					Version.loader.load(tag.getString("version")),
 					Switchable.generateLoader(LaunchOptions.loader).load(tag.getCompound("options")),
 					UUID.fromString(tag.getString("identifier").getValue()));
 		}

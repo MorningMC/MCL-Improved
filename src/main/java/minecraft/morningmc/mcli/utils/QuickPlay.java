@@ -42,6 +42,47 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 	};
 	
 	/**
+	 * Creates a new {@link QuickPlay} object with the specified type, singleplayer, and multiplayer.
+	 *
+	 * @param type         The type of the Quick Play.
+	 * @param singleplayer The singleplayer Quick Play.
+	 * @param multiplayer  The multiplayer Quick Play.
+	 * @return A new {@link QuickPlay} object.
+	 */
+	public static QuickPlay of(Type type, Singleplayer singleplayer, Multiplayer multiplayer) {
+		return new QuickPlay(type, singleplayer, multiplayer);
+	}
+	
+	/**
+	 * Creates a new {@link QuickPlay} object with the type {@link Type#NONE}.
+	 *
+	 * @return A new {@link QuickPlay} object.
+	 */
+	public static QuickPlay none() {
+		return of(Type.NONE, null, null);
+	}
+	
+	/**
+	 * Creates a new {@link QuickPlay} object with the type {@link Type#SINGLEPLAYER}.
+	 *
+	 * @param singleplayer The singleplayer Quick Play.
+	 * @return A new {@link QuickPlay} object.
+	 */
+	public static QuickPlay singleplayer(Singleplayer singleplayer) {
+		return of(Type.SINGLEPLAYER, singleplayer, null);
+	}
+	
+	/**
+	 * Creates a new {@link QuickPlay} object with the type {@link Type#MULTIPLAYER}.
+	 *
+	 * @param multiplayer The multiplayer Quick Play.
+	 * @return A new {@link QuickPlay} object.
+	 */
+	public static QuickPlay multiplayer(Multiplayer multiplayer) {
+		return of(Type.MULTIPLAYER, null, multiplayer);
+	}
+	
+	/**
 	 * Enumerates the types of the world entry.
 	 */
 	public enum Type {

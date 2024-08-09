@@ -2,6 +2,8 @@ package minecraft.morningmc.mcli.utils.interfaces;
 
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 
+import javafx.scene.paint.Color;
+
 import dev.dewy.nbt.api.Tag;
 import dev.dewy.nbt.tags.collection.CompoundTag;
 import dev.dewy.nbt.tags.collection.ListTag;
@@ -18,6 +20,31 @@ import java.util.*;
  * @param <T> The type of NBT tag.
  */
 public interface NbtLoader<C, T extends Tag> {
+	/** {@link NbtLoader} for loading and saving {@link String} objects from/to NBT data. */
+	NbtLoader<String, StringTag> stringLoader = new NbtLoader<>() {
+
+		/**
+		 * Load a string from an NBT string tag.
+		 *
+		 * @param tag The NBT string tag.
+		 * @return The loaded string.
+		 */
+		@Override
+		public String load(StringTag tag) {
+			return tag.getValue();
+		}
+
+		/**
+		 * Save a string to an NBT string tag.
+		 *
+		 * @param object The string to be saved.
+		 * @return The NBT string tag containing the saved string.
+		 */
+		@Override
+		public StringTag save(String object) {
+			return new StringTag(object);
+		}
+	};
 	
 	/** {@link NbtLoader} for loading and saving a list of strings from/to NBT data. */
 	NbtLoader<List<String>, ListTag<StringTag>> stringListLoader = new NbtLoader<>() {
@@ -42,11 +69,7 @@ public interface NbtLoader<C, T extends Tag> {
 		@Override
 		public ListTag<StringTag> save(List<String> object) {
 			ListTag<StringTag> tag = new ListTag<>();
-			
-			for (String s : object) {
-				tag.add(new StringTag(s));
-			}
-			
+			object.stream().map(StringTag::new).forEach(tag::add);
 			return tag;
 		}
 	};
@@ -67,9 +90,9 @@ public interface NbtLoader<C, T extends Tag> {
 			if (type == Proxy.Type.DIRECT) {
 				return Proxy.NO_PROXY;
 			}
-			
 			String address = tag.getString("address").getValue();
 			int port = tag.getInt("port").getValue();
+			
 			return new Proxy(type, new InetSocketAddress(address, port));
 		}
 
@@ -90,6 +113,44 @@ public interface NbtLoader<C, T extends Tag> {
 				tag.putInt("port", address.getPort());
 			}
 			
+			return tag;
+		}
+	};
+	
+	/** {@link NbtLoader} for loading and saving {@link Color} objects from/to NBT data. */
+	NbtLoader<Color, CompoundTag> colorLoader = new NbtLoader<>() {
+
+		/**
+		 * Load a color from an NBT compound tag.
+		 *
+		 * @param tag The NBT compound tag containing color data.
+		 * @return The loaded color.
+		 */
+		@Override
+		public Color load(CompoundTag tag) {
+			double red = tag.getDouble("red").getValue();
+			double green = tag.getDouble("green").getValue();
+			double blue = tag.getDouble("blue").getValue();
+			double opacity = tag.getDouble("opacity").getValue();
+
+			return new Color(red, green, blue, opacity);
+		}
+
+		/**
+		 * Save a color to an NBT compound tag.
+		 *
+		 * @param object The color to be saved.
+		 * @return The NBT compound tag containing the saved color data.
+		 */
+		@Override
+		public CompoundTag save(Color object) {
+			CompoundTag tag = new CompoundTag();
+
+			tag.putDouble("red", object.getRed());
+			tag.putDouble("green", object.getGreen());
+			tag.putDouble("blue", object.getBlue());
+			tag.putDouble("opacity", object.getOpacity());
+
 			return tag;
 		}
 	};

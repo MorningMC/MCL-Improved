@@ -12,19 +12,19 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
 public final class GlobalSettings {
 	
 	/** {@link NbtLoader} for loading and saving {@link GlobalSettings} objects from/to NBT data. */
-	public static final NbtLoader<GlobalSettings, CompoundTag> loader = new NbtLoader<>() {
+	public static final NbtLoader<Void, CompoundTag> loader = new NbtLoader<>() {
 		@Override
-		public GlobalSettings load(CompoundTag tag) {
+		public Void load(CompoundTag tag) {
 			timestampFormat = tag.getString("timestampFormat").getValue();
 			maxRecommendMemory = tag.getLong("maxRecommendMemory").getValue();
 			autoSaveConfigInterval = tag.getInt("autoSaveConfigInterval").getValue();
 			easterEggs = tag.getByte("easterEggs").getValue() == 1;
 			
-			return new GlobalSettings();
+			return null;
 		}
 		
 		@Override
-		public CompoundTag save(GlobalSettings object) {
+		public CompoundTag save(Void object) {
 			CompoundTag tag = new CompoundTag();
 			
 			tag.putString("timestampFormat", timestampFormat);
@@ -37,7 +37,7 @@ public final class GlobalSettings {
 	};
 	
 	// Formats
-	/** The timestamp format. */
+	/** The format of the timestamp. */
 	public static String timestampFormat;
 	
 	// Miscellaneous
