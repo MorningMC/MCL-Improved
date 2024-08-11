@@ -1,4 +1,4 @@
-package minecraft.morningmc.mcli.launcher.metadata;
+package minecraft.morningmc.mcli.launcher.main;
 
 import minecraft.morningmc.mcli.minecraft.client.MinecraftDirectory;
 import minecraft.morningmc.mcli.utils.Platform;
@@ -8,11 +8,9 @@ import java.io.*;
 
 /**
  * Utility class for managing file and directory metadata in the MCLI launcher.
- *
- * @see LauncherMetadata
  */
 @StaticClass
-public class FileMetadata {
+public class FileManager {
 	/** The root directory for application data. */
 	public static final File appdata = resolveAppData();
 	
@@ -20,10 +18,10 @@ public class FileMetadata {
 	public static final File workingRoot = new File(appdata, ".mcli");
 	
 	/** The root directory for caching MCLI-related data. */
-	public static final File cacheRoot = new File(workingRoot, "cache");
+	public static File cacheRoot = new File(workingRoot, "cache");
 
 	/** The configuration file for MCLI. */
-	public static final File config = new File(workingRoot, "config.nbt");
+	public static File config = new File(workingRoot, "config.nbt");
 
 	/**
 	 * Resolves the root directory for application data.
@@ -80,7 +78,7 @@ public class FileMetadata {
 	 * @return An {@link InputStream} for the specified resource.
 	 */
 	public static InputStream getResource(String path) {
-		return FileMetadata.class.getClassLoader().getResourceAsStream(path);
+		return FileManager.class.getClassLoader().getResourceAsStream(path);
 	}
 	
 	/**

@@ -1,8 +1,7 @@
 package minecraft.morningmc.mcli.launcher.main;
 
 import minecraft.morningmc.mcli.launcher.settings.GlobalSettings;
-import minecraft.morningmc.mcli.launcher.Translation;
-import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
+import minecraft.morningmc.mcli.ui.Translation;
 import minecraft.morningmc.mcli.launcher.settings.SettingsManager;
 import minecraft.morningmc.mcli.minecraft.client.profile.ProfileCollection;
 import minecraft.morningmc.mcli.minecraft.java.JavaRuntimeCollection;
@@ -86,7 +85,7 @@ public final class ConfigHelper implements Runnable {
 		config.put("launcher", Launcher.loader.save(Main.instance.launcher));
 		
 		try {
-			new Nbt().toFile(config, FileMetadata.config);
+			new Nbt().toFile(config, FileManager.config);
 		} catch (Exception e) {
 			logger.error("Failed to save config: ", e);
 		}

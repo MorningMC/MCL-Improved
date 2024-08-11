@@ -1,6 +1,6 @@
-package minecraft.morningmc.mcli.launcher;
+package minecraft.morningmc.mcli.ui;
 
-import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
+import minecraft.morningmc.mcli.launcher.main.FileManager;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
@@ -57,7 +57,7 @@ public class Translation {
 		// Load translations
 		logger.info("Loading translations for language: {}", language);
 		
-		try (BufferedReader reader = FileMetadata.getReader(FileMetadata.getResource(
+		try (BufferedReader reader = FileManager.getReader(FileManager.getResource(
 				"assets/lang/lang_%s.properties".formatted(language)))) {
 			for (String line; (line = reader.readLine()) != null; ) {
 				Matcher matcher = Pattern.compile("(?<key>.*)=(?<value>.*)").matcher(line);

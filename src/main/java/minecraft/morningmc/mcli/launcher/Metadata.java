@@ -1,4 +1,4 @@
-package minecraft.morningmc.mcli.launcher.metadata;
+package minecraft.morningmc.mcli.launcher;
 
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 
@@ -10,7 +10,7 @@ import java.util.*;
  * This class provides metadata information about the MCL Improved (MCLI).
  */
 @StaticClass
-public class LauncherMetadata {
+public class Metadata {
 	// Constants
 	/** Represents the name of the launcher. */
 	public static final String name = "MCL Improved";

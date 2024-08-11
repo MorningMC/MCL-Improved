@@ -12,7 +12,7 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
  * @param <T> The type of the value.
  */
 public class Switchable<T> extends Modifiable<T> {
-	private boolean enabled;
+	public boolean enabled;
 	
 	/**
 	 * Constructs a new {@link Switchable} object.
@@ -99,8 +99,8 @@ public class Switchable<T> extends Modifiable<T> {
 			public CompoundTag save(Switchable<C> object) {
 				CompoundTag tag = new CompoundTag();
 				
-				tag.putByte("enabled", (byte) (object.isEnabled() ? 1 : 0));
-				tag.put("value", loader.save(object.get()));
+				tag.putByte("enabled", (byte) (object.enabled ? 1 : 0));
+				tag.put("value", loader.save(object.value));
 				
 				return tag;
 			}
@@ -132,23 +132,5 @@ public class Switchable<T> extends Modifiable<T> {
 	 */
 	public T getIfEnabled(T defaultValue) {
 		return enabled ? value : defaultValue;
-	}
-	
-	/**
-	 * Returns whether the {@link Switchable} object is enabled.
-	 *
-	 * @return Whether the {@link Switchable} object is enabled.
-	 */
-	public boolean isEnabled() {
-		return enabled;
-	}
-	
-	/**
-	 * Switches the {@link Switchable} object on or off.
-	 *
-	 * @param enabled Whether the {@link Switchable} object should be enabled.
-	 */
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
 	}
 }

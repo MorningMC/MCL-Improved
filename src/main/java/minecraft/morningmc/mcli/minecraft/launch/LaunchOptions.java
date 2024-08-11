@@ -7,7 +7,6 @@ import minecraft.morningmc.mcli.utils.containers.*;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
-import dev.dewy.nbt.tags.primitive.StringTag;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,9 +56,9 @@ public final class LaunchOptions {
 				watermark = DEFAULT.watermark;
 			}
 			
-			EnumSwitchable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir;
+			Enumerable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir;
 			try {
-				gameDir = EnumSwitchable.generateLoader(MinecraftDirectory.loader, MinecraftDirectory.Policy.class).load(tag.getCompound("gameDir"));
+				gameDir = Enumerable.generateLoader(MinecraftDirectory.loader, MinecraftDirectory.Policy.class).load(tag.getCompound("gameDir"));
 			} catch (Exception e) {
 				logger.warn("gameDir load failed: {}", e.getMessage());
 				gameDir = DEFAULT.gameDir;
@@ -122,7 +121,7 @@ public final class LaunchOptions {
 			
 			try {
 				
-				tag.put("gameDir", EnumSwitchable.generateLoader(MinecraftDirectory.loader, MinecraftDirectory.Policy.class).save(object.gameDir));
+				tag.put("gameDir", Enumerable.generateLoader(MinecraftDirectory.loader, MinecraftDirectory.Policy.class).save(object.gameDir));
 			} catch (Exception e) {
 				logger.warn("gameDir save failed: {}", e.getMessage());
 			}
@@ -155,7 +154,7 @@ public final class LaunchOptions {
 			Switchable.ofDisabled(MemoryRange.of(2048)),
 			Switchable.ofDisabled(List.of("-XX:+UnlockExperimentalVMOptions", "-XX:+UseG1GC", "-XX:G1NewSizePercent=20", "-XX:G1ReservePercent=20", "-XX:MaxGCPauseMillis=50", "-XX:G1HeapRegionSize=32M")),
 			Switchable.ofDisabled("MCLI"),
-			EnumSwitchable.of(MinecraftDirectory.standard, MinecraftDirectory.Policy.STANDARD),
+			Enumerable.of(MinecraftDirectory.standard, MinecraftDirectory.Policy.STANDARD),
 			WindowSize.windowed(1024, 768),
 			QuickPlay.none(),
 			false
@@ -165,7 +164,7 @@ public final class LaunchOptions {
 	public Switchable<MemoryRange> memoryRange;
 	public Switchable<List<String>> javaArguments;
 	public Switchable<String> watermark;
-	public EnumSwitchable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir;
+	public Enumerable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir;
 	public WindowSize windowSize;
 	public QuickPlay quickPlay;
 	public boolean demo;
@@ -177,7 +176,7 @@ public final class LaunchOptions {
 	 * @param memoryRange   The {@link Switchable} object for memory range.
 	 * @param javaArguments The {@link Switchable} object for Java arguments.
 	 * @param watermark     The {@link Switchable} object for watermark.
-	 * @param gameDir       The {@link EnumSwitchable} object for the game directory.
+	 * @param gameDir       The {@link Enumerable} object for the game directory.
 	 * @param windowSize    The window size.
 	 * @param quickPlay     The Quick Play info.
 	 * @param demo          Whether to run in demo mode.
@@ -186,7 +185,7 @@ public final class LaunchOptions {
 	                     Switchable<MemoryRange> memoryRange,
 	                     Switchable<List<String>> javaArguments,
 	                     Switchable<String> watermark,
-	                     EnumSwitchable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir,
+	                     Enumerable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir,
 	                     WindowSize windowSize,
 	                     QuickPlay quickPlay,
 	                     boolean demo) {

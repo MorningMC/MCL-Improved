@@ -1,6 +1,5 @@
 package minecraft.morningmc.mcli.launcher.main;
 
-import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
 import minecraft.morningmc.mcli.minecraft.java.JavaRuntimeCollection;
 import minecraft.morningmc.mcli.minecraft.launch.LaunchOptions;
 import minecraft.morningmc.mcli.minecraft.launch.Launcher;
@@ -43,7 +42,7 @@ public class Main extends Application {
 		
 		// complete files
 		try {
-			int created = FileMetadata.completeFiles();
+			int created = FileManager.completeFiles();
 			logger.debug("Completed {} files.", created);
 			
 		} catch (IOException e) {
@@ -53,7 +52,7 @@ public class Main extends Application {
 		// load config
 		CompoundTag config;
 		try {
-			config = new Nbt().fromFile(FileMetadata.config);
+			config = new Nbt().fromFile(FileManager.config);
 		} catch (IOException e) {
 			logger.warn("Failed to load config: {}", e.getMessage());
 			config = new CompoundTag();

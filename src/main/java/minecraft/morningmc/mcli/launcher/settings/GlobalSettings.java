@@ -13,6 +13,7 @@ public final class GlobalSettings {
 	
 	/** {@link NbtLoader} for loading and saving {@link GlobalSettings} objects from/to NBT data. */
 	public static final NbtLoader<Void, CompoundTag> loader = new NbtLoader<>() {
+		
 		@Override
 		public Void load(CompoundTag tag) {
 			timestampFormat = tag.getString("timestampFormat").getValue();

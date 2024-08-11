@@ -1,6 +1,6 @@
 package minecraft.morningmc.mcli.minecraft.client;
 
-import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
+import minecraft.morningmc.mcli.launcher.main.FileManager;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.primitive.StringTag;
@@ -25,7 +25,7 @@ public class MinecraftDirectory {
 		}
 	};
 	
-	public static final MinecraftDirectory standard = new MinecraftDirectory(new File(FileMetadata.appdata, ".minecraft"));
+	public static final MinecraftDirectory standard = new MinecraftDirectory(new File(FileManager.appdata, ".minecraft"));
 	public static final File isolateRoot = new File(standard.root, "isolate");
 	
 	/**  The root directory for Minecraft-related files. */

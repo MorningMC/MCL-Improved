@@ -1,6 +1,6 @@
 package minecraft.morningmc.mcli.launcher.networking.download;
 
-import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
+import minecraft.morningmc.mcli.launcher.main.FileManager;
 import minecraft.morningmc.mcli.launcher.networking.Requester;
 import minecraft.morningmc.mcli.launcher.settings.NetworkSettings;
 import minecraft.morningmc.mcli.utils.annotations.LauncherProcess;
@@ -77,7 +77,7 @@ public class DownloadTask implements UniqueObject {
 	 */
 	private RandomAccessFile getTemp() throws DownloadException {
 		try {
-			File tempFile = new File(FileMetadata.cacheRoot, identifier.toString() + ".download.tmp");
+			File tempFile = new File(FileManager.cacheRoot, identifier.toString() + ".download.tmp");
 			tempFile.createNewFile();
 			return new RandomAccessFile(tempFile, "rwd");
 		} catch (Exception e) {

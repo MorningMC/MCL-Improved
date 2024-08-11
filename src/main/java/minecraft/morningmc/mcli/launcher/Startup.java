@@ -1,8 +1,7 @@
 package minecraft.morningmc.mcli.launcher;
 
 import minecraft.morningmc.mcli.launcher.main.Main;
-import minecraft.morningmc.mcli.launcher.metadata.FileMetadata;
-import minecraft.morningmc.mcli.launcher.metadata.LauncherMetadata;
+import minecraft.morningmc.mcli.launcher.main.FileManager;
 import minecraft.morningmc.mcli.utils.Platform;
 
 import javafx.application.Application;
@@ -22,12 +21,12 @@ public class Startup {
      * Constructs a new instance of {@link Startup}, logging launcher information.
      */
     public Startup() {
-        logger.info(LauncherMetadata.longFullName);
+        logger.info(Metadata.longFullName);
 	    logger.info("System platform: {}", Platform.system);
 	    logger.info("Current platform: {}", Platform.current);
-	    logger.info("Working root: {}", FileMetadata.workingRoot);
+	    logger.info("Working root: {}", FileManager.workingRoot);
         
-        if (!LauncherMetadata.version.isStable()) {
+        if (!Metadata.version.isStable()) {
             logger.warn("This is a development build. There may be some issues.");
         }
     }

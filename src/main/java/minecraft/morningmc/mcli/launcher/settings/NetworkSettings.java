@@ -15,6 +15,7 @@ import java.net.Proxy;
 public class NetworkSettings {
 	/** {@link NbtLoader} for loading and saving {@link NetworkSettings} objects from/to NBT data. */
 	public static final NbtLoader<Void, CompoundTag> loader = new NbtLoader<>() {
+		
 		@Override
 		public Void load(CompoundTag tag) throws IllegalNbtException {
 			proxy = NbtLoader.proxyLoader.load(tag.getCompound("proxy"));

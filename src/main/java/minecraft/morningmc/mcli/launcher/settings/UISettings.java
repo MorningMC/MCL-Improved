@@ -4,6 +4,7 @@ import minecraft.morningmc.mcli.ui.settings.Background;
 import minecraft.morningmc.mcli.ui.settings.ColorStyle;
 import minecraft.morningmc.mcli.utils.WindowSize;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
+import minecraft.morningmc.mcli.utils.containers.Enumerable;
 import minecraft.morningmc.mcli.utils.containers.Switchable;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
@@ -21,7 +22,7 @@ public class UISettings {
 		@Override
 		public Void load(CompoundTag tag) throws IllegalNbtException {
 			windowSize = WindowSize.loader.load(tag.getCompound("windowSize"));
-			colorStyle = ColorStyle.loader.load(tag.getCompound("colorStyle"));
+			colorStyle = Enumerable.generateLoader(ColorStyle.loader, ColorStyle.Policy.class).load(tag.getCompound("colorStyle"));
 			background = Switchable.generateLoader(Background.loader).load(tag.getCompound("background"));
 			
 			return null;
@@ -32,7 +33,7 @@ public class UISettings {
 			CompoundTag tag = new CompoundTag();
 			
 			tag.put("windowSize", WindowSize.loader.save(windowSize));
-			tag.put("colorStyle", ColorStyle.loader.save(colorStyle));
+			tag.put("colorStyle", Enumerable.generateLoader(ColorStyle.loader, ColorStyle.Policy.class).save(colorStyle));
 			tag.put("background", Switchable.generateLoader(Background.loader).save(background));
 			
 			return tag;
@@ -43,7 +44,7 @@ public class UISettings {
 	public static WindowSize windowSize;
 	
 	/** The color style. */
-	public static ColorStyle colorStyle;
+	public static Enumerable<ColorStyle, ColorStyle.Policy> colorStyle;
 	
 	/** The background settings. */
 	public static Switchable<Background> background;
@@ -53,7 +54,7 @@ public class UISettings {
 	 */
 	public static void initDefault() {
 		windowSize = WindowSize.windowed(1024, 632);
-		colorStyle = ColorStyle.dark;
+		colorStyle = Enumerable.of(ColorStyle.bright, ColorStyle.Policy.SYSTEM);
 		background = Switchable.ofDisabled(Background.of(null, 1, 0));
 	}
 }
