@@ -59,16 +59,9 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 		builder.redirectErrorStream(true);
 		
 		String content;
-		
 		try {
 			Process process = builder.start();
-			BufferedReader reader = process.inputReader();
-			StringBuilder contentBuilder = new StringBuilder();
-			
-			for (String line; (line = reader.readLine()) != null; ) {
-				contentBuilder.append(line).append("\n");
-			}
-			content = contentBuilder.toString();
+			content = new String(process.getInputStream().readAllBytes());
 			
 		} catch (Exception e) {
 			throw new IllegalJavaException(path, e);
@@ -137,7 +130,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 		try {
 			return fromHome(new File(System.getProperty("java.home")));
 		} catch (IllegalJavaException e) {
-			logger.warn("Failed to get current Java runtime: ", e);
+			logger.warn("Failed to get current Java runtime: {}", e.getMessage());
 			return null;
 		}
 	}

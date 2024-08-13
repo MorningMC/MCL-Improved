@@ -1,7 +1,8 @@
 package minecraft.morningmc.mcli.launcher;
 
 import minecraft.morningmc.mcli.launcher.main.Main;
-import minecraft.morningmc.mcli.launcher.main.FileManager;
+import minecraft.morningmc.mcli.utils.FileManager;
+import minecraft.morningmc.mcli.minecraft.java.JavaRuntime;
 import minecraft.morningmc.mcli.utils.Platform;
 
 import javafx.application.Application;
@@ -24,6 +25,7 @@ public class Startup {
         logger.info(Metadata.longFullName);
 	    logger.info("System platform: {}", Platform.system);
 	    logger.info("Current platform: {}", Platform.current);
+        logger.info("Java runtime: {}", JavaRuntime.current != null ? JavaRuntime.current : "N/A");
 	    logger.info("Working root: {}", FileManager.workingRoot);
         
         if (!Metadata.version.isStable()) {

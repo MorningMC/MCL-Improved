@@ -16,6 +16,7 @@ import java.util.function.*;
  */
 public class Enumerable<T, E extends Enum<E>> extends Modifiable<T> {
 	public E policy;
+	public BiFunction<T, E, T> switcher = (value, policy) -> value;
 	
 	/**
 	 * Constructs a new {@link Enumerable} object.
@@ -88,12 +89,23 @@ public class Enumerable<T, E extends Enum<E>> extends Modifiable<T> {
 	}
 	
 	/**
+	 * Returns the value based on the default switcher.
+	 * <p>
+	 * This method is equivalent to {@code getSwitch(switcher)}.
+	 *
+	 * @return The value based on the default switcher.
+	 */
+	public T getSwitch() {
+		return getSwitch(switcher);
+	}
+	
+	/**
 	 * Returns the value based on the switcher.
 	 *
 	 * @param switcher The switcher to be used.
 	 * @return The value based on the switcher.
 	 */
-	public T get(BiFunction<T, E, T> switcher) {
+	public T getSwitch(BiFunction<T, E, T> switcher) {
 		return switcher.apply(value, policy);
 	}
 	

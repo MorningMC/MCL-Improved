@@ -1,6 +1,5 @@
-package minecraft.morningmc.mcli.ui;
+package minecraft.morningmc.mcli.utils;
 
-import minecraft.morningmc.mcli.launcher.main.FileManager;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;

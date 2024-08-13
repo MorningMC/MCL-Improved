@@ -3,11 +3,12 @@ package minecraft.morningmc.mcli.launcher.main;
 import minecraft.morningmc.mcli.minecraft.java.JavaRuntimeCollection;
 import minecraft.morningmc.mcli.minecraft.launch.LaunchOptions;
 import minecraft.morningmc.mcli.minecraft.launch.Launcher;
+import minecraft.morningmc.mcli.ui.UIManager;
+import minecraft.morningmc.mcli.utils.FileManager;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-import minecraft.morningmc.mcli.ui.UIManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,6 +51,7 @@ public class Main extends Application {
 		}
 		
 		// load config
+		logger.info("Loading configurations...");
 		CompoundTag config;
 		try {
 			config = new Nbt().fromFile(FileManager.config);

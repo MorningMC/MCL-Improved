@@ -1,9 +1,10 @@
 package minecraft.morningmc.mcli.ui;
 
+import javafx.scene.Scene;
+import javafx.stage.StageStyle;
 import minecraft.morningmc.mcli.launcher.Metadata;
-import minecraft.morningmc.mcli.launcher.main.FileManager;
+import minecraft.morningmc.mcli.utils.FileManager;
 import minecraft.morningmc.mcli.launcher.settings.UISettings;
-import minecraft.morningmc.mcli.utils.WindowSize;
 
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
@@ -26,11 +27,14 @@ public class UIManager {
 		
 		mainStage.setTitle(Metadata.fullName);
 		mainStage.getIcons().add(icon);
+		mainStage.initStyle(StageStyle.TRANSPARENT);
 		
 		refreshSize();
-		mainStage.widthProperty().addListener((obs, old, ne) -> UISettings.windowSize = WindowSize.windowed((int) ne, UISettings.windowSize.height()));
-		mainStage.heightProperty().addListener((obs, old, ne) -> UISettings.windowSize = WindowSize.windowed(UISettings.windowSize.width(), (int) ne));
+		mainStage.widthProperty().addListener((obs, old, ne) -> UISettings.windowSize = UISettings.windowSize.width(ne.intValue()));
+		mainStage.heightProperty().addListener((obs, old, ne) -> UISettings.windowSize = UISettings.windowSize.height(ne.intValue()));
+		mainStage.maximizedProperty().addListener((obs, old, ne) -> UISettings.windowSize = UISettings.windowSize.fullScreen(ne));
 		
+		mainStage.setScene(new Scene(UISettings.colorStyle.getSwitch().title.render(UISettings.windowSize.width(), 48, event -> mainStage.close())));
 		mainStage.show();
 	}
 	
@@ -40,5 +44,6 @@ public class UIManager {
 	public void refreshSize() {
 		mainStage.setWidth(UISettings.windowSize.width());
 		mainStage.setHeight(UISettings.windowSize.height());
+		mainStage.setMaximized(UISettings.windowSize.fullScreen());
 	}
 }

@@ -1,11 +1,12 @@
 package minecraft.morningmc.mcli.launcher.main;
 
 import minecraft.morningmc.mcli.launcher.settings.GlobalSettings;
-import minecraft.morningmc.mcli.ui.Translation;
-import minecraft.morningmc.mcli.launcher.settings.SettingsManager;
+import minecraft.morningmc.mcli.utils.Translation;
+import minecraft.morningmc.mcli.launcher.settings.Settings;
 import minecraft.morningmc.mcli.minecraft.client.profile.ProfileCollection;
 import minecraft.morningmc.mcli.minecraft.java.JavaRuntimeCollection;
 import minecraft.morningmc.mcli.minecraft.launch.Launcher;
+import minecraft.morningmc.mcli.utils.FileManager;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 
 import dev.dewy.nbt.Nbt;
@@ -32,10 +33,10 @@ public final class ConfigHelper implements Runnable {
 	 */
 	public static void loadConfigs(CompoundTag config) {
 		try {
-			SettingsManager.loader.load(config.getCompound("settingsManager"));
+			Settings.loader.load(config.getCompound("settings"));
 		} catch (Exception e) {
 			logger.warn("Failed to load settingsManager: {}", e.getMessage());
-			SettingsManager.initDefault();
+			Settings.initDefault();
 		}
 		
 		try {
@@ -67,7 +68,7 @@ public final class ConfigHelper implements Runnable {
 	 * @param config The compound tag to save the configurations to.
 	 */
 	public static void saveConfigs(CompoundTag config) {
-		config.put("settingsManager", SettingsManager.loader.save(null));
+		config.put("settings", Settings.loader.save(null));
 		config.put("profileCollection", ProfileCollection.loader.save(ProfileCollection.instance));
 		config.put("javaRuntimeCollection", JavaRuntimeCollection.loader.save(JavaRuntimeCollection.instance));
 		config.put("translation", Translation.loader.save(Translation.instance));

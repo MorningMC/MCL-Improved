@@ -12,7 +12,7 @@ import java.net.Proxy;
  * Represents the network settings.
  */
 @StaticClass
-public class NetworkSettings {
+public class NetworkSettings extends Settings {
 	/** {@link NbtLoader} for loading and saving {@link NetworkSettings} objects from/to NBT data. */
 	public static final NbtLoader<Void, CompoundTag> loader = new NbtLoader<>() {
 		
@@ -26,6 +26,7 @@ public class NetworkSettings {
 			bufferSize = tag.getInt("bufferSize").getValue();
 			maxRetries = tag.getByte("maxRetries").getValue();
 			
+			init();
 			return null;
 		}
 		
@@ -68,7 +69,13 @@ public class NetworkSettings {
 	public static byte maxRetries;
 	
 	/**
-	 * Initializes the {@link NetworkSettings} class in default.
+	 * Initializes the {@link NetworkSettings}.
+	 */
+	public static void init() {
+	}
+	
+	/**
+	 * Initializes the {@link NetworkSettings} in default.
 	 */
 	public static void initDefault() {
 		proxy = Proxy.NO_PROXY;
@@ -78,5 +85,7 @@ public class NetworkSettings {
 		minSizePerThread = 64;
 		bufferSize = 1024;
 		maxRetries = 8;
+		
+		init();
 	}
 }

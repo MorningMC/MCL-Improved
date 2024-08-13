@@ -155,7 +155,7 @@ public final class LaunchOptions {
 			Switchable.ofDisabled(List.of("-XX:+UnlockExperimentalVMOptions", "-XX:+UseG1GC", "-XX:G1NewSizePercent=20", "-XX:G1ReservePercent=20", "-XX:MaxGCPauseMillis=50", "-XX:G1HeapRegionSize=32M")),
 			Switchable.ofDisabled("MCLI"),
 			Enumerable.of(MinecraftDirectory.standard, MinecraftDirectory.Policy.STANDARD),
-			WindowSize.windowed(1024, 768),
+			WindowSize.window(1024, 768),
 			QuickPlay.none(),
 			false
 	);

@@ -1,6 +1,6 @@
 package minecraft.morningmc.mcli.launcher.networking.download;
 
-import minecraft.morningmc.mcli.launcher.main.FileManager;
+import minecraft.morningmc.mcli.utils.FileManager;
 import minecraft.morningmc.mcli.launcher.networking.Requester;
 import minecraft.morningmc.mcli.launcher.settings.NetworkSettings;
 import minecraft.morningmc.mcli.utils.annotations.LauncherProcess;

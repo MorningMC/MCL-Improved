@@ -132,10 +132,11 @@ public class JavaRuntimeCollection implements Runnable {
 	public void run() {
 		synchronized (runtimes) {
 			// refresh old runtimes
-			runtimes.parallelStream().forEach(runtime -> {
+			runtimes.forEach(runtime -> {
 				try {
 					JavaRuntime newRuntime = runtime.refresh();
 					if (newRuntime != null) {
+						logger.debug("Modified Java runtime: {} -> {}", runtime, newRuntime);
 						runtimes.remove(runtime);
 						runtimes.add(newRuntime);
 					}
@@ -170,8 +171,7 @@ public class JavaRuntimeCollection implements Runnable {
 								.map(System::getenv)
 								.filter(Objects::nonNull)
 								.map(File::new)
-								.flatMap(programFile -> Stream.of("Java", "BellSoft", "AdoptOpenJDK", "Zulu", "Microsoft", "Eclipse Foundation", "Semeru")
-										                         .map(vendor -> new File(programFile, vendor)))
+								.flatMap(programFile -> Stream.of("Java", "BellSoft", "AdoptOpenJDK", "Zulu", "Microsoft", "Eclipse Foundation", "Semeru").map(vendor -> new File(programFile, vendor)))
 								.flatMap(JavaRuntimeCollection::listDirectories)
 								.parallel()
 								.flatMap(JavaRuntimeCollection::parseHome)
@@ -186,35 +186,19 @@ public class JavaRuntimeCollection implements Runnable {
 							              .forEach(potentialRuntimes::add);
 					
 					case MACOS -> {
-						try {
-							for (File file : Objects.requireNonNull(new File("/Library/Java/JavaVirtualMachines").listFiles())) {
-								if (file.isDirectory()) {
-									File home = new File(file, "Contents/Home");
-									if (home.exists()) {
-										logger.trace("Query home: {}", home.getAbsolutePath());
-										potentialRuntimes.add(JavaRuntime.fromHome(home));
-									}
-									
-									home = new File(home, "jre");
-									if (home.exists()) {
-										logger.trace("Query home: {}", home.getAbsolutePath());
-										potentialRuntimes.add(JavaRuntime.fromHome(home));
-									}
-								}
-							}
-						} catch (Exception ignored) {}
+						listDirectories(new File("/Library/Java/JavaVirtualMachines"))
+								.parallel()
+								.flatMap(file -> Stream.of(new File(file, "Contents/Home"), new File(file, "Contents/Home/jre")))
+								.filter(File::exists)
+								.flatMap(JavaRuntimeCollection::parseHome)
+								.forEach(potentialRuntimes::add);
 						
-						try {
-							for (File file : Objects.requireNonNull(new File("/System/Library/Java/JavaVirtualMachines").listFiles())) {
-								if (file.isDirectory()) {
-									File home = new File(file, "Contents/Home");
-									if (home.exists()) {
-										logger.trace("Query home: {}", home.getAbsolutePath());
-										potentialRuntimes.add(JavaRuntime.fromHome(home));
-									}
-								}
-							}
-						} catch (Exception ignored) {}
+						listDirectories(new File("/System/Library/Java/JavaVirtualMachines"))
+								.parallel()
+								.map(file -> new File(file, "Contents/Home"))
+								.filter(File::exists)
+								.flatMap(JavaRuntimeCollection::parseHome)
+								.forEach(potentialRuntimes::add);
 						
 						try {
 							potentialRuntimes.add(JavaRuntime.fromPath(new File("/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin/java")));
@@ -235,12 +219,7 @@ public class JavaRuntimeCollection implements Runnable {
 							minecraftLocations.add(file);
 						}
 						
-						File programFile;
-						try {
-							programFile = new File(System.getenv("ProgramFiles(x86)"));
-						} catch (Exception e) {
-							programFile = new File("C:\\Program Files (x86)");
-						}
+						File programFile = new File(Optional.ofNullable(System.getenv("ProgramFiles(x86)")).orElse("C:\\Program Files (x86)"));
 						if (programFile.exists()) {
 							minecraftLocations.add(new File(programFile, "Minecraft Launcher\\runtime"));
 						}
@@ -264,24 +243,16 @@ public class JavaRuntimeCollection implements Runnable {
 					}
 				}
 				
-				for (File location : minecraftLocations) {
-					try {
-						for (File dir : Objects.requireNonNull(location.listFiles())) {
-							if (dir.isDirectory()) {
-								String component = dir.getName();
-								
-								try {
-									for (File file : Objects.requireNonNull(dir.listFiles())) {
-										File home = new File(file, component);
-										
-										logger.trace("Query home: {}", home.getAbsolutePath());
-										potentialRuntimes.add(JavaRuntime.fromHome(home));
-									}
-								} catch (Exception ignored) {}
-							}
-						}
-					} catch (Exception ignored) {}
-				}
+				minecraftLocations.stream()
+						.flatMap(JavaRuntimeCollection::listDirectories)
+						.parallel()
+						.filter(File::isDirectory)
+						.flatMap(dir -> {
+							String component = dir.getName();
+							return listDirectories(dir).map(file -> new File(file, component));
+						})
+						.flatMap(JavaRuntimeCollection::parseHome)
+						.forEach(potentialRuntimes::add);
 				
 				// PATH
 				try {
@@ -328,8 +299,7 @@ public class JavaRuntimeCollection implements Runnable {
 	 * List subdirectories of the given directory.
 	 *
 	 * @param directory The directory to be rooted.
-	 * @return A stream that contains all subdirectories of the given directory,
-	 *         or empty if an error occurs.
+	 * @return A stream that contains all subdirectories of the given directory, or empty if an error occurs.
 	 */
 	private static Stream<File> listDirectories(File directory) {
 		File[] files = directory.listFiles();

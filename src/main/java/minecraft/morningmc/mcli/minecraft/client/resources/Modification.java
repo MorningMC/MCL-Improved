@@ -1,11 +1,12 @@
 package minecraft.morningmc.mcli.minecraft.client.resources;
 
 import minecraft.morningmc.mcli.launcher.networking.Requester;
-import minecraft.morningmc.mcli.launcher.main.FileManager;
+import minecraft.morningmc.mcli.utils.FileManager;
 import minecraft.morningmc.mcli.minecraft.client.resources.marker.Marker;
 
-import com.moandjiezana.toml.Toml;
+import javafx.scene.image.Image;
 
+import com.moandjiezana.toml.Toml;
 import com.google.gson.*;
 
 import org.apache.logging.log4j.LogManager;
@@ -47,6 +48,10 @@ public class Modification {
 	 * @param marker The marker.
 	 */
 	public Modification(File file, Marker marker) {
+		if (!file.isFile()) {
+			throw new IllegalArgumentException("Illegal mod file: " + file.getAbsolutePath());
+		}
+		
 		this.file = file;
 		this.marker = marker;
 		loaders = Loader.infer(file);
@@ -86,7 +91,7 @@ public class Modification {
 	 * Enumerates the different mod loaders.
 	 */
 	public enum Loader {
-		FORGE, NEOFORGE, FABRIC, QUILT;
+		FORGE, NEOFORGE, FABRIC, QUILT, LITELOADER, RIFT;
 		
 		/**
 		 * Infers the mod loader based on the contents of the mod file.
@@ -110,10 +115,16 @@ public class Modification {
 				if (jarFile.getEntry("quilt.mod.json") != null) {
 					loaders.add(QUILT);
 				}
+				if (jarFile.getEntry("litemod.json") != null) {
+					loaders.add(LITELOADER);
+				}
+				if (jarFile.getEntry("mcmod.info") != null) {
+					loaders.add(RIFT);
+				}
 				return loaders;
 				
 			} catch (Exception e) {
-				logger.warn("Failed to infer mod loader for file: {}: {}", file.getAbsolutePath(), e.getMessage());
+				logger.warn("Failed to infer mod loader for file {}: {}", file.getAbsolutePath(), e.getMessage());
 				return loaders;
 			}
 		}
@@ -130,6 +141,7 @@ public class Modification {
 	 * @param name               The pretty name of the mod. Used when representing the mod on a screen.
 	 * @param description        The description of the mod.
 	 * @param icon               The icon of the mod.
+	 * @param iconImage          The {@link Image} instance of the icon of the mod.
 	 * @param iconBlur           Whether the icon should be blurred or not when trying to scale the icon. <i>Forge and NeoForge only.</i>
 	 * @param contributors       The contributors of the mod.
 	 * @param group              The group of the mod. <i>Quilt only.</i>
@@ -153,6 +165,7 @@ public class Modification {
 	                   String name,
 	                   String description,
 	                   String icon,
+	                   Image iconImage,
 					   boolean iconBlur,
 	                   Map<String, String> contributors,
 					   String group,
@@ -169,11 +182,11 @@ public class Modification {
 	                   Set<String> mixins) {
 		
 		/**
-		 * Parses a mod file and returns a {@link Info} object.
+		 * Parses a mod file and returns a set of {@link Info} object.
 		 *
 		 * @param file    The mod file to be parsed.
 		 * @param loaders The loaders of the mod file.
-		 * @return The parsed {@link Info} object, or empty {@link Set} if the file could not be parsed.
+		 * @return The parsed {@link Info} objects, or empty {@link Set} if the file could not be parsed.
 		 */
 		public static Set<Info> parse(File file, Set<Loader> loaders) {
 			Set<Info> infos = new HashSet<>();
@@ -239,8 +252,11 @@ public class Modification {
 								contact.put("homepage", displayURL);
 							}
 							
-							infos.add(new Info(lowcode, 0, fmlVersion, modID, version, name, description, icon, iconBlur, contributors, null, contact, license, credits, environment, showAsResourcePack, false, usedServices, Map.of(), dependencies, null, Set.of()));
+							logger.trace("Parsed Forge mod info: {}", modID);
+							infos.add(new Info(lowcode, 0, fmlVersion, modID, version, name, description, icon, parseIconImage(jarFile, icon), iconBlur, contributors, null, contact, license, credits, environment, showAsResourcePack, false, usedServices, Map.of(), dependencies, null, Set.of()));
 						}
+					} catch (Exception e) {
+						logger.warn("Failed to parse Forge mod info for file {}: {}", file.getAbsolutePath(), e.getMessage());
 					}
 				}
 				
@@ -304,8 +320,11 @@ public class Modification {
 								contact.put("homepage", displayURL);
 							}
 
-							infos.add(new Info(lowcode, 0, fmlVersion, modID, version, name, description, icon, iconBlur, contributors, null, contact, license, credits, Environment.UNKNOWN, showAsResourcePack, showAsDataPack, usedServices, Map.of(), dependencies, null, Set.of()));
+							logger.trace("Parsed NeoForge mod info: {}", modID);
+							infos.add(new Info(lowcode, 0, fmlVersion, modID, version, name, description, icon, parseIconImage(jarFile, icon), iconBlur, contributors, null, contact, license, credits, Environment.UNKNOWN, showAsResourcePack, showAsDataPack, usedServices, Map.of(), dependencies, null, Set.of()));
 						}
+					} catch (Exception e) {
+						logger.warn("Failed to parse NeoForge mod info for file {}: {}", file.getAbsolutePath(), e.getMessage());
 					}
 				}
 				
@@ -345,7 +364,7 @@ public class Modification {
 						Map<String, Set<String>> entrypoints = json.getAsJsonObject("entrypoints").entrySet().stream()
 								                                       .collect(Collectors.toMap(
 										                                       Map.Entry::getKey,
-										                                       e -> e.getValue().getAsJsonObject().entrySet().stream()
+										                                       entry -> entry.getValue().getAsJsonObject().entrySet().stream()
 												                                            .map(Map.Entry::getKey)
 												                                            .collect(Collectors.toSet())
 								                                       ));
@@ -373,7 +392,10 @@ public class Modification {
 							));
 						}
 						
-						infos.add(new Info(false, schemaVersion, null, modID, version, name, description, icon, false, contributors, null, contact, license, null, environment, false, false, Set.of(), entrypoints, dependencies, accessWidener, mixins));
+						logger.trace("Parsed Fabric mod info: {}", modID);
+						infos.add(new Info(false, schemaVersion, null, modID, version, name, description, icon, parseIconImage(jarFile, icon), false, contributors, null, contact, license, null, environment, false, false, Set.of(), entrypoints, dependencies, accessWidener, mixins));
+					} catch (Exception e) {
+						logger.warn("Failed to parse Fabric mod info for file {}: {}", file.getAbsolutePath(), e.getMessage());
 					}
 				}
 				
@@ -419,7 +441,7 @@ public class Modification {
 						Map<String, Set<String>> entrypoints = quilt.getAsJsonObject("entrypoints").entrySet().stream()
 								                                       .collect(Collectors.toMap(
 																			   Map.Entry::getKey,
-										                                       e -> e.getValue().getAsJsonObject().entrySet().stream()
+										                                       entry -> entry.getValue().getAsJsonObject().entrySet().stream()
 												                                            .map(Map.Entry::getKey)
 												                                            .collect(Collectors.toSet())
 								                                       ));
@@ -448,7 +470,18 @@ public class Modification {
 						
 						Set<String> mixins = Set.of(json.get("mixin").getAsString());
 						
-						infos.add(new Info(false, schemaVersion, null, modID, version, name, description, icon, false, contributors, group, contact, null, null, Environment.UNKNOWN, false, false, Set.of(), entrypoints, dependencies, null, mixins));
+						logger.trace("Parsed Quilt mod info: {}", modID);
+						infos.add(new Info(false, schemaVersion, null, modID, version, name, description, icon, parseIconImage(jarFile, icon), false, contributors, group, contact, null, null, Environment.UNKNOWN, false, false, Set.of(), entrypoints, dependencies, null, mixins));
+					} catch (Exception e) {
+						logger.warn("Failed to parse Quilt mod info for file {}: {}", file.getAbsolutePath(), e.getMessage());
+					}
+					
+					if (loaders.contains(Loader.LITELOADER)) {
+						logger.warn("LiteLoader parsing is not supported");
+					}
+					
+					if (loaders.contains(Loader.RIFT)) {
+						logger.warn("Rift parsing is not supported");
 					}
 				}
 				
@@ -471,6 +504,22 @@ public class Modification {
 		private static InputStream getJarInputStream(JarFile jarFile, String entryName) throws IOException {
 			ZipEntry entry = jarFile.getEntry(entryName);
 			return jarFile.getInputStream(entry);
+		}
+		
+		/**
+		 * Parses an {@link Image} instance of the icon from the mod file.
+		 *
+		 * @param jarFile A {@link JarFile} instance for the mod file.
+		 * @param icon    The name of the icon entry.
+		 * @return The {@link Image} instance of the icon, or {@code null} if an I/O error occurs.
+		 */
+		private static Image parseIconImage(JarFile jarFile, String icon) {
+			try {
+				return new Image(getJarInputStream(jarFile, icon));
+			} catch (IOException e) {
+				logger.warn("Failed to parse icon image for mod file: {}", e.getMessage());
+				return null;
+			}
 		}
 		
 		/**

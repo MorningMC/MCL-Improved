@@ -10,16 +10,31 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
  * Manages all the settings of the launcher.
  */
 @StaticClass
-public class SettingsManager {
-	/** {@link NbtLoader} for loading and saving {@link SettingsManager} objects from/to NBT data. */
+public class Settings {
+	/** {@link NbtLoader} for loading and saving {@link Settings} objects from/to NBT data. */
 	public static final NbtLoader<Void, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
 		public Void load(CompoundTag tag) throws IllegalNbtException {
-			GlobalSettings.loader.load(tag.getCompound("globalSettings"));
-			NetworkSettings.loader.load(tag.getCompound("networkSettings"));
-			UISettings.loader.load(tag.getCompound("uiSettings"));
+			try {
+				GlobalSettings.loader.load(tag.getCompound("globalSettings"));
+			} catch (Exception e) {
+				GlobalSettings.initDefault();
+			}
 			
+			try {
+				NetworkSettings.loader.load(tag.getCompound("networkSettings"));
+			} catch (Exception e) {
+				NetworkSettings.initDefault();
+			}
+			
+			try {
+				UISettings.loader.load(tag.getCompound("uiSettings"));
+			} catch (Exception e) {
+				UISettings.initDefault();
+			}
+			
+			init();
 			return null;
 		}
 		
@@ -36,11 +51,19 @@ public class SettingsManager {
 	};
 	
 	/**
-	 * Initializes all the settings in default.
+	 * Initializes the {@link Settings}.
+	 */
+	public static void init() {
+	}
+	
+	/**
+	 * Initializes the {@link Settings} in default.
 	 */
 	public static void initDefault() {
 		GlobalSettings.initDefault();
 		NetworkSettings.initDefault();
 		UISettings.initDefault();
+		
+		init();
 	}
 }

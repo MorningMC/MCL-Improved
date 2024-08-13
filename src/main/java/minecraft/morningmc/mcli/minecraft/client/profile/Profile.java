@@ -1,6 +1,6 @@
 package minecraft.morningmc.mcli.minecraft.client.profile;
 
-import minecraft.morningmc.mcli.launcher.main.FileManager;
+import minecraft.morningmc.mcli.utils.FileManager;
 import minecraft.morningmc.mcli.minecraft.client.Version;
 import minecraft.morningmc.mcli.minecraft.launch.LaunchOptions;
 import minecraft.morningmc.mcli.utils.interfaces.UniqueObject;

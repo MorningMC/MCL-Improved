@@ -15,16 +15,18 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
  * Represents the UI settings.
  */
 @StaticClass
-public class UISettings {
+public class UISettings extends Settings {
 	/** {@link NbtLoader} for loading and saving {@link UISettings} objects from/to NBT data. */
 	public static final NbtLoader<Void, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
 		public Void load(CompoundTag tag) throws IllegalNbtException {
+			scale = tag.getDouble("scale").getValue();
 			windowSize = WindowSize.loader.load(tag.getCompound("windowSize"));
 			colorStyle = Enumerable.generateLoader(ColorStyle.loader, ColorStyle.Policy.class).load(tag.getCompound("colorStyle"));
 			background = Switchable.generateLoader(Background.loader).load(tag.getCompound("background"));
 			
+			init();
 			return null;
 		}
 		
@@ -32,6 +34,7 @@ public class UISettings {
 		public CompoundTag save(Void object) {
 			CompoundTag tag = new CompoundTag();
 			
+			tag.putDouble("scale", scale);
 			tag.put("windowSize", WindowSize.loader.save(windowSize));
 			tag.put("colorStyle", Enumerable.generateLoader(ColorStyle.loader, ColorStyle.Policy.class).save(colorStyle));
 			tag.put("background", Switchable.generateLoader(Background.loader).save(background));
@@ -40,7 +43,10 @@ public class UISettings {
 		}
 	};
 	
-	/** The size of the window in pixel */
+	/** The scaling size. */
+	public static double scale;
+	
+	/** The size of the window. */
 	public static WindowSize windowSize;
 	
 	/** The color style. */
@@ -50,11 +56,26 @@ public class UISettings {
 	public static Switchable<Background> background;
 	
 	/**
+	 * Initializes the {@link UISettings}.
+	 */
+	public static void init() {
+		colorStyle.switcher = (value, policy) -> switch (policy) {
+			case SYSTEM -> ColorStyle.followSystem();
+			case BRIGHT -> ColorStyle.bright;
+			case DARK -> ColorStyle.dark;
+			case CUSTOM -> value;
+		};
+	}
+	
+	/**
 	 * Initializes the {@link UISettings} in default.
 	 */
 	public static void initDefault() {
-		windowSize = WindowSize.windowed(1024, 632);
+		scale = 1;
+		windowSize = WindowSize.window(1311, 810);
 		colorStyle = Enumerable.of(ColorStyle.bright, ColorStyle.Policy.SYSTEM);
 		background = Switchable.ofDisabled(Background.of(null, 1, 0));
+		
+		init();
 	}
 }

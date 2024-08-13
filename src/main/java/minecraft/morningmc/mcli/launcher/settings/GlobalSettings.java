@@ -9,8 +9,7 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
  * Represents the global settings.
  */
 @StaticClass
-public final class GlobalSettings {
-	
+public final class GlobalSettings extends Settings {
 	/** {@link NbtLoader} for loading and saving {@link GlobalSettings} objects from/to NBT data. */
 	public static final NbtLoader<Void, CompoundTag> loader = new NbtLoader<>() {
 		
@@ -21,6 +20,7 @@ public final class GlobalSettings {
 			autoSaveConfigInterval = tag.getInt("autoSaveConfigInterval").getValue();
 			easterEggs = tag.getByte("easterEggs").getValue() == 1;
 			
+			init();
 			return null;
 		}
 		
@@ -52,12 +52,20 @@ public final class GlobalSettings {
 	public static boolean easterEggs;
 	
 	/**
-	 * Initializes the {@link GlobalSettings} class in default.
+	 * Initializes the {@link GlobalSettings}.
+	 */
+	public static void init() {
+	}
+	
+	/**
+	 * Initializes the {@link GlobalSettings} in default.
 	 */
 	public static void initDefault() {
 		timestampFormat = "yyyy-MM-dd'T'HH:mm:ss:SSSZZ";
 		maxRecommendMemory = 8192;
 		autoSaveConfigInterval = 300000;
 		easterEggs = true;
+		
+		init();
 	}
 }

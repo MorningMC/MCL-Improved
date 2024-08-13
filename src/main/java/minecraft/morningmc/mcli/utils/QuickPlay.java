@@ -101,10 +101,10 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 			
 			@Override
 			public StringTag save(Singleplayer object) {
-				if (object == null) {
-					return new StringTag("");
+				if (object != null) {
+					return new StringTag(object.world);
 				}
-				return new StringTag(object.world);
+				return new StringTag("");
 			}
 		};
 		
@@ -170,12 +170,10 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 			public CompoundTag save(Multiplayer object) {
 				CompoundTag tag = new CompoundTag();
 				
-				if (object == null) {
-					return tag;
+				if (object != null) {
+					tag.putString("host", object.host);
+					tag.putInt("port", object.port);
 				}
-				
-				tag.putString("host", object.host);
-				tag.putInt("port", object.port);
 				
 				return tag;
 			}

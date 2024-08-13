@@ -8,8 +8,8 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
  * Represents the size and state (full-screen or windowed) of a window.
  *
  * @param fullScreen Whether the window is full-screen.
- * @param width      The width of the window.
- * @param height     The height of the window.
+ * @param width      The width of the window in pixel.
+ * @param height     The height of the window in pixel.
  */
 public record WindowSize(boolean fullScreen, int width, int height) {
 	
@@ -60,23 +60,66 @@ public record WindowSize(boolean fullScreen, int width, int height) {
 	 *
 	 * @return The {@link WindowSize} object for a full-screen window.
 	 */
-	public static WindowSize fullScreened() {
+	public static WindowSize window() {
 		return new WindowSize(true, 0, 0);
 	}
 	
 	/**
 	 * Creates a {@link WindowSize} object representing a window with the specified width and height.
 	 *
-	 * @param width  The width of the window.
-	 * @param height The height of the window.
+	 * @param width  The width of the window in pixel.
+	 * @param height The height of the window in pixel.
 	 * @return The {@link WindowSize} object for a window with the specified width and height.
 	 * @throws IndexOutOfBoundsException If width or height is negative.
 	 */
-	public static WindowSize windowed(int width, int height) {
-		if (width < 0 || height < 0) {
-			throw new IndexOutOfBoundsException("width or height can't be negative");
+	public static WindowSize window(int width, int height) {
+		if (width < 0) {
+			throw new IndexOutOfBoundsException("width can't be negative");
+		}
+		if (height < 0) {
+			throw new IndexOutOfBoundsException("height can't be negative");
 		}
 		
 		return new WindowSize(false, width, height);
+	}
+	
+	/**
+	 * Constructs a new {@link WindowSize} object with the specified full-screen state.
+	 *
+	 * @param fullScreen Whether the window should be full-screen or not.
+	 * @return A new {@link WindowSize}.
+	 */
+	public WindowSize fullScreen(boolean fullScreen) {
+		return new WindowSize(fullScreen, width, height);
+	}
+	
+	/**
+	 * Constructs a new {@link WindowSize} object with the specified width.
+	 *
+	 * @param width The width of the window in pixel.
+	 * @return A new {@link WindowSize}.
+	 * @throws IndexOutOfBoundsException If width is negative.
+	 */
+	public WindowSize width(int width) {
+		if (width < 0) {
+			throw new IndexOutOfBoundsException("width can't be negative");
+		}
+		
+		return new WindowSize(fullScreen, width, height);
+	}
+	
+	/**
+	 * Constructs a new {@link WindowSize} object with the specified height.
+	 *
+	 * @param height The height of the window in pixel.
+	 * @return A new {@link WindowSize}.
+	 * @throws IndexOutOfBoundsException If height is negative.
+	 */
+	public WindowSize height(int height) {
+		if (height < 0) {
+			throw new IndexOutOfBoundsException("height can't be negative");
+		}
+
+		return new WindowSize(fullScreen, width, height);
 	}
 }

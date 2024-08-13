@@ -7,6 +7,11 @@ import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 import dev.dewy.nbt.tags.collection.CompoundTag;
 
 import javafx.scene.paint.Color;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.shape.Rectangle;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -79,9 +84,9 @@ public final class ColorStyle {
 	
 	/** The preset dark color style. */
 	public static final ColorStyle dark = new ColorStyle(
+			ButtonStyle.ofSimple(Color.rgb(49, 50, 51)),
 			ButtonStyle.ofSimple(Color.rgb(72, 73, 74)),
-			ButtonStyle.ofSimple(Color.rgb(72, 73, 74)),
-			ButtonStyle.ofSimple(Color.rgb(72, 73, 74)),
+			ButtonStyle.ofSimple(Color.rgb(49, 50, 51)),
 			ButtonStyle.ofSimple(Color.rgb(60, 133, 39)),
 			ButtonStyle.ofSimple(Color.rgb(115, 69, 229)),
 			Color.rgb(255, 255, 255),
@@ -149,7 +154,7 @@ public final class ColorStyle {
 					yield new String(process.getInputStream().readAllBytes()).toLowerCase().contains("dark") ? dark : bright;
 				}
 				default -> {
-					logger.warn("Unknown operating system, use bright default.");
+					logger.warn("Unknown operating system, use bright style default.");
 					yield bright;
 				}
 			};
@@ -229,6 +234,43 @@ public final class ColorStyle {
 		 */
 		public static ButtonStyle ofSimple(Color major) {
 			return new ButtonStyle(major, major.brighter(), major.darker().darker());
+		}
+		
+		/**
+		 * Generates an {@link AnchorPane} representing the button style.
+		 *
+		 * @param width  The width of the {@link AnchorPane} in pixel.
+		 * @param height The height of the {@link AnchorPane} in pixel.
+		 * @return An {@link AnchorPane} instance.
+		 */
+		public AnchorPane render(int width, int height) {
+			return render(width, height, event -> {});
+		}
+		
+		/**
+		 * Generates an {@link AnchorPane} with a {@link Button} representing the button style.
+		 *
+		 * @param width  The width of the {@link AnchorPane} in pixel.
+		 * @param height The height of the {@link AnchorPane} in pixel.
+		 * @param eventHandler The event handler for the button click event.
+		 * @return An {@link AnchorPane} instance with a {@link Button}.
+		 */
+		public AnchorPane render(int width, int height, EventHandler<MouseEvent> eventHandler) {
+			Button button = new Button();
+			button.setPrefSize(width, height);
+			button.setOnMouseClicked(eventHandler);
+			button.setStyle("-fx-background-color: transparent;");
+			
+			Rectangle majorRect = new Rectangle(width - 6, height - 12, major);
+			Rectangle edgeRect = new Rectangle(width, height - 6, edge);
+			Rectangle bottomRect = new Rectangle(width, 6, bottom);
+			
+			AnchorPane pane = new AnchorPane(edgeRect, majorRect, bottomRect, button);
+			pane.setPrefSize(width, height);
+			AnchorPane.setTopAnchor(majorRect, 3.);
+			AnchorPane.setLeftAnchor(majorRect, 3.);
+			AnchorPane.setTopAnchor(bottomRect, height - 6.);
+			return pane;
 		}
 	}
 	

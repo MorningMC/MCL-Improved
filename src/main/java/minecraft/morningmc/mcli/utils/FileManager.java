@@ -1,7 +1,6 @@
-package minecraft.morningmc.mcli.launcher.main;
+package minecraft.morningmc.mcli.utils;
 
 import minecraft.morningmc.mcli.minecraft.client.MinecraftDirectory;
-import minecraft.morningmc.mcli.utils.Platform;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 
 import java.io.*;

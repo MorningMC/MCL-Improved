@@ -46,7 +46,7 @@ public record LaunchArguments(LaunchOptions options, Profile profile, Account ac
 	 * @return The directory for the Minecraft client.
 	 */
 	public MinecraftDirectory getDirectory() {
-		MinecraftDirectory directory = options.gameDir.get((value, policy) -> switch (policy) {
+		MinecraftDirectory directory = options.gameDir.getSwitch((value, policy) -> switch (policy) {
 			case ISOLATED -> new MinecraftDirectory(new File(MinecraftDirectory.isolateRoot, profile.identifier().toString()));
 			case CUSTOM -> value;
 			default -> MinecraftDirectory.standard;
