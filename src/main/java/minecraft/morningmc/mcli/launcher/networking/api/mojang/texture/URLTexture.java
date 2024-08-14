@@ -1,6 +1,6 @@
 package minecraft.morningmc.mcli.launcher.networking.api.mojang.texture;
 
-import minecraft.morningmc.mcli.launcher.networking.Requester;
+import minecraft.morningmc.mcli.launcher.networking.ConnectionBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +11,6 @@ public record URLTexture(URL url, Map<String, String> metadata) implements Textu
 	
 	@Override
 	public InputStream openStream() throws IOException {
-		return Requester.openConnection(url).getInputStream();
+		return ConnectionBuilder.create(url).build().getInputStream();
 	}
 }

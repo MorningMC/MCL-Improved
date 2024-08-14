@@ -1,7 +1,6 @@
 package minecraft.morningmc.mcli.launcher.settings;
 
-import minecraft.morningmc.mcli.ui.settings.Background;
-import minecraft.morningmc.mcli.ui.settings.ColorStyle;
+import minecraft.morningmc.mcli.ui.settings.*;
 import minecraft.morningmc.mcli.utils.WindowSize;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 import minecraft.morningmc.mcli.utils.containers.Enumerable;
@@ -25,6 +24,7 @@ public class UISettings extends Settings {
 			windowSize = WindowSize.loader.load(tag.getCompound("windowSize"));
 			colorStyle = Enumerable.generateLoader(ColorStyle.loader, ColorStyle.Policy.class).load(tag.getCompound("colorStyle"));
 			background = Switchable.generateLoader(Background.loader).load(tag.getCompound("background"));
+			constants = Constants.loader.load(tag.getCompound("constants"));
 			
 			init();
 			return null;
@@ -38,6 +38,7 @@ public class UISettings extends Settings {
 			tag.put("windowSize", WindowSize.loader.save(windowSize));
 			tag.put("colorStyle", Enumerable.generateLoader(ColorStyle.loader, ColorStyle.Policy.class).save(colorStyle));
 			tag.put("background", Switchable.generateLoader(Background.loader).save(background));
+			tag.put("constants", Constants.loader.save(constants));
 			
 			return tag;
 		}
@@ -54,6 +55,9 @@ public class UISettings extends Settings {
 	
 	/** The background settings. */
 	public static Switchable<Background> background;
+	
+	/** The constants of the UI. */
+	public static Constants constants;
 	
 	/**
 	 * Initializes the {@link UISettings}.
@@ -75,6 +79,7 @@ public class UISettings extends Settings {
 		windowSize = WindowSize.window(1311, 810);
 		colorStyle = Enumerable.of(ColorStyle.bright, ColorStyle.Policy.SYSTEM);
 		background = Switchable.ofDisabled(Background.of(null, 1, 0));
+		constants = Constants.initDefault();
 		
 		init();
 	}

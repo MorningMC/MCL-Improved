@@ -1,12 +1,10 @@
 package minecraft.morningmc.mcli.launcher.networking;
 
-import minecraft.morningmc.mcli.launcher.settings.NetworkSettings;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 
 import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
-import java.util.*;
 
 /**
  * A utility class that creates connections and sends requests.
@@ -26,68 +24,6 @@ public class Requester {
 		} catch (Exception e) {
 			return null;
 		}
-	}
-	
-	/**
-	 * Creates a connection to a {@link URL}.
-	 *
-	 * @param url The URL to be connected.
-	 * @return The created {@link URLConnection}.
-	 * @throws IOException If an I/O error occurs.
-	 */
-	public static URLConnection openConnection(URL url) throws IOException {
-		URLConnection connection = url.openConnection(NetworkSettings.proxy);
-		connection.setConnectTimeout(NetworkSettings.connectTimeout);
-		connection.setReadTimeout(NetworkSettings.readTimeout);
-		connection.setDoOutput(true);
-		return connection;
-	}
-	
-	/**
-	 * Creates a connection to a {@link URL} with the given headers.
-	 *
-	 * @param url     The URL to be connected.
-	 * @param headers The headers to be set for the connection.
-	 * @return The created {@link URLConnection}.
-	 * @throws IOException If an I/O error occurs.
-	 */
-	public static URLConnection openConnection(URL url, Map<String, String> headers) throws IOException {
-		URLConnection connection = openConnection(url);
-		
-		for (Map.Entry<String, String> header : headers.entrySet()) {
-			connection.setRequestProperty(header.getKey(), header.getValue());
-		}
-		
-		return connection;
-	}
-	
-	/**
-	 * Creates a connection to a {@link URL} with the given method.
-	 *
-	 * @param url    The URL to be connected.
-	 * @param method The request method.
-	 * @return The created {@link HttpURLConnection}.
-	 * @throws IOException If an I/O error occurs.
-	 */
-	public static HttpURLConnection openConnection(URL url, Method method) throws IOException {
-		HttpURLConnection connection = (HttpURLConnection) openConnection(url);
-		connection.setRequestMethod(method.name());
-		return connection;
-	}
-	
-	/**
-	 * Creates a connection to a {@link URL} with the given headers and method.
-	 *
-	 * @param url     The URL to be connected.
-	 * @param headers The headers to be set for the connection.
-	 * @param method  The request method.
-	 * @return The created {@link HttpURLConnection}.
-	 * @throws IOException If an I/O error occurs.
-	 */
-	public static HttpURLConnection openConnection(URL url, Map<String, String> headers, Method method) throws IOException {
-		HttpURLConnection connection = (HttpURLConnection) openConnection(url, headers);
-		connection.setRequestMethod(method.name());
-		return connection;
 	}
 	
 	/**
@@ -185,12 +121,5 @@ public class Requester {
 		public String toString() {
 			return new String(data, encoding);
 		}
-	}
-	
-	/**
-	 * Enumerates different HTTP request methods.
-	 */
-	public enum Method {
-		GET, POST, HEAD, OPTIONS, PUT, DELETE, TRACE
 	}
 }

@@ -133,7 +133,7 @@ public interface NbtLoader<C, T extends Tag> {
 			double blue = tag.getDouble("blue").getValue();
 			double opacity = tag.getDouble("opacity").getValue();
 
-			return new Color(red, green, blue, opacity);
+			return Color.color(red, green, blue, opacity);
 		}
 
 		/**

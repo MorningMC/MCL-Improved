@@ -3,6 +3,7 @@ package minecraft.morningmc.mcli.ui;
 import javafx.scene.Scene;
 import javafx.stage.StageStyle;
 import minecraft.morningmc.mcli.launcher.Metadata;
+import minecraft.morningmc.mcli.ui.settings.FontStyle;
 import minecraft.morningmc.mcli.utils.FileManager;
 import minecraft.morningmc.mcli.launcher.settings.UISettings;
 
@@ -34,7 +35,13 @@ public class UIManager {
 		mainStage.heightProperty().addListener((obs, old, ne) -> UISettings.windowSize = UISettings.windowSize.height(ne.intValue()));
 		mainStage.maximizedProperty().addListener((obs, old, ne) -> UISettings.windowSize = UISettings.windowSize.fullScreen(ne));
 		
-		mainStage.setScene(new Scene(UISettings.colorStyle.getSwitch().title.render(UISettings.windowSize.width(), 48, event -> mainStage.close())));
+		mainStage.setScene(new Scene(
+				UISettings.colorStyle.getSwitch().title.render(UISettings.windowSize.width(), 48)
+						.text(Metadata.fullName, FontStyle.minecraftTen)
+						.icon(icon)
+						.eventHandler(event -> mainStage.close())
+						.build()
+		));
 		mainStage.show();
 	}
 	

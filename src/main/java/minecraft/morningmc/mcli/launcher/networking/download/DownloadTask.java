@@ -1,5 +1,6 @@
 package minecraft.morningmc.mcli.launcher.networking.download;
 
+import minecraft.morningmc.mcli.launcher.networking.ConnectionBuilder;
 import minecraft.morningmc.mcli.utils.FileManager;
 import minecraft.morningmc.mcli.launcher.networking.Requester;
 import minecraft.morningmc.mcli.launcher.settings.NetworkSettings;
@@ -92,7 +93,10 @@ public class DownloadTask implements UniqueObject {
 	 */
 	private long getLength() {
 		try {
-			return Requester.openConnection(source, Requester.Method.HEAD).getContentLengthLong();
+			return ConnectionBuilder.create(source)
+					       .method(ConnectionBuilder.Method.HEAD)
+					       .build()
+					       .getContentLengthLong();
 		} catch (IOException e) {
 			logger.warn("Failed to get the length of file: {}", e.getMessage());
 			return -1;

@@ -192,6 +192,8 @@ public class Modification {
 			Set<Info> infos = new HashSet<>();
 			
 			try (JarFile jarFile = new JarFile(file)) {
+				
+				// parsing Forge mod info
 				if (loaders.contains(Loader.FORGE)) {
 					try (InputStream in = getJarInputStream(jarFile, "META-INF/mods.toml")) {
 						Toml toml = new Toml().read(in);
@@ -260,6 +262,7 @@ public class Modification {
 					}
 				}
 				
+				// parsing NeoForge mod info
 				if (loaders.contains(Loader.NEOFORGE)) {
 					try (InputStream in = getJarInputStream(jarFile, "META-INF/neoforge.mods.toml")) {
 						Toml toml = new Toml().read(in);
@@ -328,6 +331,7 @@ public class Modification {
 					}
 				}
 				
+				// parsing Fabric mod info
 				if (loaders.contains(Loader.FABRIC)) {
 					try (InputStream in = getJarInputStream(jarFile, "fabric.mod.json")) {
 						JsonObject json = JsonParser.parseReader(FileManager.getReader(in)).getAsJsonObject();
@@ -399,6 +403,7 @@ public class Modification {
 					}
 				}
 				
+				// parsing Quilt mod info
 				if (loaders.contains(Loader.QUILT)) {
 					try (InputStream in = getJarInputStream(jarFile, "quilt.mod.json")) {
 						JsonObject json = JsonParser.parseReader(FileManager.getReader(in)).getAsJsonObject();
@@ -476,10 +481,12 @@ public class Modification {
 						logger.warn("Failed to parse Quilt mod info for file {}: {}", file.getAbsolutePath(), e.getMessage());
 					}
 					
+					// parsing LiteLoader mod info is not supported yet
 					if (loaders.contains(Loader.LITELOADER)) {
 						logger.warn("LiteLoader parsing is not supported");
 					}
 					
+					// parsing Rift mod info is not supported yet
 					if (loaders.contains(Loader.RIFT)) {
 						logger.warn("Rift parsing is not supported");
 					}

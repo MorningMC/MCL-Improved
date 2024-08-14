@@ -1,5 +1,6 @@
 package minecraft.morningmc.mcli.launcher.networking.download;
 
+import minecraft.morningmc.mcli.launcher.networking.ConnectionBuilder;
 import minecraft.morningmc.mcli.launcher.networking.Requester;
 
 import org.apache.logging.log4j.LogManager;
@@ -33,8 +34,10 @@ public class DownloadThread extends Thread {
 	@Override
 	public void run() {
 		try {
-			HttpURLConnection connection = Requester.openConnection(source, Map.of("Range", "bytes=%d-%d".formatted(start, end)), Requester.Method.GET);
-			int responseCode = Requester.request(connection).code();
+			int responseCode = ConnectionBuilder.create(source)
+					                   .header("Range", "bytes=%d-%d".formatted(start, end))
+					                   .request()
+					                   .code();
 			
 			target.seek(start);
 			
