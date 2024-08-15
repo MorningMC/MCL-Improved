@@ -2,6 +2,7 @@ package minecraft.morningmc.mcli.utils.interfaces;
 
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 
+import javafx.scene.text.Font;
 import javafx.scene.paint.Color;
 
 import dev.dewy.nbt.api.Tag;
@@ -150,6 +151,40 @@ public interface NbtLoader<C, T extends Tag> {
 			tag.putDouble("green", object.getGreen());
 			tag.putDouble("blue", object.getBlue());
 			tag.putDouble("opacity", object.getOpacity());
+
+			return tag;
+		}
+	};
+	
+	/** {@link NbtLoader} for loading and saving {@link Font} objects from/to NBT data. */
+	NbtLoader<Font, CompoundTag> fontLoader = new NbtLoader<>() {
+
+		/**
+		 * Load a font from an NBT compound tag.
+		 *
+		 * @param tag The NBT compound tag containing font data.
+		 * @return The loaded font.
+		 */
+		@Override
+		public Font load(CompoundTag tag) {
+			String family = tag.getString("family").getValue();
+			double size = tag.getDouble("size").getValue();
+
+			return Font.font(family, size);
+		}
+
+		/**
+		 * Save a font to an NBT compound tag.
+		 *
+		 * @param object The font to be saved.
+		 * @return The NBT compound tag containing the saved font data.
+		 */
+		@Override
+		public CompoundTag save(Font object) {
+			CompoundTag tag = new CompoundTag();
+
+			tag.putString("family", object.getFamily());
+			tag.putDouble("size", object.getSize());
 
 			return tag;
 		}

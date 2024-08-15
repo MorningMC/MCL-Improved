@@ -26,26 +26,26 @@ public final class LaunchOptions {
 		public LaunchOptions load(CompoundTag tag) {
 			Switchable<JavaRuntime> javaRuntime;
 			try {
-				javaRuntime = Switchable.generateLoader(JavaRuntime.loader).load(tag.getCompound("javaRuntime"));
+				javaRuntime = Switchable.generateLoader(JavaRuntime.loader).load(tag.getCompound("java_runtime"));
 			} catch (Exception e) {
-				logger.warn("javaRuntime load failed: {}", e.getMessage());
-				javaRuntime = DEFAULT.javaRuntime;
+				logger.warn("java_runtime load failed: {}", e.getMessage());
+				javaRuntime = defaultOptions.javaRuntime;
 			}
 			
 			Switchable<MemoryRange> memoryRange;
 			try {
-				memoryRange = Switchable.generateLoader(MemoryRange.loader).load(tag.getCompound("memoryRange"));
+				memoryRange = Switchable.generateLoader(MemoryRange.loader).load(tag.getCompound("memory_range"));
 			} catch (Exception e) {
-				logger.warn("memoryRange load failed: {}", e.getMessage());
-				memoryRange = DEFAULT.memoryRange;
+				logger.warn("memory_range load failed: {}", e.getMessage());
+				memoryRange = defaultOptions.memoryRange;
 			}
 			
 			Switchable<List<String>> javaArguments;
 			try {
-				javaArguments = Switchable.generateLoader(NbtLoader.stringListLoader).load(tag.getCompound("javaArguments"));
+				javaArguments = Switchable.generateLoader(NbtLoader.stringListLoader).load(tag.getCompound("java_arguments"));
 			} catch (Exception e) {
-				logger.warn("javaArguments load failed: {}", e.getMessage());
-				javaArguments = DEFAULT.javaArguments;
+				logger.warn("java_arguments load failed: {}", e.getMessage());
+				javaArguments = defaultOptions.javaArguments;
 			}
 			
 			Switchable<String> watermark;
@@ -53,31 +53,31 @@ public final class LaunchOptions {
 				watermark = Switchable.generateLoader(NbtLoader.stringLoader).load(tag.getCompound("watermark"));
 			} catch (Exception e) {
 				logger.warn("watermark load failed: {}", e.getMessage());
-				watermark = DEFAULT.watermark;
+				watermark = defaultOptions.watermark;
 			}
 			
 			Enumerable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir;
 			try {
-				gameDir = Enumerable.generateLoader(MinecraftDirectory.loader, MinecraftDirectory.Policy.class).load(tag.getCompound("gameDir"));
+				gameDir = Enumerable.generateLoader(MinecraftDirectory.loader, MinecraftDirectory.Policy.class).load(tag.getCompound("game_dir"));
 			} catch (Exception e) {
-				logger.warn("gameDir load failed: {}", e.getMessage());
-				gameDir = DEFAULT.gameDir;
+				logger.warn("game_dir load failed: {}", e.getMessage());
+				gameDir = defaultOptions.gameDir;
 			}
 			
 			WindowSize windowSize;
 			try {
-				windowSize = WindowSize.loader.load(tag.getCompound("windowSize"));
+				windowSize = WindowSize.loader.load(tag.getCompound("window_size"));
 			} catch (Exception e) {
-				logger.warn("windowSize load failed: {}", e.getMessage());
-				windowSize = DEFAULT.windowSize;
+				logger.warn("window_size load failed: {}", e.getMessage());
+				windowSize = defaultOptions.windowSize;
 			}
 			
 			QuickPlay quickPlay;
 			try {
-				quickPlay = QuickPlay.loader.load(tag.getCompound("quickPlay"));
+				quickPlay = QuickPlay.loader.load(tag.getCompound("quick_play"));
 			} catch (Exception e) {
-				logger.warn("quickPlay load failed: {}", e.getMessage());
-				quickPlay = DEFAULT.quickPlay;
+				logger.warn("quick_play load failed: {}", e.getMessage());
+				quickPlay = defaultOptions.quickPlay;
 			}
 			
 			boolean demo;
@@ -85,7 +85,7 @@ public final class LaunchOptions {
 				demo = tag.getByte("demo").getValue() != 0;
 			} catch (Exception e) {
 				logger.warn("demo load failed: {}", e.getMessage());
-				demo = DEFAULT.demo;
+				demo = defaultOptions.demo;
 			}
 			
 			return new LaunchOptions(javaRuntime, memoryRange, javaArguments, watermark, gameDir, windowSize, quickPlay, demo);
@@ -96,21 +96,21 @@ public final class LaunchOptions {
 			CompoundTag tag = new CompoundTag();
 			
 			try {
-				tag.put("javaRuntime", Switchable.generateLoader(JavaRuntime.loader).save(object.javaRuntime));
+				tag.put("java_runtime", Switchable.generateLoader(JavaRuntime.loader).save(object.javaRuntime));
 			} catch (Exception e) {
-				logger.warn("javaRuntime save failed: {}", e.getMessage());
+				logger.warn("java_runtime save failed: {}", e.getMessage());
 			}
 			
 			try {
-				tag.put("memoryRange", Switchable.generateLoader(MemoryRange.loader).save(object.memoryRange));
+				tag.put("memory_range", Switchable.generateLoader(MemoryRange.loader).save(object.memoryRange));
 			} catch (Exception e) {
-				logger.warn("memoryRange save failed: {}", e.getMessage());
+				logger.warn("memory_range save failed: {}", e.getMessage());
 			}
 			
 			try {
-				tag.put("javaArguments", Switchable.generateLoader(NbtLoader.stringListLoader).save(object.javaArguments));
+				tag.put("java_arguments", Switchable.generateLoader(NbtLoader.stringListLoader).save(object.javaArguments));
 			} catch (Exception e) {
-				logger.warn("javaArguments save failed: {}", e.getMessage());
+				logger.warn("java_arguments save failed: {}", e.getMessage());
 			}
 			
 			try {
@@ -121,21 +121,21 @@ public final class LaunchOptions {
 			
 			try {
 				
-				tag.put("gameDir", Enumerable.generateLoader(MinecraftDirectory.loader, MinecraftDirectory.Policy.class).save(object.gameDir));
+				tag.put("game_dir", Enumerable.generateLoader(MinecraftDirectory.loader, MinecraftDirectory.Policy.class).save(object.gameDir));
 			} catch (Exception e) {
-				logger.warn("gameDir save failed: {}", e.getMessage());
+				logger.warn("game_dir save failed: {}", e.getMessage());
 			}
 			
 			try {
-				tag.put("windowSize", WindowSize.loader.save(object.windowSize));
+				tag.put("window_size", WindowSize.loader.save(object.windowSize));
 			} catch (Exception e) {
-				logger.warn("windowSize save failed: {}", e.getMessage());
+				logger.warn("window_size save failed: {}", e.getMessage());
 			}
 			
 			try {
-				tag.put("quickPlay", QuickPlay.loader.save(object.quickPlay));
+				tag.put("quick_play", QuickPlay.loader.save(object.quickPlay));
 			} catch (Exception e) {
-				logger.warn("quickPlay save failed: {}", e.getMessage());
+				logger.warn("quick_play save failed: {}", e.getMessage());
 			}
 			
 			try {
@@ -149,7 +149,7 @@ public final class LaunchOptions {
 	};
 	
 	/** The default launch options. */
-	public static final LaunchOptions DEFAULT = new LaunchOptions(
+	public static final LaunchOptions defaultOptions = new LaunchOptions(
 			Switchable.ofDisabled(JavaRuntime.current),
 			Switchable.ofDisabled(MemoryRange.of(2048)),
 			Switchable.ofDisabled(List.of("-XX:+UnlockExperimentalVMOptions", "-XX:+UseG1GC", "-XX:G1NewSizePercent=20", "-XX:G1ReservePercent=20", "-XX:MaxGCPauseMillis=50", "-XX:G1HeapRegionSize=32M")),

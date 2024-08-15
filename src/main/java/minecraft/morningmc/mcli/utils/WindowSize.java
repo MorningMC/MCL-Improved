@@ -26,7 +26,7 @@ public record WindowSize(boolean fullScreen, int width, int height) {
 		public WindowSize load(CompoundTag tag) {
 			try {
 				return new WindowSize(
-						tag.getByte("fullScreen").getValue() != 0,
+						tag.getByte("full_screen").getValue() != 0,
 						tag.getInt("width").getValue(),
 						tag.getInt("height").getValue()
 				);
@@ -46,7 +46,7 @@ public record WindowSize(boolean fullScreen, int width, int height) {
 			CompoundTag tag = new CompoundTag();
 			
 			if (object != null) {
-				tag.putByte("fullScreen", (byte) (object.fullScreen ? 1 : 0));
+				tag.putByte("full_screen", (byte) (object.fullScreen ? 1 : 0));
 				tag.putInt("width", object.width);
 				tag.putInt("height", object.height);
 			}

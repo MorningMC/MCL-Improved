@@ -19,12 +19,12 @@ public class NetworkSettings extends Settings {
 		@Override
 		public Void load(CompoundTag tag) throws IllegalNbtException {
 			proxy = NbtLoader.proxyLoader.load(tag.getCompound("proxy"));
-			connectTimeout = tag.getInt("connectTimeout").getValue();
-			readTimeout = tag.getInt("readTimeout").getValue();
-			maxThreads = tag.getShort("maxThreads").getValue();
-			minSizePerThread = tag.getInt("minSizePerThread").getValue();
-			bufferSize = tag.getInt("bufferSize").getValue();
-			maxRetries = tag.getByte("maxRetries").getValue();
+			connectTimeout = tag.getInt("connect_timeout").getValue();
+			readTimeout = tag.getInt("read_timeout").getValue();
+			maxThreads = tag.getShort("max_threads").getValue();
+			minSizePerThread = tag.getInt("min_size_per_thread").getValue();
+			bufferSize = tag.getInt("buffer_size").getValue();
+			maxRetries = tag.getByte("max_retries").getValue();
 			
 			init();
 			return null;
@@ -35,12 +35,12 @@ public class NetworkSettings extends Settings {
 			CompoundTag tag = new CompoundTag();
 			
 			tag.put("proxy", NbtLoader.proxyLoader.save(proxy));
-			tag.putInt("connectTimeout", connectTimeout);
-			tag.putInt("readTimeout", readTimeout);
-			tag.putShort("maxThreads", maxThreads);
-			tag.putInt("minSizePerThread", minSizePerThread);
-			tag.putInt("bufferSize", bufferSize);
-			tag.putByte("maxRetries", maxRetries);
+			tag.putInt("connect_timeout", connectTimeout);
+			tag.putInt("read_timeout", readTimeout);
+			tag.putShort("max_threads", maxThreads);
+			tag.putInt("min_size_per_thread", minSizePerThread);
+			tag.putInt("buffer_size", bufferSize);
+			tag.putByte("max_retries", maxRetries);
 			
 			return tag;
 		}

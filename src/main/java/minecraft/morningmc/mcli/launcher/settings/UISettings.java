@@ -21,8 +21,9 @@ public class UISettings extends Settings {
 		@Override
 		public Void load(CompoundTag tag) throws IllegalNbtException {
 			scale = tag.getDouble("scale").getValue();
-			windowSize = WindowSize.loader.load(tag.getCompound("windowSize"));
-			colorStyle = Enumerable.generateLoader(ColorStyle.loader, ColorStyle.Policy.class).load(tag.getCompound("colorStyle"));
+			defaultWindowSize = WindowSize.loader.load(tag.getCompound("default_window_size"));
+			colorStyle = Enumerable.generateLoader(ColorStyle.loader, ColorStyle.Policy.class).load(tag.getCompound("color_style"));
+			fontStyle = FontStyle.loader.load(tag.getCompound("font_style"));
 			background = Switchable.generateLoader(Background.loader).load(tag.getCompound("background"));
 			constants = Constants.loader.load(tag.getCompound("constants"));
 			
@@ -35,8 +36,9 @@ public class UISettings extends Settings {
 			CompoundTag tag = new CompoundTag();
 			
 			tag.putDouble("scale", scale);
-			tag.put("windowSize", WindowSize.loader.save(windowSize));
-			tag.put("colorStyle", Enumerable.generateLoader(ColorStyle.loader, ColorStyle.Policy.class).save(colorStyle));
+			tag.put("default_window_size", WindowSize.loader.save(defaultWindowSize));
+			tag.put("color_style", Enumerable.generateLoader(ColorStyle.loader, ColorStyle.Policy.class).save(colorStyle));
+			tag.put("font_style", FontStyle.loader.save(fontStyle));
 			tag.put("background", Switchable.generateLoader(Background.loader).save(background));
 			tag.put("constants", Constants.loader.save(constants));
 			
@@ -47,11 +49,14 @@ public class UISettings extends Settings {
 	/** The scaling size. */
 	public static double scale;
 	
-	/** The size of the window. */
-	public static WindowSize windowSize;
+	/** The default window size of the windows. */
+	public static WindowSize defaultWindowSize;
 	
 	/** The color style. */
 	public static Enumerable<ColorStyle, ColorStyle.Policy> colorStyle;
+	
+	/** The font style. */
+	public static FontStyle fontStyle;
 	
 	/** The background settings. */
 	public static Switchable<Background> background;
@@ -76,8 +81,9 @@ public class UISettings extends Settings {
 	 */
 	public static void initDefault() {
 		scale = 1;
-		windowSize = WindowSize.window(1311, 810);
+		defaultWindowSize = WindowSize.window(1311, 810);
 		colorStyle = Enumerable.of(ColorStyle.bright, ColorStyle.Policy.SYSTEM);
+		fontStyle = FontStyle.defaultStyle;
 		background = Switchable.ofDisabled(Background.of(null, 1, 0));
 		constants = Constants.initDefault();
 		

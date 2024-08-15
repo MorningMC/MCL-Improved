@@ -1,6 +1,7 @@
 package minecraft.morningmc.mcli.launcher.main;
 
 import minecraft.morningmc.mcli.launcher.settings.GlobalSettings;
+import minecraft.morningmc.mcli.ui.WindowSizeManager;
 import minecraft.morningmc.mcli.utils.Translation;
 import minecraft.morningmc.mcli.launcher.settings.Settings;
 import minecraft.morningmc.mcli.minecraft.client.profile.ProfileCollection;
@@ -35,24 +36,30 @@ public final class ConfigHelper implements Runnable {
 		try {
 			Settings.loader.load(config.getCompound("settings"));
 		} catch (Exception e) {
-			logger.warn("Failed to load settingsManager: {}", e.getMessage());
+			logger.warn("Failed to load settings: {}", e.getMessage());
 			Settings.initDefault();
 		}
 		
 		try {
-			ProfileCollection.loader.load(config.getList("profileCollection"));
+			ProfileCollection.loader.load(config.getList("profile_collection"));
 		} catch (Exception e) {
-			logger.warn("Failed to load profileCollection: {}", e.getMessage());
+			logger.warn("Failed to load profile_collection: {}", e.getMessage());
 			ProfileCollection.init(Set.of());
 		}
 		
 		try {
-			JavaRuntimeCollection.loader.load(config.getList("javaRuntimeCollection"));
+			JavaRuntimeCollection.loader.load(config.getList("java_runtime_collection"));
 		} catch (Exception e) {
-			logger.warn("Failed to load javaRuntimeCollection: {}", e.getMessage());
+			logger.warn("Failed to load java_runtime_collection: {}", e.getMessage());
 			JavaRuntimeCollection.init(Set.of());
 		}
 		JavaRuntimeCollection.search();
+		
+		try {
+			WindowSizeManager.loader.load(config.getCompound("window_size_manager"));
+		} catch (Exception e) {
+			logger.warn("Failed to load window_size_manager: {}", e.getMessage());
+		}
 		
 		try {
 			Translation.loader.load(config.getString("translation"));
@@ -69,8 +76,9 @@ public final class ConfigHelper implements Runnable {
 	 */
 	public static void saveConfigs(CompoundTag config) {
 		config.put("settings", Settings.loader.save(null));
-		config.put("profileCollection", ProfileCollection.loader.save(ProfileCollection.instance));
-		config.put("javaRuntimeCollection", JavaRuntimeCollection.loader.save(JavaRuntimeCollection.instance));
+		config.put("profile_collection", ProfileCollection.loader.save(ProfileCollection.instance));
+		config.put("java_runtime_collection", JavaRuntimeCollection.loader.save(JavaRuntimeCollection.instance));
+		config.put("window_size_manager", WindowSizeManager.loader.save(null));
 		config.put("translation", Translation.loader.save(Translation.instance));
 	}
 	
@@ -119,9 +127,9 @@ public final class ConfigHelper implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			if (GlobalSettings.autoSaveConfigInterval > 0) {
+			if (GlobalSettings.autoSaveInterval > 0) {
 				try {
-					Thread.sleep(GlobalSettings.autoSaveConfigInterval);
+					Thread.sleep(GlobalSettings.autoSaveInterval);
 				} catch (InterruptedException e) {
 					break;
 				}

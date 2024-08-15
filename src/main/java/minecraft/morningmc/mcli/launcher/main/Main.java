@@ -66,7 +66,7 @@ public class Main extends Application {
 			launcher = Launcher.loader.load(config.getCompound("launcher"));
 		} catch (Exception e) {
 			logger.warn("Failed to load launcher: {}", e.getMessage());
-			launcher = new Launcher(LaunchOptions.DEFAULT, null, null);
+			launcher = new Launcher(LaunchOptions.defaultOptions, null, null);
 		}
 		
 		// start auto-save thread

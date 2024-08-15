@@ -1,7 +1,6 @@
 package minecraft.morningmc.mcli.launcher.settings;
 
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
@@ -15,21 +14,21 @@ public class Settings {
 	public static final NbtLoader<Void, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
-		public Void load(CompoundTag tag) throws IllegalNbtException {
+		public Void load(CompoundTag tag) {
 			try {
-				GlobalSettings.loader.load(tag.getCompound("globalSettings"));
+				GlobalSettings.loader.load(tag.getCompound("global_settings"));
 			} catch (Exception e) {
 				GlobalSettings.initDefault();
 			}
 			
 			try {
-				NetworkSettings.loader.load(tag.getCompound("networkSettings"));
+				NetworkSettings.loader.load(tag.getCompound("network_settings"));
 			} catch (Exception e) {
 				NetworkSettings.initDefault();
 			}
 			
 			try {
-				UISettings.loader.load(tag.getCompound("uiSettings"));
+				UISettings.loader.load(tag.getCompound("ui_settings"));
 			} catch (Exception e) {
 				UISettings.initDefault();
 			}
@@ -42,9 +41,9 @@ public class Settings {
 		public CompoundTag save(Void object) {
 			CompoundTag tag = new CompoundTag();
 			
-			tag.put("globalSettings", GlobalSettings.loader.save(null));
-			tag.put("networkSettings", NetworkSettings.loader.save(null));
-			tag.put("uiSettings", UISettings.loader.save(null));
+			tag.put("global_settings", GlobalSettings.loader.save(null));
+			tag.put("network_settings", NetworkSettings.loader.save(null));
+			tag.put("ui_settings", UISettings.loader.save(null));
 			
 			return tag;
 		}

@@ -11,26 +11,32 @@ public class Constants {
 		public Constants load(CompoundTag tag) {
 			Constants constants = new Constants();
 			
-			constants.edgeThickness = tag.getShort("edgeThickness").getValue();
-			constants.bottomThickness = tag.getShort("bottomThickness").getValue();
-			constants.iconSizeFactor = tag.getDouble("iconSizeFactor").getValue();
-			constants.shadowOffset = tag.getShort("shadowOffset").getValue();
+			constants.titleHeight = tag.getShort("title_height").getValue();
+			constants.edgeThickness = tag.getShort("edge_thickness").getValue();
+			constants.bottomThickness = tag.getShort("bottom_thickness").getValue();
+			constants.iconSizeFactor = tag.getDouble("icon_size_factor").getValue();
+			constants.shadowOffset = tag.getShort("shadow_offset").getValue();
 			
-			return null;
+			return constants;
 		}
 
 		@Override
 		public CompoundTag save(Constants object) {
 			CompoundTag tag = new CompoundTag();
 			
-			tag.putShort("edgeThickness", object.edgeThickness);
-			tag.putShort("bottomThickness", object.bottomThickness);
-			tag.putDouble("iconSizeFactor", object.iconSizeFactor);
-			tag.putShort("shadowOffset", object.shadowOffset);
+			tag.putShort("title_height", object.titleHeight);
+			tag.putShort("edge_thickness", object.edgeThickness);
+			tag.putShort("bottom_thickness", object.bottomThickness);
+			tag.putDouble("icon_size_factor", object.iconSizeFactor);
+			tag.putShort("shadow_offset", object.shadowOffset);
 			
 			return tag;
 		}
 	};
+	
+	// Title bar
+	/** The height of the title bar in pixel. */
+	public short titleHeight;
 	
 	// Button
 	/** The thickness of the edge of a button in pixel. */
@@ -54,6 +60,7 @@ public class Constants {
 	public static Constants initDefault() {
 		Constants constants = new Constants();
 		
+		constants.titleHeight = 48;
 		constants.edgeThickness = 3;
 		constants.bottomThickness = 6;
 		constants.iconSizeFactor = 0.5;

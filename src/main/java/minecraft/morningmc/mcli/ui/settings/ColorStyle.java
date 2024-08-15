@@ -41,14 +41,15 @@ public final class ColorStyle {
 		@Override
 		public ColorStyle load(CompoundTag tag) throws IllegalNbtException {
 			return new ColorStyle(
-					ButtonStyle.loader.load(tag.getCompound("simpleButton")),
+					ButtonStyle.loader.load(tag.getCompound("simple")),
+					ButtonStyle.loader.load(tag.getCompound("launch")),
+					ButtonStyle.loader.load(tag.getCompound("account")),
 					ButtonStyle.loader.load(tag.getCompound("background")),
 					ButtonStyle.loader.load(tag.getCompound("title")),
-					ButtonStyle.loader.load(tag.getCompound("launchButton")),
-					ButtonStyle.loader.load(tag.getCompound("accountButton")),
+					ButtonStyle.loader.load(tag.getCompound("close")),
 					NbtLoader.colorLoader.load(tag.getCompound("text")),
-					NbtLoader.colorLoader.load(tag.getCompound("textShadow")),
-					ButtonStyle.loader.load(tag.getCompound("textEntry"))
+					NbtLoader.colorLoader.load(tag.getCompound("text_shadow")),
+					ButtonStyle.loader.load(tag.getCompound("text_entry"))
 			);
 		}
 		
@@ -62,14 +63,15 @@ public final class ColorStyle {
 		public CompoundTag save(ColorStyle object) {
 			CompoundTag tag = new CompoundTag();
 			
-			tag.put("simpleButton", ButtonStyle.loader.save(object.simpleButton));
+			tag.put("simple", ButtonStyle.loader.save(object.simple));
+			tag.put("launch", ButtonStyle.loader.save(object.launch));
+			tag.put("account", ButtonStyle.loader.save(object.account));
 			tag.put("background", ButtonStyle.loader.save(object.background));
 			tag.put("title", ButtonStyle.loader.save(object.title));
-			tag.put("launchButton", ButtonStyle.loader.save(object.launchButton));
-			tag.put("accountButton", ButtonStyle.loader.save(object.accountButton));
+			tag.put("close", ButtonStyle.loader.save(object.close));
 			tag.put("text", NbtLoader.colorLoader.save(object.text));
-			tag.put("textShadow", NbtLoader.colorLoader.save(object.textShadow));
-			tag.put("textEntry", ButtonStyle.loader.save(object.textEntry));
+			tag.put("text_shadow", NbtLoader.colorLoader.save(object.textShadow));
+			tag.put("text_entry", ButtonStyle.loader.save(object.textEntry));
 			
 			return tag;
 		}
@@ -78,10 +80,11 @@ public final class ColorStyle {
 	/** The preset bright color style. */
 	public static final ColorStyle bright = new ColorStyle(
 			ButtonStyle.ofSimple(Color.rgb(208, 209, 212)),
-			ButtonStyle.ofSimple(Color.rgb(146, 146, 148)),
-			ButtonStyle.ofSimple(Color.rgb(208, 209, 212)),
 			ButtonStyle.ofSimple(Color.rgb(60, 133, 39)),
 			ButtonStyle.ofSimple(Color.rgb(115, 69, 229)),
+			ButtonStyle.ofSimple(Color.rgb(146, 146, 148)),
+			ButtonStyle.ofSimple(Color.rgb(208, 209, 212)),
+			ButtonStyle.ofSimple(Color.rgb(202, 54, 54)),
 			Color.rgb(0, 0, 0),
 			Color.rgb(0, 0, 0, 0.4),
 			ButtonStyle.ofSimple(Color.rgb(185, 186, 189))
@@ -90,20 +93,22 @@ public final class ColorStyle {
 	/** The preset dark color style. */
 	public static final ColorStyle dark = new ColorStyle(
 			ButtonStyle.ofSimple(Color.rgb(49, 50, 51)),
-			ButtonStyle.ofSimple(Color.rgb(72, 73, 74)),
-			ButtonStyle.ofSimple(Color.rgb(49, 50, 51)),
 			ButtonStyle.ofSimple(Color.rgb(60, 133, 39)),
 			ButtonStyle.ofSimple(Color.rgb(115, 69, 229)),
+			ButtonStyle.ofSimple(Color.rgb(72, 73, 74)),
+			ButtonStyle.ofSimple(Color.rgb(49, 50, 51)),
+			ButtonStyle.ofSimple(Color.rgb(202, 54, 54)),
 			Color.rgb(255, 255, 255),
 			Color.rgb(0, 0, 0, 0.4),
 			ButtonStyle.ofSimple(Color.rgb(49, 50, 51))
 	);
 	
-	public ButtonStyle simpleButton;
+	public ButtonStyle simple;
+	public ButtonStyle launch;
+	public ButtonStyle account;
 	public ButtonStyle background;
 	public ButtonStyle title;
-	public ButtonStyle launchButton;
-	public ButtonStyle accountButton;
+	public ButtonStyle close;
 	public Color text;
 	public Color textShadow;
 	public ButtonStyle textEntry;
@@ -111,28 +116,31 @@ public final class ColorStyle {
 	/**
 	 * Constructs a new {@link ColorStyle} instance with the specified styles and colors.
 	 *
-	 * @param simpleButton  The style for the simple button.
+	 * @param simple        The style for the simple button.
+	 * @param launch        The style for the launch button.
+	 * @param account       The style for the account button.
 	 * @param background    The style for the background.
 	 * @param title         The style for the title.
-	 * @param launchButton  The style for the launch button.
-	 * @param accountButton The style for the account button.
+	 * @param close         The style for the close button.
 	 * @param text          The color of the text.
 	 * @param textShadow    The color of the text shadow.
 	 * @param textEntry     The style for the text entry.
 	 */
-	public ColorStyle(ButtonStyle simpleButton,
+	public ColorStyle(ButtonStyle simple,
+	                  ButtonStyle launch,
+	                  ButtonStyle account,
 	                  ButtonStyle background,
 	                  ButtonStyle title,
-	                  ButtonStyle launchButton,
-	                  ButtonStyle accountButton,
+	                  ButtonStyle close,
 	                  Color text,
 	                  Color textShadow,
 	                  ButtonStyle textEntry) {
-		this.simpleButton = simpleButton;
+		this.simple = simple;
+		this.launch = launch;
+		this.account = account;
 		this.background = background;
 		this.title = title;
-		this.launchButton = launchButton;
-		this.accountButton = accountButton;
+		this.close = close;
 		this.text = text;
 		this.textShadow = textShadow;
 		this.textEntry = textEntry;
@@ -262,7 +270,8 @@ public final class ColorStyle {
 			private Image icon = null;
 			private String text = "";
 			private Font font = Font.getDefault();
-			private EventHandler<MouseEvent> eventHandler = event -> {};
+			private EventHandler<MouseEvent> pressHandler = event -> {};
+			private EventHandler<MouseEvent> dragHandler = event -> {};
 			
 			/**
 			 * Constructs a new {@link Renderer} instance.
@@ -317,11 +326,22 @@ public final class ColorStyle {
 			/**
 			 * Sets the event handler for the button click event.
 			 *
-			 * @param eventHandler The event handler to be set.
+			 * @param pressHandler The event handler to be set.
 			 * @return The current {@link Renderer} instance.
 			 */
-			public Renderer eventHandler(EventHandler<MouseEvent> eventHandler) {
-				this.eventHandler = eventHandler;
+			public Renderer pressHandler(EventHandler<MouseEvent> pressHandler) {
+				this.pressHandler = pressHandler;
+				return this;
+			}
+			
+			/**
+			 * Sets the event handler for the button drag event.
+			 *
+			 * @param dragHandler The event handler to be set.
+			 * @return The current {@link Renderer} instance.
+			 */
+			public Renderer dragHandler(EventHandler<MouseEvent> dragHandler) {
+				this.dragHandler = dragHandler;
 				return this;
 			}
 			
@@ -336,7 +356,8 @@ public final class ColorStyle {
 				Button button = new Button();
 				button.setPrefSize(width, height);
 				button.setOpacity(0); // the button should be hided in order to show the structure behind
-				button.setOnMouseClicked(eventHandler);
+				button.setOnMousePressed(pressHandler);
+				button.setOnMouseDragged(dragHandler);
 				
 				// basic shapes
 				Rectangle majorRect = new Rectangle(width - UISettings.constants.edgeThickness * 2, height - UISettings.constants.edgeThickness * 2 - UISettings.constants.bottomThickness, style.major);

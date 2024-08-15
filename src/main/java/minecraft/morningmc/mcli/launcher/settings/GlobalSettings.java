@@ -15,10 +15,10 @@ public final class GlobalSettings extends Settings {
 		
 		@Override
 		public Void load(CompoundTag tag) {
-			timestampFormat = tag.getString("timestampFormat").getValue();
-			maxRecommendMemory = tag.getLong("maxRecommendMemory").getValue();
-			autoSaveConfigInterval = tag.getInt("autoSaveConfigInterval").getValue();
-			easterEggs = tag.getByte("easterEggs").getValue() == 1;
+			timestampFormat = tag.getString("timestamp_format").getValue();
+			maxRecommendMemory = tag.getLong("max_recommend_memory").getValue();
+			autoSaveInterval = tag.getInt("auto_save_interval").getValue();
+			easterEggs = tag.getByte("easter_eggs").getValue() == 1;
 			
 			init();
 			return null;
@@ -28,10 +28,10 @@ public final class GlobalSettings extends Settings {
 		public CompoundTag save(Void object) {
 			CompoundTag tag = new CompoundTag();
 			
-			tag.putString("timestampFormat", timestampFormat);
-			tag.putLong("maxRecommendMemory", maxRecommendMemory);
-			tag.putInt("autoSaveConfigInterval", autoSaveConfigInterval);
-			tag.putByte("easterEggs", easterEggs ? (byte) 1 : (byte) 0);
+			tag.putString("timestamp_format", timestampFormat);
+			tag.putLong("max_recommend_memory", maxRecommendMemory);
+			tag.putInt("auto_save_interval", autoSaveInterval);
+			tag.putByte("easter_eggs", easterEggs ? (byte) 1 : (byte) 0);
 			
 			return tag;
 		}
@@ -46,7 +46,7 @@ public final class GlobalSettings extends Settings {
 	public static long maxRecommendMemory;
 	
 	/** The interval at which the auto-save is made in milliseconds, or 0 or negative to turn off. */
-	public static int autoSaveConfigInterval;
+	public static int autoSaveInterval;
 	
 	/** Whether to enable the Easter eggs. */
 	public static boolean easterEggs;
@@ -63,7 +63,7 @@ public final class GlobalSettings extends Settings {
 	public static void initDefault() {
 		timestampFormat = "yyyy-MM-dd'T'HH:mm:ss:SSSZZ";
 		maxRecommendMemory = 8192;
-		autoSaveConfigInterval = 300000;
+		autoSaveInterval = 300000;
 		easterEggs = true;
 		
 		init();
