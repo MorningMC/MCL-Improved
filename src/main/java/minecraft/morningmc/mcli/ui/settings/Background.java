@@ -1,19 +1,23 @@
 package minecraft.morningmc.mcli.ui.settings;
 
+import javafx.scene.effect.GaussianBlur;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
+
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
 
-import java.io.File;
+import java.io.*;
 
 /**
  * Represents the background settings, including the background image file, opacity, and blur level.
  *
  * @param background The file representing the background image.
  * @param opacity    The opacity of the background image, between 0 (completely transparent) and 1 (completely opaque).
- * @param blur       The blur level of the background image, between 0 (no blur) and 1 (maximum blur).
+ * @param blur       The blur radius of the background image.
  */
-public record Background(File background, double opacity, double blur) {
+public record Background(File background, double opacity, int blur) {
 	
 	/** {@link NbtLoader} for loading and saving {@link Background} objects from/to NBT data. */
 	public static final NbtLoader<Background, CompoundTag> loader = new NbtLoader<>() {
@@ -33,7 +37,7 @@ public record Background(File background, double opacity, double blur) {
 				file = null;
 			}
 			double opacity = tag.getDouble("opacity").getValue();
-			double blur = tag.getDouble("blur").getValue();
+			int blur = tag.getInt("blur").getValue();
 			
 			return of(file, opacity, blur);
 		}
@@ -52,7 +56,7 @@ public record Background(File background, double opacity, double blur) {
 				tag.putString("background", object.background.getAbsolutePath());
 			}
 			tag.putDouble("opacity", object.opacity);
-			tag.putDouble("blur", object.blur);
+			tag.putInt("blur", object.blur);
 			
 			return tag;
 		}
@@ -63,18 +67,32 @@ public record Background(File background, double opacity, double blur) {
 	 *
 	 * @param background The file representing the background image.
 	 * @param opacity    The opacity of the background image, between 0 (completely transparent) and 1 (completely opaque).
-	 * @param blur       The blur level of the background image, between 0 (no blur) and 1 (maximum blur).
+	 * @param blur       The blur radius of the background image.
 	 * @return A new {@link Background} instance with the specified settings.
-	 * @throws IllegalArgumentException if the opacity or blur values are not between 0 and 1.
+	 * @throws IllegalArgumentException if the opacity value are not between 0 and 1.
 	 */
-	public static Background of(File background, double opacity, double blur) {
+	public static Background of(File background, double opacity, int blur) {
 		if (opacity < 0 || opacity > 1) {
 			throw new IllegalArgumentException("Opacity must be between 0 and 1");
 		}
-		if (blur < 0 || blur > 1) {
-			throw new IllegalArgumentException("Blur must be between 0 and 1");
-		}
 		
 		return new Background(background, opacity, blur);
+	}
+	
+	public ImageView render(int width, int height) {
+		ImageView imageView = new ImageView();
+		
+		try {
+			Image image = new Image(new FileInputStream(background));
+			imageView.setImage(image);
+			imageView.setFitWidth(width);
+			imageView.setFitHeight(height);
+			imageView.setOpacity(opacity);
+			imageView.setEffect(new GaussianBlur(blur));
+			
+			return imageView;
+		} catch (Exception e) {
+			return imageView;
+		}
 	}
 }

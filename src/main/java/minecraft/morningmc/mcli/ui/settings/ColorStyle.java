@@ -1,5 +1,6 @@
 package minecraft.morningmc.mcli.ui.settings;
 
+import javafx.scene.Cursor;
 import minecraft.morningmc.mcli.launcher.settings.UISettings;
 import minecraft.morningmc.mcli.utils.Platform;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
@@ -270,6 +271,8 @@ public final class ColorStyle {
 			private Image icon = null;
 			private String text = "";
 			private Font font = Font.getDefault();
+			private Cursor cursor = Cursor.DEFAULT;
+			private Cursor cursorPressed = null;
 			private EventHandler<MouseEvent> clickHandler = event -> {};
 			private EventHandler<MouseEvent> pressHandler = event -> {};
 			private EventHandler<MouseEvent> dragHandler = event -> {};
@@ -325,6 +328,28 @@ public final class ColorStyle {
 			}
 			
 			/**
+			 * Sets the cursor for the button.
+			 *
+			 * @param cursor The cursor to be set.
+			 * @return The current {@link Renderer} instance.
+			 */
+			public Renderer cursor(Cursor cursor) {
+				this.cursor = cursor;
+				return this;
+			}
+			
+			/**
+			 * Sets the cursor for the button when it is pressed.
+			 *
+			 * @param cursorPressed The cursor to be set when the button is pressed.
+			 * @return The current {@link Renderer} instance.
+			 */
+			public Renderer cursorPressed(Cursor cursorPressed) {
+				this.cursorPressed = cursorPressed;
+				return this;
+			}
+			
+			/**
 			 * Sets the event handler for the button click event.
 			 *
 			 * @param clickHandler The event handler to be set.
@@ -368,8 +393,17 @@ public final class ColorStyle {
 				Button button = new Button();
 				button.setPrefSize(width, height);
 				button.setOpacity(0); // the button should be hided in order to show the structure behind
+				button.setCursor(cursor);
+				if (cursorPressed != null) {
+					button.setOnMousePressed(event -> {
+						pressHandler.handle(event);
+						button.setCursor(cursorPressed);
+					});
+					button.setOnMouseReleased(event -> button.setCursor(cursor));
+				} else {
+					button.setOnMousePressed(pressHandler);
+				}
 				button.setOnMouseClicked(clickHandler);
-				button.setOnMousePressed(pressHandler);
 				button.setOnMouseDragged(dragHandler);
 				
 				// basic shapes
