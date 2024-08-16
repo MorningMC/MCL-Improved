@@ -270,6 +270,7 @@ public final class ColorStyle {
 			private Image icon = null;
 			private String text = "";
 			private Font font = Font.getDefault();
+			private EventHandler<MouseEvent> clickHandler = event -> {};
 			private EventHandler<MouseEvent> pressHandler = event -> {};
 			private EventHandler<MouseEvent> dragHandler = event -> {};
 			
@@ -326,6 +327,17 @@ public final class ColorStyle {
 			/**
 			 * Sets the event handler for the button click event.
 			 *
+			 * @param clickHandler The event handler to be set.
+			 * @return The current {@link Renderer} instance.
+			 */
+			public Renderer clickHandler(EventHandler<MouseEvent> clickHandler) {
+				this.clickHandler = clickHandler;
+				return this;
+			}
+			
+			/**
+			 * Sets the event handler for the button press event.
+			 *
 			 * @param pressHandler The event handler to be set.
 			 * @return The current {@link Renderer} instance.
 			 */
@@ -356,13 +368,14 @@ public final class ColorStyle {
 				Button button = new Button();
 				button.setPrefSize(width, height);
 				button.setOpacity(0); // the button should be hided in order to show the structure behind
+				button.setOnMouseClicked(clickHandler);
 				button.setOnMousePressed(pressHandler);
 				button.setOnMouseDragged(dragHandler);
 				
 				// basic shapes
-				Rectangle majorRect = new Rectangle(width - UISettings.constants.edgeThickness * 2, height - UISettings.constants.edgeThickness * 2 - UISettings.constants.bottomThickness, style.major);
-				Rectangle edgeRect = new Rectangle(width, height - UISettings.constants.bottomThickness, style.edge);
-				Rectangle bottomRect = new Rectangle(width, UISettings.constants.bottomThickness, style.bottom);
+				Rectangle majorRect = new Rectangle(width - UISettings.edgeThickness * 2, height - UISettings.edgeThickness * 2 - UISettings.bottomThickness, style.major);
+				Rectangle edgeRect = new Rectangle(width, height - UISettings.bottomThickness, style.edge);
+				Rectangle bottomRect = new Rectangle(width, UISettings.bottomThickness, style.bottom);
 				
 				// text render
 				Text textView = new Text(text);
@@ -370,7 +383,7 @@ public final class ColorStyle {
 				textView.setFill(UISettings.colorStyle.getSwitch().text);
 				textView.setTextAlignment(TextAlignment.CENTER);
 				StackPane textPane = new StackPane(textView);
-				textPane.setPrefSize(width, height - UISettings.constants.bottomThickness);
+				textPane.setPrefSize(width, height - UISettings.bottomThickness);
 				
 				// text shadow render
 				Text shadowView = new Text(text);
@@ -378,20 +391,20 @@ public final class ColorStyle {
 				shadowView.setFill(UISettings.colorStyle.getSwitch().textShadow);
 				shadowView.setTextAlignment(TextAlignment.CENTER);
 				StackPane shadowPane = new StackPane(shadowView);
-				shadowPane.setPrefSize(width - UISettings.constants.shadowOffset * 2, height - UISettings.constants.shadowOffset * 2 - UISettings.constants.bottomThickness);
+				shadowPane.setPrefSize(width - UISettings.shadowOffset * 2, height - UISettings.shadowOffset * 2 - UISettings.bottomThickness);
 				
 				AnchorPane pane = new AnchorPane(edgeRect, majorRect, bottomRect, shadowPane, textPane, button);
 				pane.setPrefSize(width, height);
-				AnchorPane.setTopAnchor(majorRect, UISettings.constants.edgeThickness * 1.);
-				AnchorPane.setLeftAnchor(majorRect, UISettings.constants.edgeThickness * 1.);
-				AnchorPane.setTopAnchor(bottomRect, height - UISettings.constants.bottomThickness * 1.);
-				AnchorPane.setTopAnchor(shadowPane, UISettings.constants.shadowOffset * 2.);
-				AnchorPane.setLeftAnchor(shadowPane, UISettings.constants.shadowOffset * 2.);
+				AnchorPane.setTopAnchor(majorRect, UISettings.edgeThickness * 1.);
+				AnchorPane.setLeftAnchor(majorRect, UISettings.edgeThickness * 1.);
+				AnchorPane.setTopAnchor(bottomRect, height - UISettings.bottomThickness * 1.);
+				AnchorPane.setTopAnchor(shadowPane, UISettings.shadowOffset * 2.);
+				AnchorPane.setLeftAnchor(shadowPane, UISettings.shadowOffset * 2.);
 				
 				// icon render
 				if (icon != null) {
-					final double length = Math.min(width, height - UISettings.constants.bottomThickness);
-					final double iconSize = length * UISettings.constants.iconSizeFactor;
+					final double length = Math.min(width, height - UISettings.bottomThickness);
+					final double iconSize = length * UISettings.iconSizeFactor;
 					
 					ImageView iconView = new ImageView(icon);
 					iconView.setFitWidth(iconSize);

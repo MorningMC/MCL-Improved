@@ -88,15 +88,24 @@ public final class ConfigHelper implements Runnable {
 	public static void saveAll() {
 		logger.info("Saving configurations...");
 		
-		CompoundTag config = new CompoundTag();
-		
-		ConfigHelper.saveConfigs(config);
-		config.put("launcher", Launcher.loader.save(Main.instance.launcher));
-		
-		try {
-			new Nbt().toFile(config, FileManager.config);
-		} catch (Exception e) {
-			logger.error("Failed to save config: ", e);
+		// save config to file
+		byte retries = 0;
+		while (retries < GlobalSettings.saveConfigMaxRetries) {
+			CompoundTag config = new CompoundTag();
+			
+			ConfigHelper.saveConfigs(config);
+			config.put("launcher", Launcher.loader.save(Main.instance.launcher));
+			
+			try {
+				new Nbt().toFile(config, FileManager.config);
+				logger.info("Configuration successfully saved to file: {}", FileManager.config);
+				break;
+			} catch (Exception e) {
+				logger.warn("Failed to save config, tried {}: {}", ++retries, e.getMessage());
+			}
+		}
+		if (retries >= GlobalSettings.saveConfigMaxRetries) {
+			logger.error("Failed to save config after {} retries.", retries);
 		}
 	}
 	
