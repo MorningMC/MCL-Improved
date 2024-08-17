@@ -1,7 +1,7 @@
 package minecraft.morningmc.mcli.launcher.settings;
 
 import minecraft.morningmc.mcli.ui.settings.*;
-import minecraft.morningmc.mcli.utils.WindowSize;
+import minecraft.morningmc.mcli.minecraft.launch.options.WindowSize;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 import minecraft.morningmc.mcli.utils.containers.Enumerable;
 import minecraft.morningmc.mcli.utils.containers.Switchable;

@@ -1,12 +1,13 @@
-package minecraft.morningmc.mcli.minecraft.launch.listener;
+package minecraft.morningmc.mcli.minecraft.launch;
 
-import minecraft.morningmc.mcli.utils.annotations.LauncherProcess;
+import minecraft.morningmc.mcli.utils.annotations.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * A utility class for listening to the output streams (stdout, stderr) of a Minecraft process.
@@ -17,6 +18,7 @@ public class ProcessListener {
 	private static final Logger logger = LogManager.getLogger();
 	
 	public final Process minecraftInstance;
+	public final LaunchArguments arguments;
 	public final long processID;
 	
 	public volatile boolean running = true;
@@ -31,9 +33,11 @@ public class ProcessListener {
 	 * Constructs a {@link ProcessListener} for the given Minecraft process.
 	 *
 	 * @param minecraftInstance The Minecraft process to monitor.
+	 * @param arguments         The launch arguments for the Minecraft process.
 	 */
-	public ProcessListener(Process minecraftInstance) {
+	public ProcessListener(Process minecraftInstance, LaunchArguments arguments) {
 		this.minecraftInstance = minecraftInstance;
+		this.arguments = arguments;
 		processID = minecraftInstance.pid();
 		
 		stdOutListener = new Thread(() -> readerListener(minecraftInstance.inputReader()), "stdOutListener#" + processID);
@@ -45,9 +49,6 @@ public class ProcessListener {
 		stdErrListener.start();
 		exitChecker.start();
 		logger.info("Started listening for Minecraft instance {}", processID);
-		
-		// Add this listener to the collection of active listeners
-		ProcessListenerCollection.add(this);
 	}
 	
 	/**
@@ -92,5 +93,51 @@ public class ProcessListener {
 			logger.info("Minecraft process exited with code: {}", exitCode);
 			running = false;
 		} catch (InterruptedException ignored) {} // this will return automatically
+	}
+	
+	/**
+	 * Represents a collection of process listeners.
+	 */
+	@ObjectCollection
+	@StaticClass
+	public static class Collection {
+		public static Map<Long, ProcessListener> listeners = new ConcurrentHashMap<>();
+		
+		/**
+		 * Gets the set of process listeners in the collection.
+		 *
+		 * @return The set of process listeners.
+		 */
+		public static java.util.Collection<ProcessListener> get() {
+			return listeners.values();
+		}
+		
+		/**
+		 * Add a process listener to the collection.
+		 *
+		 * @param listener The process listener to be added.
+		 */
+		public static void add(ProcessListener listener) {
+			listeners.put(listener.processID, listener);
+		}
+		
+		/**
+		 * Remove a process listener from the collection.
+		 *
+		 * @param listener The process listener to be removed.
+		 */
+		public static void remove(ProcessListener listener) {
+			listeners.remove(listener.processID);
+		}
+		
+		/**
+		 * Resolves a process listener by process ID from the collection.
+		 *
+		 * @param pid The process ID of the process listener to be resolved.
+		 * @return The resolved process listener, or {@code null} if not found.
+		 */
+		public static ProcessListener resolve(long pid) {
+			return listeners.get(pid);
+		}
 	}
 }

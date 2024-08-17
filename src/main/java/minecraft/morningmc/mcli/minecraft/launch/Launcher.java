@@ -1,9 +1,8 @@
 package minecraft.morningmc.mcli.minecraft.launch;
 
-import minecraft.morningmc.mcli.minecraft.auth.AccountCollection;
-import minecraft.morningmc.mcli.minecraft.client.profile.Profile;
-import minecraft.morningmc.mcli.minecraft.client.profile.ProfileCollection;
-import minecraft.morningmc.mcli.minecraft.launch.listener.ProcessListener;
+import minecraft.morningmc.mcli.minecraft.auth.Account;
+import minecraft.morningmc.mcli.minecraft.client.Profile;
+import minecraft.morningmc.mcli.minecraft.launch.options.LaunchOptions;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.exceptions.LaunchException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
@@ -106,7 +105,7 @@ public class Launcher {
 	 * @throws LaunchException If there is an issue launching the Minecraft client.
 	 */
 	public ProcessListener launch() throws LaunchException {
-		return launch(ProfileCollection.resolve(profile));
+		return launch(Profile.Collection.resolve(profile));
 	}
 	
 	/**
@@ -149,7 +148,9 @@ public class Launcher {
 			throw new LaunchException("Couldn't start process", e);
 		}
 		
-		return new ProcessListener(process);
+		ProcessListener listener = new ProcessListener(process, arguments);
+		ProcessListener.Collection.add(listener);
+		return listener;
 	}
 	
 	/**
@@ -158,7 +159,7 @@ public class Launcher {
 	 * @return The generated launch arguments.
 	 */
 	public LaunchArguments generateArguments() {
-		return generateArguments(ProfileCollection.resolve(profile));
+		return generateArguments(Profile.Collection.resolve(profile));
 	}
 	
 	/**
@@ -169,6 +170,6 @@ public class Launcher {
 	 * @throws NullPointerException If the profile is null.
 	 */
 	public LaunchArguments generateArguments(Profile profile) {
-		return new LaunchArguments(profile.options.getIfEnabled(options), profile, AccountCollection.resolve(account));
+		return new LaunchArguments(profile.options.getIfEnabled(options), profile, Account.Collection.resolve(account));
 	}
 }

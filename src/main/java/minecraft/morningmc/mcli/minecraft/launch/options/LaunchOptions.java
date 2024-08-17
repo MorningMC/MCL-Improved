@@ -1,8 +1,7 @@
-package minecraft.morningmc.mcli.minecraft.launch;
+package minecraft.morningmc.mcli.minecraft.launch.options;
 
 import minecraft.morningmc.mcli.minecraft.client.MinecraftDirectory;
 import minecraft.morningmc.mcli.minecraft.java.JavaRuntime;
-import minecraft.morningmc.mcli.utils.*;
 import minecraft.morningmc.mcli.utils.containers.*;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 

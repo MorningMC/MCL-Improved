@@ -1,4 +1,4 @@
-package minecraft.morningmc.mcli.minecraft.client;
+package minecraft.morningmc.mcli.minecraft.client.version;
 
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 

@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.regex.*;
 
 /**
- * The {@link Translation} class manages language translations for the application.
+ * Manages language translations for the application.
  * It loads translation files and provides methods to retrieve translated strings.
  */
 @StaticClass

@@ -1,7 +1,7 @@
 package minecraft.morningmc.mcli.launcher.main;
 
-import minecraft.morningmc.mcli.minecraft.java.JavaRuntimeCollection;
-import minecraft.morningmc.mcli.minecraft.launch.LaunchOptions;
+import minecraft.morningmc.mcli.minecraft.java.JavaRuntime;
+import minecraft.morningmc.mcli.minecraft.launch.options.LaunchOptions;
 import minecraft.morningmc.mcli.minecraft.launch.Launcher;
 import minecraft.morningmc.mcli.ui.UIManager;
 import minecraft.morningmc.mcli.utils.FileManager;
@@ -99,7 +99,7 @@ public class Main extends Application {
 		logger.info("Stopping launcher...");
 		
 		// wait other threads to finish
-		while (JavaRuntimeCollection.isSearching()) {
+		while (JavaRuntime.Collection.isSearching()) {
 			Thread.onSpinWait();
 		}
 		

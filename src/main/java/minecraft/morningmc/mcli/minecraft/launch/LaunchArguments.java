@@ -2,7 +2,8 @@ package minecraft.morningmc.mcli.minecraft.launch;
 
 import minecraft.morningmc.mcli.minecraft.auth.Account;
 import minecraft.morningmc.mcli.minecraft.client.MinecraftDirectory;
-import minecraft.morningmc.mcli.minecraft.client.profile.Profile;
+import minecraft.morningmc.mcli.minecraft.client.Profile;
+import minecraft.morningmc.mcli.minecraft.launch.options.LaunchOptions;
 
 import java.io.File;
 import java.util.*;
@@ -14,7 +15,8 @@ import java.util.*;
  * @param profile The profile to be used.
  * @param account The account to be used.
  */
-public record LaunchArguments(LaunchOptions options, Profile profile, Account account) {
+public record LaunchArguments(
+		LaunchOptions options, Profile profile, Account account) {
 	
 	/**
 	 * Constructs a new {@link LaunchArguments} instance.

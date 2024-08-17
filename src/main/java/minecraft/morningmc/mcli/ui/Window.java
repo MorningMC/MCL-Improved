@@ -1,5 +1,6 @@
 package minecraft.morningmc.mcli.ui;
 
+import dev.dewy.nbt.tags.collection.CompoundTag;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -9,7 +10,16 @@ import javafx.stage.*;
 import minecraft.morningmc.mcli.launcher.Metadata;
 import minecraft.morningmc.mcli.launcher.settings.UISettings;
 import minecraft.morningmc.mcli.ui.settings.Background;
-import minecraft.morningmc.mcli.utils.WindowSize;
+import minecraft.morningmc.mcli.minecraft.launch.options.WindowSize;
+import minecraft.morningmc.mcli.utils.annotations.StaticClass;
+import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
+import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.*;
 
 /**
  * Represents a customizable window in the MCLI UI.
@@ -17,7 +27,7 @@ import minecraft.morningmc.mcli.utils.WindowSize;
  */
 public class Window {
 	private final Stage stage;
-	private final WindowSizeManager.Handle sizeHandle;
+	private final WindowSizeManager.Token sizeToken;
 	private double dragOffsetX;
 	private double dragOffsetY;
 	private double resizeOldX;
@@ -27,35 +37,35 @@ public class Window {
 	 * Constructs a new {@link Window} instance.
 	 *
 	 * @param stage      The {@link Stage} instance associated with this window.
-	 * @param sizeHandle The handle used to manage the window size.
+	 * @param sizeToken  The token used to manage the window size.
 	 * @param title      The title of the window.
 	 */
-	public Window(Stage stage, WindowSizeManager.Handle sizeHandle, String title) {
+	public Window(Stage stage, WindowSizeManager.Token sizeToken, String title) {
 		this.stage = stage;
-		this.sizeHandle = sizeHandle;
+		this.sizeToken = sizeToken;
 		
 		stage.setTitle(title);
 		stage.getIcons().add(UIManager.icon);
 		stage.initStyle(StageStyle.TRANSPARENT);
 		
-		resize(WindowSizeManager.get(sizeHandle));
+		resize(WindowSizeManager.get(sizeToken));
 		
-		stage.widthProperty().addListener((obs, old, ne) -> resize(WindowSizeManager.get(sizeHandle).width(ne.intValue())));
-		stage.heightProperty().addListener((obs, old, ne) -> resize(WindowSizeManager.get(sizeHandle).height(ne.intValue())));
-		stage.maximizedProperty().addListener((obs, old, ne) -> resize(WindowSizeManager.get(sizeHandle).fullScreen(ne)));
+		stage.widthProperty().addListener((obs, old, ne) -> resize(WindowSizeManager.get(sizeToken).width(ne.intValue())));
+		stage.heightProperty().addListener((obs, old, ne) -> resize(WindowSizeManager.get(sizeToken).height(ne.intValue())));
+		stage.maximizedProperty().addListener((obs, old, ne) -> resize(WindowSizeManager.get(sizeToken).fullScreen(ne)));
 		
 		stage.show();
 	}
 	
 	/**
-	 * Creates a new {@link Window} instance.
+	 * Creates a new window.
 	 *
-	 * @param sizeHandle The handle used to manage the window size.
+	 * @param sizeToken  The token used to manage the window size.
 	 * @param title      The title of the window.
 	 * @return           A new {@link Window} instance.
 	 */
-	public static Window create(WindowSizeManager.Handle sizeHandle, String title) {
-		return new Window(new Stage(), sizeHandle, title);
+	public static Window create(WindowSizeManager.Token sizeToken, String title) {
+		return new Window(new Stage(), sizeToken, title);
 	}
 	
 	/**
@@ -64,14 +74,14 @@ public class Window {
 	 * @param size the new size of the window.
 	 */
 	public void resize(WindowSize size) {
-		WindowSizeManager.set(sizeHandle, size);
+		WindowSizeManager.set(sizeToken, size);
 		
 		stage.setWidth(size.width());
 		stage.setHeight(size.height());
 		stage.setMaximized(size.fullScreen());
 		
 		// render the window
-		WindowSize currentSize = WindowSizeManager.get(sizeHandle);
+		WindowSize currentSize = WindowSizeManager.get(sizeToken);
 		
 		// render title bar
 		AnchorPane title = UISettings.colorStyle.getSwitch().title.render(currentSize.width(), UISettings.titleHeight)
@@ -110,7 +120,7 @@ public class Window {
 		// render background
 		AnchorPane background = UISettings.colorStyle.getSwitch().background.render(currentSize.width(), currentSize.height() - UISettings.titleHeight)
 				                   .build();
-		ImageView backgroundView = UISettings.background.getIfEnabled(Background.of(null, 1, 0)).render(currentSize.width(), currentSize.height() - UISettings.titleHeight);
+		ImageView backgroundView = UISettings.background.getIfEnabled(Background.of(null, 0, 0)).render(currentSize.width(), currentSize.height() - UISettings.titleHeight);
 		
 		AnchorPane root = new AnchorPane(titleBar, background, backgroundView);
 		root.setPrefSize(currentSize.width(), currentSize.height());
@@ -275,5 +285,80 @@ public class Window {
 		}
 		
 		stage.setScene(new Scene(root));
+	}
+	
+	/**
+	 * Manages different types of window sizes.
+	 */
+	@StaticClass
+	public static class WindowSizeManager {
+		private static final Logger logger = LogManager.getLogger();
+		
+		/** {@link NbtLoader} for loading and saving {@link WindowSizeManager} objects from/to NBT data. */
+		public static final NbtLoader<Void, CompoundTag> loader = new NbtLoader<>() {
+			@Override
+			public Void load(CompoundTag tag) {
+				windowSizes = new ConcurrentHashMap<>(tag.getValue().entrySet().stream()
+						                                      .flatMap(entry -> {
+																  try {
+																	  return Stream.of(Map.entry(
+																			  Token.valueOf(entry.getKey()),
+																			  WindowSize.loader.load((CompoundTag) entry.getValue())
+																	  ));
+																  } catch (IllegalNbtException e) {
+																	  logger.warn("Illegal window size: {}", e.getMessage());
+																	  return Stream.empty();
+																  }
+						                                      })
+						                                      .collect(Collectors.toMap(
+																	  Map.Entry::getKey,
+								                                      Map.Entry::getValue
+						                                      ))
+				);
+				return null;
+			}
+			
+			@Override
+			public CompoundTag save(Void object) {
+				CompoundTag tag = new CompoundTag();
+				
+				for (Map.Entry<Token, WindowSize> entry : windowSizes.entrySet()) {
+					tag.put(entry.getKey().name(), WindowSize.loader.save(entry.getValue()));
+				}
+				
+				return tag;
+			}
+		};
+		
+		/** The managed {@link WindowSize} instances. */
+		private static Map<Token, WindowSize> windowSizes = new ConcurrentHashMap<>();
+		
+		/**
+		 * Gets the {@link WindowSize} for a given handle.
+		 *
+		 * @param token The token of the window size.
+		 * @return The {@link WindowSize} for the given handle.
+		 */
+		public static WindowSize get(Token token) {
+			return windowSizes.getOrDefault(token, UISettings.defaultWindowSize);
+		}
+		
+		/**
+		 * Sets the {@link WindowSize} for a given handle.
+		 *
+		 * @param token      The token of the window size.
+		 * @param windowSize The {@link WindowSize} to be set.
+		 */
+		public static void set(Token token, WindowSize windowSize) {
+			windowSizes.put(token, windowSize);
+		}
+		
+		/**
+		 * The tokens for the windows.
+		 */
+		public enum Token {
+			/** The main window. */
+			MAIN
+		}
 	}
 }

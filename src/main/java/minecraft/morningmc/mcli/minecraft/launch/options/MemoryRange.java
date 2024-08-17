@@ -1,6 +1,7 @@
-package minecraft.morningmc.mcli.utils;
+package minecraft.morningmc.mcli.minecraft.launch.options;
 
 import minecraft.morningmc.mcli.launcher.settings.GlobalSettings;
+import minecraft.morningmc.mcli.utils.Platform;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;

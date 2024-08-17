@@ -1,4 +1,4 @@
-package minecraft.morningmc.mcli.utils;
+package minecraft.morningmc.mcli.minecraft.launch.options;
 
 import minecraft.morningmc.mcli.minecraft.client.resources.World;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
