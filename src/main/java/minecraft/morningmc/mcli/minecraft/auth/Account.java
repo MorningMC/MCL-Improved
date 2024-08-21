@@ -1,6 +1,5 @@
 package minecraft.morningmc.mcli.minecraft.auth;
 
-import dev.dewy.nbt.tags.collection.ListTag;
 import minecraft.morningmc.mcli.utils.annotations.ObjectCollection;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
@@ -8,6 +7,8 @@ import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 import minecraft.morningmc.mcli.utils.interfaces.UniqueObject;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
+import dev.dewy.nbt.tags.collection.ListTag;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,6 +33,8 @@ public record Account(String username,
                       UserType userType,
                       String xboxUserId,
                       UUID identifier) implements UniqueObject {
+	private static final Logger logger = LogManager.getLogger();
+	
 	/** {@link NbtLoader} for loading and saving {@link Account} objects from/to NBT data. */
 	public static final NbtLoader<Account, CompoundTag> loader = new NbtLoader<>() {
 
@@ -82,8 +85,6 @@ public record Account(String username,
 	@ObjectCollection
 	@StaticClass
 	public static class Collection {
-		private static final Logger logger = LogManager.getLogger();
-		
 		/** {@link NbtLoader} for loading and saving {@link Collection} objects from/to NBT data. */
 		public static final NbtLoader<Void, ListTag<CompoundTag>> loader = new NbtLoader<>() {
 			

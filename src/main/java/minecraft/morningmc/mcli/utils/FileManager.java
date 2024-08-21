@@ -1,6 +1,5 @@
 package minecraft.morningmc.mcli.utils;
 
-import minecraft.morningmc.mcli.minecraft.client.MinecraftDirectory;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 
 import java.io.*;
@@ -15,12 +14,12 @@ public class FileManager {
 	
 	/** The working root directory for MCLI. */
 	public static final File workingRoot = new File(appdata, ".mcli");
-	
-	/** The root directory for caching MCLI-related data. */
-	public static File cacheRoot = new File(workingRoot, "cache");
 
 	/** The configuration file for MCLI. */
 	public static File config = new File(workingRoot, "config.nbt");
+	
+	/** The backup configuration file for MCLI. */
+	public static File configBackup = new File(workingRoot, "config.backup.nbt");
 
 	/**
 	 * Resolves the root directory for application data.
@@ -38,36 +37,6 @@ public class FileManager {
 		} catch (Exception e) {
 			return new File(".");
 		}
-	}
-	
-	/**
-	 * Completes the required files and directories for the MCLI launcher.
-	 *
-	 * @return The number of files and directories created during the process.
-	 * @throws IOException If an I/O error occurs while creating files or directories.
-	 */
-	public static int completeFiles() throws IOException {
-		File[] directories = {
-				workingRoot,
-				cacheRoot,
-				
-				MinecraftDirectory.standard.root,
-				MinecraftDirectory.isolateRoot
-		};
-		File[] files = {
-				config
-		};
-		
-		int created = 0;
-		
-		for (File directory : directories) {
-			created = directory.mkdirs() ? 1 : 0;
-		}
-		for (File file : files) {
-			created += file.createNewFile() ? 1 : 0;
-		}
-		
-		return created;
 	}
 	
 	/**

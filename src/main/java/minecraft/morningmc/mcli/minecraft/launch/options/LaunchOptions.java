@@ -1,16 +1,19 @@
 package minecraft.morningmc.mcli.minecraft.launch.options;
 
+import minecraft.morningmc.mcli.launcher.settings.FileSettings;
 import minecraft.morningmc.mcli.minecraft.client.MinecraftDirectory;
 import minecraft.morningmc.mcli.minecraft.java.JavaRuntime;
 import minecraft.morningmc.mcli.utils.containers.*;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
+import dev.dewy.nbt.tags.primitive.StringTag;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents the options used for launching Minecraft.
@@ -47,6 +50,14 @@ public final class LaunchOptions {
 				javaArguments = defaultOptions.javaArguments;
 			}
 			
+			Map<String, String> customArgumentParameters;
+			try {
+				customArgumentParameters = tag.getCompound("custom_argument_parameters").getValue().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> ((StringTag) entry.getValue()).getValue()));
+			} catch (Exception e) {
+				logger.warn("custom_argument_parameters load failed: {}", e.getMessage());
+				customArgumentParameters = defaultOptions.customArgumentParameters;
+			}
+			
 			Switchable<String> watermark;
 			try {
 				watermark = Switchable.generateLoader(NbtLoader.stringLoader).load(tag.getCompound("watermark"));
@@ -55,9 +66,9 @@ public final class LaunchOptions {
 				watermark = defaultOptions.watermark;
 			}
 			
-			Enumerable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir;
+			Switchable<MinecraftDirectory> gameDir;
 			try {
-				gameDir = Enumerable.generateLoader(MinecraftDirectory.loader, MinecraftDirectory.Policy.class).load(tag.getCompound("game_dir"));
+				gameDir = Switchable.generateLoader(MinecraftDirectory.loader).load(tag.getCompound("game_dir"));
 			} catch (Exception e) {
 				logger.warn("game_dir load failed: {}", e.getMessage());
 				gameDir = defaultOptions.gameDir;
@@ -87,7 +98,7 @@ public final class LaunchOptions {
 				demo = defaultOptions.demo;
 			}
 			
-			return new LaunchOptions(javaRuntime, memoryRange, javaArguments, watermark, gameDir, windowSize, quickPlay, demo);
+			return new LaunchOptions(javaRuntime, memoryRange, javaArguments, customArgumentParameters, watermark, gameDir, windowSize, quickPlay, demo);
 		}
 		
 		@Override
@@ -113,6 +124,12 @@ public final class LaunchOptions {
 			}
 			
 			try {
+				tag.put("custom_argument_parameters", new CompoundTag(object.customArgumentParameters.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> new StringTag(entry.getValue())))));
+			} catch (Exception e) {
+				logger.warn("custom_argument_parameters save failed: {}", e.getMessage());
+			}
+			
+			try {
 				tag.put("watermark", Switchable.generateLoader(NbtLoader.stringLoader).save(object.watermark));
 			} catch (Exception e) {
 				logger.warn("watermark save failed: {}", e.getMessage());
@@ -120,7 +137,7 @@ public final class LaunchOptions {
 			
 			try {
 				
-				tag.put("game_dir", Enumerable.generateLoader(MinecraftDirectory.loader, MinecraftDirectory.Policy.class).save(object.gameDir));
+				tag.put("game_dir", Switchable.generateLoader(MinecraftDirectory.loader).save(object.gameDir));
 			} catch (Exception e) {
 				logger.warn("game_dir save failed: {}", e.getMessage());
 			}
@@ -152,8 +169,9 @@ public final class LaunchOptions {
 			Switchable.ofDisabled(JavaRuntime.current),
 			Switchable.ofDisabled(MemoryRange.of(2048)),
 			Switchable.ofDisabled(List.of("-XX:+UnlockExperimentalVMOptions", "-XX:+UseG1GC", "-XX:G1NewSizePercent=20", "-XX:G1ReservePercent=20", "-XX:MaxGCPauseMillis=50", "-XX:G1HeapRegionSize=32M")),
+			Map.of(),
 			Switchable.ofDisabled("MCLI"),
-			Enumerable.of(MinecraftDirectory.standard, MinecraftDirectory.Policy.STANDARD),
+			Switchable.ofDisabled(new MinecraftDirectory(FileSettings.standardRoot)),
 			WindowSize.window(1024, 768),
 			QuickPlay.none(),
 			false
@@ -162,8 +180,9 @@ public final class LaunchOptions {
 	public Switchable<JavaRuntime> javaRuntime;
 	public Switchable<MemoryRange> memoryRange;
 	public Switchable<List<String>> javaArguments;
+	public Map<String, String> customArgumentParameters;
 	public Switchable<String> watermark;
-	public Enumerable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir;
+	public Switchable<MinecraftDirectory> gameDir;
 	public WindowSize windowSize;
 	public QuickPlay quickPlay;
 	public boolean demo;
@@ -171,26 +190,29 @@ public final class LaunchOptions {
 	/**
 	 * Constructs a new {@link LaunchOptions} object with the specified options.
 	 *
-	 * @param javaRuntime   The {@link Switchable} object for Java runtime.
-	 * @param memoryRange   The {@link Switchable} object for memory range.
-	 * @param javaArguments The {@link Switchable} object for Java arguments.
-	 * @param watermark     The {@link Switchable} object for watermark.
-	 * @param gameDir       The {@link Enumerable} object for the game directory.
-	 * @param windowSize    The window size.
-	 * @param quickPlay     The Quick Play info.
-	 * @param demo          Whether to run in demo mode.
+	 * @param javaRuntime              The {@link Switchable} object for Java runtime.
+	 * @param memoryRange              The {@link Switchable} object for memory range.
+	 * @param javaArguments            The {@link Switchable} object for Java arguments.
+	 * @param customArgumentParameters The custom argument parameters.
+	 * @param watermark                The {@link Switchable} object for watermark.
+	 * @param gameDir                  The {@link Switchable} object for the game directory.
+	 * @param windowSize               The window size.
+	 * @param quickPlay                The Quick Play info.
+	 * @param demo                     Whether to run in demo mode.
 	 */
 	public LaunchOptions(Switchable<JavaRuntime> javaRuntime,
 	                     Switchable<MemoryRange> memoryRange,
 	                     Switchable<List<String>> javaArguments,
+						 Map<String, String> customArgumentParameters,
 	                     Switchable<String> watermark,
-	                     Enumerable<MinecraftDirectory, MinecraftDirectory.Policy> gameDir,
+	                     Switchable<MinecraftDirectory> gameDir,
 	                     WindowSize windowSize,
 	                     QuickPlay quickPlay,
 	                     boolean demo) {
 		this.javaRuntime = javaRuntime;
 		this.memoryRange = memoryRange;
 		this.javaArguments = javaArguments;
+		this.customArgumentParameters = customArgumentParameters;
 		this.watermark = watermark;
 		this.gameDir = gameDir;
 		this.windowSize = windowSize;

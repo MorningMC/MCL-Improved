@@ -5,6 +5,8 @@ import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
 
+import java.text.SimpleDateFormat;
+
 /**
  * Represents the global settings.
  */
@@ -15,7 +17,7 @@ public final class GlobalSettings extends Settings {
 		
 		@Override
 		public Void load(CompoundTag tag) {
-			timestampFormat = tag.getString("timestamp_format").getValue();
+			timestampFormat = new SimpleDateFormat(tag.getString("timestamp_format").getValue());
 			maxRecommendMemory = tag.getLong("max_recommend_memory").getValue();
 			autoSaveInterval = tag.getInt("auto_save_interval").getValue();
 			saveConfigMaxRetries = tag.getByte("save_config_max_retries").getValue();
@@ -29,7 +31,7 @@ public final class GlobalSettings extends Settings {
 		public CompoundTag save(Void object) {
 			CompoundTag tag = new CompoundTag();
 			
-			tag.putString("timestamp_format", timestampFormat);
+			tag.putString("timestamp_format", timestampFormat.toPattern());
 			tag.putLong("max_recommend_memory", maxRecommendMemory);
 			tag.putInt("auto_save_interval", autoSaveInterval);
 			tag.putByte("save_config_max_retries", saveConfigMaxRetries);
@@ -41,7 +43,7 @@ public final class GlobalSettings extends Settings {
 	
 	// Formats
 	/** The format of the timestamp. */
-	public static String timestampFormat;
+	public static SimpleDateFormat timestampFormat;
 	
 	// Miscellaneous
 	/** The maximum recommended memory in MB. */
@@ -66,7 +68,7 @@ public final class GlobalSettings extends Settings {
 	 * Initializes the {@link GlobalSettings} in default.
 	 */
 	public static void initDefault() {
-		timestampFormat = "yyyy-MM-dd'T'HH:mm:ss:SSSZZ";
+		timestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZ");
 		maxRecommendMemory = 8192;
 		autoSaveInterval = 300000;
 		saveConfigMaxRetries = 3;

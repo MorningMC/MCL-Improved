@@ -1,5 +1,6 @@
 package minecraft.morningmc.mcli.minecraft.launch;
 
+import minecraft.morningmc.mcli.launcher.settings.FileSettings;
 import minecraft.morningmc.mcli.minecraft.auth.Account;
 import minecraft.morningmc.mcli.minecraft.client.MinecraftDirectory;
 import minecraft.morningmc.mcli.minecraft.client.Profile;
@@ -15,8 +16,7 @@ import java.util.*;
  * @param profile The profile to be used.
  * @param account The account to be used.
  */
-public record LaunchArguments(
-		LaunchOptions options, Profile profile, Account account) {
+public record LaunchArguments(LaunchOptions options, Profile profile, Account account) {
 	
 	/**
 	 * Constructs a new {@link LaunchArguments} instance.
@@ -25,7 +25,7 @@ public record LaunchArguments(
 	 * @param profile The profile to be used.
 	 * @param account The account to be used.
 	 *
-	 * @throws NullPointerException If any of the arguments are null.
+	 * @throws NullPointerException If any of the parameters are {@code null}.
 	 */
 	public LaunchArguments(LaunchOptions options, Profile profile, Account account) {
 		this.options = Objects.requireNonNull(options);
@@ -48,12 +48,7 @@ public record LaunchArguments(
 	 * @return The directory for the Minecraft client.
 	 */
 	public MinecraftDirectory getDirectory() {
-		MinecraftDirectory directory = options.gameDir.getSwitch((value, policy) -> switch (policy) {
-			case ISOLATED -> new MinecraftDirectory(new File(MinecraftDirectory.isolateRoot, profile.identifier().toString()));
-			case CUSTOM -> value;
-			default -> MinecraftDirectory.standard;
-		});
-		
+		MinecraftDirectory directory = options.gameDir.getIfEnabled(new MinecraftDirectory(new File(FileSettings.isolateRoot, profile.identifier().toString())));
 		directory.root.mkdirs();
 		return directory;
 	}

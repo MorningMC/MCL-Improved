@@ -34,9 +34,6 @@ public class MinecraftDirectory {
 		}
 	};
 	
-	public static final MinecraftDirectory standard = new MinecraftDirectory(new File(FileManager.appdata, ".minecraft"));
-	public static final File isolateRoot = new File(standard.root, "isolate");
-	
 	public final File root;
 	public Set<Modification> mods = Collections.newSetFromMap(new ConcurrentHashMap<>());
 	
@@ -70,12 +67,5 @@ public class MinecraftDirectory {
 					})
 					.forEach(mods::add);
 		} catch (Exception ignored) {}
-	}
-	
-	/**
-	 * Enumerates the directory structure for the specified policy.
-	 */
-	public enum Policy {
-		STANDARD, ISOLATED, CUSTOM
 	}
 }

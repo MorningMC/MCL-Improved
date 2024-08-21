@@ -204,12 +204,7 @@ public class Modification {
 						boolean showAsResourcePack = toml.getBoolean("showAsResourcePack", false);
 						Set<String> usedServices = new HashSet<>(toml.getList("services", List.of()));
 						Map<String, String> properties = Optional.ofNullable(toml.getTable("properties"))
-								                                 .map(p -> p.toMap().keySet().stream()
-										                                           .collect(Collectors.toMap(
-																						   "${file.%s}"::formatted,
-												                                           p::getString
-										                                           ))
-								                                 )
+								                                 .map(p -> p.toMap().keySet().stream().collect(Collectors.toMap("${file.%s}"::formatted, p::getString)))
 								                                 .orElseGet(HashMap::new);
 						properties.put("${file.jarVersion}", Optional.ofNullable(jarFile.getManifest().getMainAttributes().getValue("Implementation-Version")).orElse("0.0NONE"));
 						URL issueTracker = Requester.newURL(toml.getString("issueTrackerURL"));
@@ -227,10 +222,7 @@ public class Modification {
 							boolean iconBlur = mods.getBoolean("logoBlur", true);
 							Map<String, String> contributors = Arrays.stream(mods.getString("authors", "").split(","))
 									                                   .map(String::trim)
-									                                   .collect(Collectors.toMap(
-																			   contributor -> contributor,
-											                                   ignored -> "Developer"
-									                                   ));
+									                                   .collect(Collectors.toMap(contributor -> contributor, ignored -> "Developer"));
 							String credits = mods.getString("credits", "");
 							Environment environment = Environment.parseDisplayTest(mods.getString("displayTest", "MATCH_VERSION"));
 							
@@ -274,12 +266,7 @@ public class Modification {
 						boolean showAsDataPack = toml.getBoolean("showAsDataPack", false);
 						Set<String> usedServices = new HashSet<>(toml.getList("services", List.of()));
 						Map<String, String> properties = Optional.ofNullable(toml.getTable("properties"))
-								                                 .map(p -> p.toMap().keySet().stream()
-										                                           .collect(Collectors.toMap(
-												                                           "${file.%s}"::formatted,
-												                                           p::getString
-										                                           ))
-								                                 )
+								                                 .map(p -> p.toMap().keySet().stream().collect(Collectors.toMap("${file.%s}"::formatted, p::getString)))
 								                                 .orElseGet(HashMap::new);
 						properties.put("${file.jarVersion}", Optional.ofNullable(jarFile.getManifest().getMainAttributes().getValue("Implementation-Version")).orElse("0.0NONE"));
 						URL issueTracker = Requester.newURL(toml.getString("issueTrackerURL"));
@@ -297,10 +284,7 @@ public class Modification {
 							boolean iconBlur = mods.getBoolean("logoBlur", true);
 							Map<String, String> contributors = Arrays.stream(mods.getString("authors", "").split(","))
 									                                   .map(String::trim)
-									                                   .collect(Collectors.toMap(
-											                                   contributor -> contributor,
-											                                   ignored -> "Developer"
-									                                   ));
+									                                   .collect(Collectors.toMap(contributor -> contributor, ignored -> "Developer"));
 							String credits = mods.getString("credits", "");
 
 							// parse dependencies
@@ -344,10 +328,7 @@ public class Modification {
 						String icon = json.get("icon").getAsString();
 						Map<String, String> contributors = json.getAsJsonArray("authors").asList().stream()
 								                                   .map(JsonElement::getAsString)
-								                                   .collect(Collectors.toMap(
-										                                   contributor -> contributor,
-										                                   ignored -> "Developer"
-								                                   ));
+								                                   .collect(Collectors.toMap(contributor -> contributor, ignored -> "Developer"));
 						Map<String, URL> contact = json.getAsJsonObject("contact").entrySet().stream()
 								                           .flatMap(e -> {
 									                           try {
@@ -359,10 +340,7 @@ public class Modification {
 										                           return Stream.empty();
 									                           }
 								                           })
-								                           .collect(Collectors.toMap(
-																   Map.Entry::getKey,
-										                           Map.Entry::getValue
-								                           ));
+								                           .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 						String license = json.get("license").getAsString();
 						Environment environment = json.get("environment").getAsString().equals("*") ? Environment.BOTH : Environment.valueOf(json.get("environment").getAsString().toUpperCase());
 						Map<String, Set<String>> entrypoints = json.getAsJsonObject("entrypoints").entrySet().stream()
@@ -420,11 +398,7 @@ public class Modification {
 						JsonObject metadata = quilt.getAsJsonObject("metadata");
 						String name = metadata.get("name").getAsString();
 						String description = metadata.get("description").getAsString();
-						Map<String, String> contributors = metadata.getAsJsonObject("authors").entrySet().stream()
-								                                   .collect(Collectors.toMap(
-																		   Map.Entry::getKey,
-										                                   e -> e.getValue().getAsString()
-								                                   ));
+						Map<String, String> contributors = metadata.getAsJsonObject("authors").entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getAsString()));
 						Map<String, URL> contact = metadata.getAsJsonObject("contact").entrySet().stream()
 								                           .flatMap(e -> {
 									                           try {
@@ -436,10 +410,7 @@ public class Modification {
 										                           return Stream.empty();
 									                           }
 								                           })
-								                           .collect(Collectors.toMap(
-										                           Map.Entry::getKey,
-										                           Map.Entry::getValue
-								                           ));
+								                           .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 						String icon = metadata.get("icon").getAsString();
 						// end of the "metadata" entry
 						

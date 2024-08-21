@@ -63,29 +63,25 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 		ProcessBuilder builder = new ProcessBuilder(path.getAbsolutePath(), "-XshowSettings:properties", "-version");
 		builder.redirectErrorStream(true);
 		
-		String content;
 		try {
 			Process process = builder.start();
-			content = new String(process.getInputStream().readAllBytes());
+			String content = new String(process.getInputStream().readAllBytes());
 			
-		} catch (Exception e) {
-			throw new IllegalJavaException(path, e);
-		}
-		
-		if (!content.contains("java") && !content.contains("sun")) {
-			throw new IllegalJavaException(path);
-		}
-		
-		try {
+			// check whether the executable is a valid java runtime
+			if (!content.contains("Property settings:") || !content.contains("Runtime Environment")) {
+				throw new IllegalStateException();
+			}
+			
 			// parse version
 			String versionString = Objects.requireNonNull(getProperty(content, "java.version"));
 			if (versionString.startsWith("1.")) {
-				versionString = versionString.substring(2);
+				// in some cases, the version number has an extra "1." at the beginning
+				versionString = versionString.substring(2); // filter out the extra "1."
 			}
 			
 			return new JavaRuntime(
 					path,
-					Runtime.Version.parse(versionString.replace("_", ".")),
+					Runtime.Version.parse(versionString.replace("_", ".")), // some version number separates the update number and the patch number with "_" instead of "."
 					new Platform(
 							Platform.OperatingSystem.infer(getProperty(content, "os.name")),
 							Platform.Architecture.infer(getProperty(content, "sun.arch.data.model"), getProperty(content, "os.arch")),
@@ -109,21 +105,6 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	 */
 	public static JavaRuntime fromHome(File home) throws IllegalJavaException {
 		return fromPath(new File(home, "bin/" + executableName));
-	}
-	
-	/**
-	 * Refreshes the {@link JavaRuntime} instance to check for changes.
-	 *
-	 * @return The refreshed {@link JavaRuntime} instance, or {@code null} if no changes were detected.
-	 * @throws IllegalJavaException If an error occurs during Java version retrieval or the executable is illegal.
-	 */
-	public JavaRuntime refresh() throws IllegalJavaException {
-		JavaRuntime newRuntime = fromPath(executable);
-		
-		if (this.compareTo(newRuntime) != 0) {
-			return newRuntime;
-		}
-		return null;
 	}
 	
 	/**
@@ -151,6 +132,21 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 		Matcher matcher = Pattern.compile(key.replace(".", "\\.") + " = (?<value>.*)").matcher(content);
 		if (matcher.find()) {
 			return matcher.group("value");
+		}
+		return null;
+	}
+	
+	/**
+	 * Refreshes the {@link JavaRuntime} instance to check for changes.
+	 *
+	 * @return The refreshed {@link JavaRuntime} instance, or {@code null} if no changes were detected.
+	 * @throws IllegalJavaException If an error occurs during Java version retrieval or the executable is illegal.
+	 */
+	public JavaRuntime refresh() throws IllegalJavaException {
+		JavaRuntime newRuntime = fromPath(executable);
+		
+		if (this.compareTo(newRuntime) != 0) {
+			return newRuntime;
 		}
 		return null;
 	}
@@ -190,8 +186,6 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	@ObjectCollection
 	@StaticClass
 	public static class Collection implements Runnable {
-		private static final Logger logger = LogManager.getLogger();
-		
 		/** {@link NbtLoader} for loading and saving {@link Collection} objects from/to NBT data. */
 		public static final NbtLoader<Void, ListTag<StringTag>> loader = new NbtLoader<>() {
 			
@@ -234,7 +228,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 			}
 		};
 		@SuppressWarnings("unchecked")
-		private static final Comparator<JavaRuntime> comparator = ((Comparator<JavaRuntime>) Comparator.reverseOrder()).thenComparingInt(JavaRuntime::hashCode);
+		private static final Comparator<JavaRuntime> comparator = ((Comparator<JavaRuntime>) Comparator.reverseOrder()).thenComparing(runtime -> runtime.executable.getAbsolutePath());
 		
 		private static final Set<JavaRuntime> runtimes = new TreeSet<>(comparator);
 		private static Thread thread = null;
@@ -316,6 +310,8 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 					// 3. PATH
 					
 					// System-defined locations
+					logger.debug("Searching in system-defined locations...");
+					
 					switch (Platform.current.operatingSystem()) {
 						case WINDOWS -> {
 							potentialRuntimes.addAll(queryJavaHomesInRegistryKey("HKEY_LOCAL_MACHINE\\SOFTWARE\\JavaSoft\\Java Runtime Environment\\"));
@@ -368,6 +364,8 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 					}
 					
 					// Minecraft-installed locations
+					logger.debug("Searching in Minecraft-installed locations...");
+					
 					Set<File> minecraftLocations = new HashSet<>();
 					switch (Platform.current.operatingSystem()) {
 						case WINDOWS -> {
@@ -412,6 +410,8 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 							.forEach(potentialRuntimes::add);
 					
 					// PATH
+					logger.debug("Searching in PATH...");
+					
 					try {
 						Arrays.stream(System.getenv("PATH").split(Platform.current.pathSeparator()))
 								.parallel()

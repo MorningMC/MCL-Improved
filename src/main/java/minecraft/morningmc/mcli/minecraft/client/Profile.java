@@ -24,6 +24,8 @@ import java.util.stream.*;
  * Represents a Minecraft profile, storing information such as name, icon, version, launch options, etc.
  */
 public final class Profile implements UniqueObject {
+	private static final Logger logger = LogManager.getLogger();
+	
 	/** {@link NbtLoader} for loading and saving {@link Profile} objects from/to NBT data. */
 	public static final NbtLoader<Profile, CompoundTag> loader = new NbtLoader<>() {
 		
@@ -113,8 +115,6 @@ public final class Profile implements UniqueObject {
 	@ObjectCollection
 	@StaticClass
 	public static class Collection {
-		private static final Logger logger = LogManager.getLogger();
-		
 		/** {@link NbtLoader} for loading and saving {@link Collection} objects from/to NBT data. */
 		public static final NbtLoader<Void, ListTag<CompoundTag>> loader = new NbtLoader<>() {
 			

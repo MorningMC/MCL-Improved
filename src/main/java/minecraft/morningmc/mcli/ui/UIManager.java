@@ -20,6 +20,6 @@ public class UIManager {
 	 * @param mainStage the main stage of the launcher.
 	 */
 	public UIManager(Stage mainStage) {
-		mainWindow = new Window(mainStage, Window.WindowSizeManager.Token.MAIN, Metadata.fullName);
+		mainWindow = new Window(mainStage, Window.SizeManager.Token.MAIN, Metadata.fullName);
 	}
 }

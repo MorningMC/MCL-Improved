@@ -15,7 +15,10 @@ import org.apache.logging.log4j.Logger;
 import dev.dewy.nbt.Nbt;
 import dev.dewy.nbt.tags.collection.CompoundTag;
 
-import java.io.IOException;
+import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 /**
  * The Main class represents the main entry point for the Minecraft launcher application.
@@ -41,13 +44,26 @@ public class Main extends Application {
 		
 		logger.info("Initializing launcher...");
 		
-		// complete files
-		try {
-			int created = FileManager.completeFiles();
-			logger.debug("Completed {} files.", created);
+		if (FileManager.config.exists()) {
+			// backup config
+			logger.info("Config found! Backing up config...");
 			
-		} catch (IOException e) {
-			logger.error("Complete files failed: ", e);
+			try {
+				FileManager.configBackup.createNewFile();
+				try (InputStream in = new FileInputStream(FileManager.config); OutputStream out = new FileOutputStream(FileManager.configBackup)) {
+					in.transferTo(out);
+				}
+			} catch (Exception e) {
+				logger.warn("Failed to backup config: {}", e.getMessage());
+			}
+			
+		} else {
+			// try complete config
+			try {
+				FileManager.config.createNewFile();
+			} catch (IOException e) {
+				logger.error("Failed to complete config file: ", e);
+			}
 		}
 		
 		// load config

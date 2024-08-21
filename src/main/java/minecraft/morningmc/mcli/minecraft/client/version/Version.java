@@ -1,12 +1,33 @@
 package minecraft.morningmc.mcli.minecraft.client.version;
 
+import minecraft.morningmc.mcli.launcher.networking.download.DownloadInfo;
+import minecraft.morningmc.mcli.minecraft.client.version.libraries.Library;
+import minecraft.morningmc.mcli.utils.Conditional;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.primitive.StringTag;
 
+import java.util.*;
+
 public record Version(String version,
-                      Type type,
-                      String mainClass) {
+					  List<Conditional<String>> javaArguments,
+					  List<Conditional<String>> gameArguments,
+					  String assets,
+					  DownloadInfo assetIndex,
+					  DownloadInfo client,
+					  DownloadInfo clientMappings,
+					  DownloadInfo server,
+					  DownloadInfo serverMappings,
+					  String id,
+					  int javaVersion,
+					  Set<Conditional<Library>> libraries,
+					  String loggingType,
+					  DownloadInfo loggingFile,
+					  String loggingArgument,
+					  String mainClass,
+					  Date releaseTime,
+					  Date time,
+                      Type type) {
 	/** {@link NbtLoader} for loading and saving {@link Version} objects from/to NBT data. */
 	public static final NbtLoader<Version, StringTag> loader = new NbtLoader<>() {
 		
@@ -26,6 +47,6 @@ public record Version(String version,
 	}
 	
 	public enum Type {
-		RELEASE, SNAPSHOT, CUSTOM
+		RELEASE, SNAPSHOT, ALPHA, BETA, CUSTOM
 	}
 }

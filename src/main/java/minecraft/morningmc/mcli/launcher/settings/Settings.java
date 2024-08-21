@@ -22,6 +22,12 @@ public class Settings {
 			}
 			
 			try {
+				FileSettings.loader.load(tag.getCompound("file_settings"));
+			} catch (Exception e) {
+				FileSettings.initDefault();
+			}
+			
+			try {
 				NetworkSettings.loader.load(tag.getCompound("network_settings"));
 			} catch (Exception e) {
 				NetworkSettings.initDefault();
@@ -42,6 +48,7 @@ public class Settings {
 			CompoundTag tag = new CompoundTag();
 			
 			tag.put("global_settings", GlobalSettings.loader.save(null));
+			tag.put("file_settings", FileSettings.loader.save(null));
 			tag.put("network_settings", NetworkSettings.loader.save(null));
 			tag.put("ui_settings", UISettings.loader.save(null));
 			
@@ -60,6 +67,7 @@ public class Settings {
 	 */
 	public static void initDefault() {
 		GlobalSettings.initDefault();
+		FileSettings.initDefault();
 		NetworkSettings.initDefault();
 		UISettings.initDefault();
 		

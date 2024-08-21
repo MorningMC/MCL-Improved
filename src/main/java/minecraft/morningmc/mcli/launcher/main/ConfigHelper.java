@@ -16,6 +16,7 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.*;
 import java.util.*;
 
 /**
@@ -56,7 +57,7 @@ public final class ConfigHelper implements Runnable {
 		JavaRuntime.Collection.search();
 		
 		try {
-			Window.WindowSizeManager.loader.load(config.getCompound("window_size_manager"));
+			Window.SizeManager.loader.load(config.getCompound("window_size_manager"));
 		} catch (Exception e) {
 			logger.warn("Failed to load window_size_manager: {}", e.getMessage());
 		}
@@ -78,7 +79,7 @@ public final class ConfigHelper implements Runnable {
 		config.put("settings", Settings.loader.save(null));
 		config.put("profile_collection", Profile.Collection.loader.save(null));
 		config.put("java_runtime_collection", JavaRuntime.Collection.loader.save(null));
-		config.put("window_size_manager", Window.WindowSizeManager.loader.save(null));
+		config.put("window_size_manager", Window.SizeManager.loader.save(null));
 		config.put("translation", Translation.loader.save(Translation.instance));
 	}
 	
@@ -106,6 +107,17 @@ public final class ConfigHelper implements Runnable {
 		}
 		if (retries >= GlobalSettings.saveConfigMaxRetries) {
 			logger.error("Failed to save config after {} retries.", retries);
+			
+			// revert to config.backup.nbt
+			if (FileManager.configBackup.exists()) {
+				logger.info("Backup file found! reverting...");
+				
+				try (InputStream in = new FileInputStream(FileManager.configBackup); OutputStream out = new FileOutputStream(FileManager.config)) {
+					in.transferTo(out);
+				} catch (Exception e) {
+					logger.error("Failed to revert to backup: ", e);
+				}
+			}
 		}
 	}
 	
@@ -142,7 +154,6 @@ public final class ConfigHelper implements Runnable {
 				} catch (InterruptedException e) {
 					break;
 				}
-				
 				saveAll();
 				
 			} else {
