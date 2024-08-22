@@ -134,7 +134,6 @@ public class Modification {
 	 * Represents the information of a mod.
 	 *
 	 * @param lowcode            Whether the mod is lowcode or not. <i>Forge and NeoForge only.</i>
-	 * @param schemaVersion      The schema version of the mod, or {@code 0} if not supported. <i>Fabric and Quilt only.</i>
 	 * @param fmlVersion         The acceptable version range of the Forge Mod Loader, expressed as a <a href="https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html">Maven Version Range</a>. <i>Forge and NeoForge only.</i>
 	 * @param modID              The mod identifier.
 	 * @param version            The version of the mod.
@@ -158,7 +157,6 @@ public class Modification {
 	 * @param mixins             The mixins of the mod. <i>Fabric and Quilt only.</i>
 	 */
 	public record Info(boolean lowcode,
-	                   int schemaVersion,
 					   String fmlVersion,
 	                   String modID,
 	                   String version,
@@ -247,7 +245,7 @@ public class Modification {
 							}
 							
 							logger.trace("Parsed Forge mod info: {}", modID);
-							infos.add(new Info(lowcode, 0, fmlVersion, modID, version, name, description, icon, parseIconImage(jarFile, icon), iconBlur, contributors, null, contact, license, credits, environment, showAsResourcePack, false, usedServices, Map.of(), dependencies, null, Set.of()));
+							infos.add(new Info(lowcode, fmlVersion, modID, version, name, description, icon, parseIconImage(jarFile, icon), iconBlur, contributors, null, contact, license, credits, environment, showAsResourcePack, false, usedServices, Map.of(), dependencies, null, Set.of()));
 						}
 					} catch (Exception e) {
 						logger.warn("Failed to parse Forge mod info for file {}: {}", file.getAbsolutePath(), e.getMessage());
@@ -308,7 +306,7 @@ public class Modification {
 							}
 
 							logger.trace("Parsed NeoForge mod info: {}", modID);
-							infos.add(new Info(lowcode, 0, fmlVersion, modID, version, name, description, icon, parseIconImage(jarFile, icon), iconBlur, contributors, null, contact, license, credits, Environment.UNKNOWN, showAsResourcePack, showAsDataPack, usedServices, Map.of(), dependencies, null, Set.of()));
+							infos.add(new Info(lowcode, fmlVersion, modID, version, name, description, icon, parseIconImage(jarFile, icon), iconBlur, contributors, null, contact, license, credits, Environment.UNKNOWN, showAsResourcePack, showAsDataPack, usedServices, Map.of(), dependencies, null, Set.of()));
 						}
 					} catch (Exception e) {
 						logger.warn("Failed to parse NeoForge mod info for file {}: {}", file.getAbsolutePath(), e.getMessage());
@@ -320,11 +318,10 @@ public class Modification {
 					try (InputStream in = getJarInputStream(jarFile, "fabric.mod.json")) {
 						JsonObject json = JsonParser.parseReader(FileManager.getReader(in)).getAsJsonObject();
 						
-						int schemaVersion = json.get("schemaVersion").getAsInt();
 						String modID = json.get("id").getAsString();
 						String version = json.get("version").getAsString();
-						String name = json.get("name").getAsString();
-						String description = json.get("description").getAsString();
+						String name = Optional.ofNullable(json.get("name").getAsString()).orElse(modID);
+						String description = Optional.ofNullable(json.get("description").getAsString()).orElse("");
 						String icon = json.get("icon").getAsString();
 						Map<String, String> contributors = json.getAsJsonArray("authors").asList().stream()
 								                                   .map(JsonElement::getAsString)
@@ -342,7 +339,7 @@ public class Modification {
 								                           })
 								                           .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 						String license = json.get("license").getAsString();
-						Environment environment = json.get("environment").getAsString().equals("*") ? Environment.BOTH : Environment.valueOf(json.get("environment").getAsString().toUpperCase());
+						Environment environment = Optional.ofNullable(json.get("environment").getAsString()).orElse("*").equals("*") ? Environment.BOTH : Environment.valueOf(json.get("environment").getAsString().toUpperCase());
 						Map<String, Set<String>> entrypoints = json.getAsJsonObject("entrypoints").entrySet().stream()
 								                                       .collect(Collectors.toMap(
 										                                       Map.Entry::getKey,
@@ -355,27 +352,14 @@ public class Modification {
 						
 						// parse dependencies
 						Set<Dependency> dependencies = new HashSet<>();
-						for (Map.Entry<String, JsonElement> dependency : json.getAsJsonObject("depends").entrySet()) {
-							dependencies.add(new Dependency(
-									dependency.getKey(),
-									dependency.getValue().getAsString(),
-									Dependency.Type.REQUIRED,
-									Dependency.Ordering.NONE,
-									Environment.UNKNOWN
-							));
-						}
-						for (Map.Entry<String, JsonElement> recommendations : json.getAsJsonObject("recommends").entrySet()) {
-							dependencies.add(new Dependency(
-									recommendations.getKey(),
-									recommendations.getValue().getAsString(),
-									Dependency.Type.OPTIONAL,
-									Dependency.Ordering.NONE,
-									Environment.UNKNOWN
-							));
-						}
+						dependencies.addAll(Dependency.parseFabric(json.getAsJsonObject("depends"), Dependency.Type.REQUIRED));
+						dependencies.addAll(Dependency.parseFabric(json.getAsJsonObject("recommends"), Dependency.Type.RECOMMENDS));
+						dependencies.addAll(Dependency.parseFabric(json.getAsJsonObject("suggests"), Dependency.Type.OPTIONAL));
+						dependencies.addAll(Dependency.parseFabric(json.getAsJsonObject("conflicts"), Dependency.Type.CONFLICTS));
+						dependencies.addAll(Dependency.parseFabric(json.getAsJsonObject("breaks"), Dependency.Type.INCOMPATIBLE));
 						
 						logger.trace("Parsed Fabric mod info: {}", modID);
-						infos.add(new Info(false, schemaVersion, null, modID, version, name, description, icon, parseIconImage(jarFile, icon), false, contributors, null, contact, license, null, environment, false, false, Set.of(), entrypoints, dependencies, accessWidener, mixins));
+						infos.add(new Info(false, null, modID, version, name, description, icon, parseIconImage(jarFile, icon), false, contributors, null, contact, license, null, environment, false, false, Set.of(), entrypoints, dependencies, accessWidener, mixins));
 					} catch (Exception e) {
 						logger.warn("Failed to parse Fabric mod info for file {}: {}", file.getAbsolutePath(), e.getMessage());
 					}
@@ -385,8 +369,6 @@ public class Modification {
 				if (loaders.contains(Loader.QUILT)) {
 					try (InputStream in = getJarInputStream(jarFile, "quilt.mod.json")) {
 						JsonObject json = JsonParser.parseReader(FileManager.getReader(in)).getAsJsonObject();
-						
-						int schemaVersion = json.get("schema_version").getAsInt();
 						
 						// parse entries that warped in the "quilt_loader" entry
 						JsonObject quilt = json.getAsJsonObject("quilt_loader");
@@ -424,30 +406,17 @@ public class Modification {
 						
 						// parse dependencies
 						Set<Dependency> dependencies = new HashSet<>();
-						for (JsonElement dependency : quilt.getAsJsonArray("depends").asList()) {
-							dependencies.add(new Dependency(
-									dependency.getAsString(),
-									null,
-									Dependency.Type.REQUIRED,
-									Dependency.Ordering.NONE,
-									Environment.UNKNOWN
-							));
-						}
-						for (JsonElement recommendations : quilt.getAsJsonArray("recommends").asList()) {
-							dependencies.add(new Dependency(
-									recommendations.getAsString(),
-									null,
-									Dependency.Type.OPTIONAL,
-									Dependency.Ordering.NONE,
-									Environment.UNKNOWN
-							));
-						}
+						dependencies.addAll(Dependency.parseQuilt(quilt.getAsJsonArray("depends"), Dependency.Type.REQUIRED));
+						dependencies.addAll(Dependency.parseQuilt(quilt.getAsJsonArray("recommends"), Dependency.Type.RECOMMENDS));
+						dependencies.addAll(Dependency.parseQuilt(quilt.getAsJsonArray("suggests"), Dependency.Type.OPTIONAL));
+						dependencies.addAll(Dependency.parseQuilt(quilt.getAsJsonArray("conflicts"), Dependency.Type.CONFLICTS));
+						dependencies.addAll(Dependency.parseQuilt(quilt.getAsJsonArray("breaks"), Dependency.Type.INCOMPATIBLE));
 						// end of the "quilt_loader" entry
 						
 						Set<String> mixins = Set.of(json.get("mixin").getAsString());
 						
 						logger.trace("Parsed Quilt mod info: {}", modID);
-						infos.add(new Info(false, schemaVersion, null, modID, version, name, description, icon, parseIconImage(jarFile, icon), false, contributors, group, contact, null, null, Environment.UNKNOWN, false, false, Set.of(), entrypoints, dependencies, null, mixins));
+						infos.add(new Info(false, null, modID, version, name, description, icon, parseIconImage(jarFile, icon), false, contributors, group, contact, null, null, Environment.UNKNOWN, false, false, Set.of(), entrypoints, dependencies, null, mixins));
 					} catch (Exception e) {
 						logger.warn("Failed to parse Quilt mod info for file {}: {}", file.getAbsolutePath(), e.getMessage());
 					}
@@ -540,7 +509,7 @@ public class Modification {
 						switch (dependency.getString("type", "required")) {
 							case "optional" -> Type.OPTIONAL;
 							case "incompatible" -> Type.INCOMPATIBLE;
-							case "discouraged" -> Type.DISCOURAGED;
+							case "discouraged" -> Type.CONFLICTS;
 							default -> Type.REQUIRED;
 						},
 						Ordering.valueOf(dependency.getString("ordering", "NONE")),
@@ -549,20 +518,69 @@ public class Modification {
 			}
 			
 			/**
+			 * Parses a set of dependencies from a {@link JsonObject} specific to Fabric.
+			 *
+			 * @param json The {@link JsonObject} representing the dependencies.
+			 * @param type The type of the dependencies.
+			 * @return A set of parsed {@link Dependency} objects.
+			 */
+			public static Set<Dependency> parseFabric(JsonObject json, Type type) {
+				Set<Dependency> dependencies = new HashSet<>();
+				
+				for (Map.Entry<String, JsonElement> dependency : json.entrySet()) {
+					dependencies.add(new Dependency(
+							dependency.getKey(),
+							dependency.getValue().getAsString(),
+							type,
+							Dependency.Ordering.NONE,
+							Environment.UNKNOWN
+					));
+				}
+				
+				return dependencies;
+			}
+			
+			/**
+			 * Parses a set of dependencies from a {@link JsonArray} specific to Quilt.
+			 *
+			 * @param json The {@link JsonArray} representing the dependencies.
+			 * @param type The type of the dependencies.
+			 * @return A set of parsed {@link Dependency} objects.
+			 */
+			public static Set<Dependency> parseQuilt(JsonArray json, Type type) {
+				Set<Dependency> dependencies = new HashSet<>();
+				
+				for (JsonElement dependency : json.asList()) {
+					dependencies.add(new Dependency(
+							dependency.getAsString(),
+							null,
+							type,
+							Dependency.Ordering.NONE,
+							Environment.UNKNOWN
+					));
+				}
+
+				return dependencies;
+			}
+			
+			/**
 			 * Enumerates the different types of dependencies.
 			 */
 			public enum Type {
-				/** Prevents the mod from loading if this dependency is missing. */
+				/** For dependencies required to run. Without them a game will crash. */
 				REQUIRED,
 				
-				/** Will not prevent the mod from loading if the dependency is missing, but still validates that the dependency is compatible. */
+				/** For dependencies not required to run. Without them a game will log a warning. */
+				RECOMMENDS,
+				
+				/** For dependencies not required to run. Use this as a kind of metadata. */
 				OPTIONAL,
 				
-				/** Prevents the mod from loading if this dependency is present. */
-				INCOMPATIBLE,
+				/** For mods whose together with yours cause some kind of bugs, etc. With them a game will log a warning. */
+				CONFLICTS,
 				
-				/** Still allows the mod to load if the dependency is present, but presents a warning to the user. */
-				DISCOURAGED
+				/** For mods whose together with yours might cause a game crash. With them a game will crash. */
+				INCOMPATIBLE
 			}
 			
 			/**
