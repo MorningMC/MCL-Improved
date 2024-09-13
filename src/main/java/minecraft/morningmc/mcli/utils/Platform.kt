@@ -26,9 +26,7 @@ data class Platform(
     @JvmField val encoding: Charset
 ) {
 
-    override fun toString(): String {
-        return "$operatingSystem $architecture"
-    }
+    override fun toString(): String = "$operatingSystem $architecture"
 
     /**
      * Enumerates different operating systems and provides utility methods.
@@ -96,11 +94,9 @@ data class Platform(
                 if (name != null) {
                     return if (name == "64") BIT64 else BIT32
                 }
-
                 if (archName != null) {
                     return if (archName.contains("64")) BIT64 else BIT32
                 }
-
                 return UNKNOWN
             }
         }
@@ -122,12 +118,11 @@ data class Platform(
          */
         private fun resolveSystem(): Platform {
             val os = OperatingSystem.infer(System.getProperty("os.name"))
-
             val arch: Architecture
+
             if (os == OperatingSystem.WINDOWS) {
                 val processorArch = System.getenv("PROCESSOR_ARCHITECTURE")
                 val wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432")
-
                 arch = if (processorArch != null && processorArch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64")) Architecture.BIT64 else Architecture.BIT32
             } else {
                 arch = if (System.getProperty("os.arch").contains("64")) Architecture.BIT64 else Architecture.BIT32

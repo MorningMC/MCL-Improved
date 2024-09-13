@@ -65,11 +65,9 @@ object Metadata {
          */
         fun toFullString(): String = "${if (isStable) "Stable" else "Dev"} Version $version Branch $build Build $patch"
 
-        override fun compareTo(other: Version): Int {
-            return Comparator.comparingInt(Version::version)
-                .thenComparingInt(Version::build)
-                .thenComparingInt(Version::patch)
-                .compare(this, other)
-        }
+        override fun compareTo(other: Version): Int = Comparator.comparingInt(Version::version)
+            .thenComparingInt(Version::build)
+            .thenComparingInt(Version::patch)
+            .compare(this, other)
     }
 }
