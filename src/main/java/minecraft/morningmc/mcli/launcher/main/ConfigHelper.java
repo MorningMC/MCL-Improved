@@ -68,6 +68,13 @@ public final class ConfigHelper implements Runnable {
 			logger.warn("Failed to load translation: {}", e.getMessage());
 			Translation.init("en");
 		}
+		
+		try {
+			Launcher.loader.load(config.getCompound("launcher"));
+		} catch (Exception e) {
+			logger.warn("Failed to load launcher: {}", e.getMessage());
+			Launcher.initDefault();
+		}
 	}
 	
 	/**
@@ -81,6 +88,7 @@ public final class ConfigHelper implements Runnable {
 		config.put("java_runtime_collection", JavaRuntime.Collection.loader.save(null));
 		config.put("window_size_manager", Window.SizeManager.loader.save(null));
 		config.put("translation", Translation.loader.save(Translation.instance));
+		config.put("launcher", Launcher.loader.save(null));
 	}
 	
 	/**
@@ -90,30 +98,34 @@ public final class ConfigHelper implements Runnable {
 		logger.info("Saving configurations...");
 		
 		// save config to file
+		// this process sometimes throws exceptions, so some retries are required to be taken
 		byte retries = 0;
 		while (retries < GlobalSettings.saveConfigMaxRetries) {
 			CompoundTag config = new CompoundTag();
 			
 			ConfigHelper.saveConfigs(config);
-			config.put("launcher", Launcher.loader.save(Main.instance.launcher));
 			
 			try {
-				new Nbt().toFile(config, FileManager.config);
+				new Nbt().toFile(config, FileManager.config); // exception may throw here
+				
+				// code below will be executed if config successfully saved to file
+				// otherwise an exception will be thrown and jump to the catch branch
 				logger.info("Configuration successfully saved to file: {}", FileManager.config);
-				break;
+				break; // break out the while loop to stop retries
 			} catch (Exception e) {
-				logger.warn("Failed to save config, tried {}: {}", ++retries, e.getMessage());
+				logger.warn("Failed to save config, tried {}: {}", ++retries /* variable retries updated here */, e.getMessage());
 			}
 		}
-		if (retries >= GlobalSettings.saveConfigMaxRetries) {
+		if (retries >= GlobalSettings.saveConfigMaxRetries) { // if exceptions still throw
 			logger.error("Failed to save config after {} retries.", retries);
 			
-			// revert to config.backup.nbt
+			// try reverse config
+			// this prevents file format corruption
 			if (FileManager.configBackup.exists()) {
 				logger.info("Backup file found! reverting...");
 				
-				try (InputStream in = new FileInputStream(FileManager.configBackup); OutputStream out = new FileOutputStream(FileManager.config)) {
-					in.transferTo(out);
+				try {
+					FileManager.copyFile(FileManager.configBackup, FileManager.config);
 				} catch (Exception e) {
 					logger.error("Failed to revert to backup: ", e);
 				}
@@ -151,11 +163,10 @@ public final class ConfigHelper implements Runnable {
 			if (GlobalSettings.autoSaveInterval > 0) {
 				try {
 					Thread.sleep(GlobalSettings.autoSaveInterval);
+					saveAll();
 				} catch (InterruptedException e) {
 					break;
 				}
-				saveAll();
-				
 			} else {
 				Thread.onSpinWait();
 			}

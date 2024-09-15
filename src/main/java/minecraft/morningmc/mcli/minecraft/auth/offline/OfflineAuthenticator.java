@@ -2,7 +2,6 @@ package minecraft.morningmc.mcli.minecraft.auth.offline;
 
 import minecraft.morningmc.mcli.minecraft.auth.Account;
 import minecraft.morningmc.mcli.minecraft.auth.Authenticator;
-import minecraft.morningmc.mcli.utils.exceptions.AuthenticationException;
 
 import java.util.*;
 

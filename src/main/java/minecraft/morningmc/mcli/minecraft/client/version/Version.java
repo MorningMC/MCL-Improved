@@ -1,7 +1,6 @@
 package minecraft.morningmc.mcli.minecraft.client.version;
 
 import minecraft.morningmc.mcli.launcher.networking.download.DownloadInfo;
-import minecraft.morningmc.mcli.minecraft.client.version.libraries.Library;
 import minecraft.morningmc.mcli.utils.Conditional;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
@@ -21,9 +20,7 @@ public record Version(String version,
 					  String id,
 					  int javaVersion,
 					  Set<Conditional<Library>> libraries,
-					  String loggingType,
-					  DownloadInfo loggingFile,
-					  String loggingArgument,
+					  Logging logging,
 					  String mainClass,
 					  Date releaseTime,
 					  Date time,
@@ -48,5 +45,12 @@ public record Version(String version,
 	
 	public enum Type {
 		RELEASE, SNAPSHOT, ALPHA, BETA, CUSTOM
+	}
+	
+	public record Logging(String type, DownloadInfo downloads, String argument) {
+	}
+	
+	public static class Manifest {
+		// TODO version_manifest.json
 	}
 }

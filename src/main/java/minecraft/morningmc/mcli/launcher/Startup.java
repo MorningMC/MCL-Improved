@@ -18,6 +18,9 @@ import org.apache.logging.log4j.Logger;
 public class Startup {
     private static final Logger logger = LogManager.getLogger();
     
+    /** Indicates whether to restart after the application is exited. */
+    private static boolean pendingRestart = false;
+    
     /**
      * Constructs a new instance of {@link Startup}, logging launcher information.
      */
@@ -43,14 +46,22 @@ public class Startup {
         
         try {
             new Startup().run(args);
-            
         } catch (Throwable t) {
             logger.fatal("Launcher crashed: ", t);
             System.exit(-1);
-            
-        } finally {
-            logger.info("Launcher quit.");
         }
+        
+        logger.info("Launcher quit.");
+        if (pendingRestart) {
+            System.exit(64); // this will be handled by the launcher and took a restart
+        }
+    }
+    
+    /**
+     * Plans a restart after the application is exited.
+     */
+    public static void planRestart() {
+        pendingRestart = true;
     }
     
     /**

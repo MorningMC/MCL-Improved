@@ -4,7 +4,9 @@ import minecraft.morningmc.mcli.launcher.settings.FileSettings;
 import minecraft.morningmc.mcli.minecraft.auth.Account;
 import minecraft.morningmc.mcli.minecraft.client.MinecraftDirectory;
 import minecraft.morningmc.mcli.minecraft.client.Profile;
+import minecraft.morningmc.mcli.minecraft.java.JavaRuntime;
 import minecraft.morningmc.mcli.minecraft.launch.options.LaunchOptions;
+import minecraft.morningmc.mcli.utils.Conditional;
 
 import java.io.File;
 import java.util.*;
@@ -43,12 +45,47 @@ public record LaunchArguments(LaunchOptions options, Profile profile, Account ac
 	}
 	
 	/**
+	 * Generates the commandline template for launching the Minecraft client.
+	 *
+	 * @param features The features that supported in the launch options.
+	 * @return The commandline template.
+	 */
+	private List<String> generateCommandlineTemplate(Map<String, Boolean> features) {
+		List<String> template = new ArrayList<>();
+		
+		template.add(options.javaRuntime.getIfEnabled(JavaRuntime.Collection.get(profile.version.javaVersion(), options.javaRuntime.get())).executable().getAbsolutePath());
+		template.addAll(options.javaArguments.getIfEnabled(
+				() -> profile.version.javaArguments().stream()
+						      .filter(arg -> arg.check(features))
+						      .map(Conditional::value)
+						      .toList()
+		));
+		template.add(profile.version.mainClass());
+		template.addAll(profile.version.gameArguments().stream()
+						 .filter(arg -> arg.check(features))
+						 .map(Conditional::value)
+						 .toList()
+		);
+		
+		return template;
+	}
+	
+	/**
+	 * Generates the commandline parameters for launching the Minecraft client.
+	 *
+	 * @return The commandline parameters.
+	 */
+	private Map<String, String> generateCommandlineParameters() {
+		return options.customArgumentParameters;
+	}
+	
+	/**
 	 * Gets the directory for the Minecraft client.
 	 *
 	 * @return The directory for the Minecraft client.
 	 */
 	public MinecraftDirectory getDirectory() {
-		MinecraftDirectory directory = options.gameDir.getIfEnabled(new MinecraftDirectory(new File(FileSettings.isolateRoot, profile.identifier().toString())));
+		MinecraftDirectory directory = options.gameDir.getIfEnabled(() -> new MinecraftDirectory(new File(FileSettings.isolateRoot, profile.identifier().toString())));
 		directory.root.mkdirs();
 		return directory;
 	}

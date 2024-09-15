@@ -527,14 +527,16 @@ public class Modification {
 			public static Set<Dependency> parseFabric(JsonObject json, Type type) {
 				Set<Dependency> dependencies = new HashSet<>();
 				
-				for (Map.Entry<String, JsonElement> dependency : json.entrySet()) {
-					dependencies.add(new Dependency(
-							dependency.getKey(),
-							dependency.getValue().getAsString(),
-							type,
-							Dependency.Ordering.NONE,
-							Environment.UNKNOWN
-					));
+				if (json != null) {
+					for (Map.Entry<String, JsonElement> dependency : json.entrySet()) {
+						dependencies.add(new Dependency(
+								dependency.getKey(),
+								dependency.getValue().getAsString(),
+								type,
+								Ordering.NONE,
+								Environment.UNKNOWN
+						));
+					}
 				}
 				
 				return dependencies;
@@ -550,16 +552,18 @@ public class Modification {
 			public static Set<Dependency> parseQuilt(JsonArray json, Type type) {
 				Set<Dependency> dependencies = new HashSet<>();
 				
-				for (JsonElement dependency : json.asList()) {
-					dependencies.add(new Dependency(
-							dependency.getAsString(),
-							null,
-							type,
-							Dependency.Ordering.NONE,
-							Environment.UNKNOWN
-					));
+				if (json != null) {
+					for (JsonElement dependency : json.asList()) {
+						dependencies.add(new Dependency(
+								dependency.getAsString(),
+								null,
+								type,
+								Ordering.NONE,
+								Environment.UNKNOWN
+						));
+					}
 				}
-
+				
 				return dependencies;
 			}
 			
@@ -598,10 +602,10 @@ public class Modification {
 			CLIENT, SERVER, BOTH, UNKNOWN;
 			
 			/**
-			 * Parses the {@code displayTest} statement in {@code META-INF/mods.toml} and returns the corresponding {@link Environment}.
+			 * Parses the {@code displayTest} statement in {@code META-INF/mods.toml} and infers the corresponding {@link Environment}.
 			 *
 			 * @param displayTest The {@code displayTest} statement in {@code META-INF/mods.toml}.
-			 * @return The parsed {@link Environment}.
+			 * @return The inferred {@link Environment}.
 			 */
 			public static Environment parseDisplayTest(String displayTest) {
 				return switch (displayTest) {

@@ -6,7 +6,6 @@ import minecraft.morningmc.mcli.utils.interfaces.Builder;
 import java.io.IOException;
 import java.net.*;
 import java.nio.charset.Charset;
-import java.util.Map;
 
 /**
  * A builder for creating {@link HttpURLConnection} objects.

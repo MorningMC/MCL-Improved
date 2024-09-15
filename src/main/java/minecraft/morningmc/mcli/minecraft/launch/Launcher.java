@@ -3,6 +3,7 @@ package minecraft.morningmc.mcli.minecraft.launch;
 import minecraft.morningmc.mcli.minecraft.auth.Account;
 import minecraft.morningmc.mcli.minecraft.client.Profile;
 import minecraft.morningmc.mcli.minecraft.launch.options.LaunchOptions;
+import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.exceptions.LaunchException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
@@ -17,24 +18,24 @@ import java.util.*;
 /**
  * The {@link Launcher} class is responsible for launching the Minecraft client with specified options and profiles.
  */
+@StaticClass
 public class Launcher {
 	private static final Logger logger = LogManager.getLogger();
 	
 	/** {@link NbtLoader} for loading and saving {@link Launcher} objects from/to NBT data. */
-	public static final NbtLoader<Launcher, CompoundTag> loader = new NbtLoader<>() {
+	public static final NbtLoader<Void, CompoundTag> loader = new NbtLoader<>() {
 		
 		/**
 		 * Loads a {@link Launcher} object from an NBT compound tag.
 		 *
 		 * @param tag The NBT compound tag representing the {@link Launcher} object.
-		 * @return The loaded {@link Launcher} object.
+		 * @return {@code null}.
 		 * @throws IllegalNbtException If the NBT data is invalid or missing required information.
 		 */
 		@Override
-		public Launcher load(CompoundTag tag) throws IllegalNbtException {
-			LaunchOptions options = LaunchOptions.loader.load(tag.getCompound("options"));
+		public Void load(CompoundTag tag) throws IllegalNbtException {
+			options = LaunchOptions.loader.load(tag.getCompound("options"));
 			
-			UUID profile;
 			try {
 				profile = UUID.fromString(tag.getString("profile").getValue());
 			} catch (Exception e) {
@@ -42,7 +43,6 @@ public class Launcher {
 				profile = null;
 			}
 			
-			UUID account;
 			try {
 				account = UUID.fromString(tag.getString("account").getValue());
 			} catch (Exception e) {
@@ -50,52 +50,48 @@ public class Launcher {
 				account = null;
 			}
 			
-			return new Launcher(options, profile, account);
+			return null;
 		}
 		
 		/**
 		 * Saves a {@link Launcher} object to an NBT compound tag.
 		 *
-		 * @param object The {@link Launcher} object to be saved.
+		 * @param object {@code null}.
 		 * @return The NBT compound tag representing the {@link Launcher} object.
 		 */
 		@Override
-		public CompoundTag save(Launcher object) {
+		public CompoundTag save(Void object) {
 			CompoundTag tag = new CompoundTag();
 			
 			try {
-				tag.putString("profile", object.profile.toString());
+				tag.putString("profile", profile.toString());
 			} catch (Exception e) {
 				logger.warn("Failed to save profile: {}", e.getMessage());
 			}
 			
 			try {
-				tag.putString("account", object.account.toString());
+				tag.putString("account", account.toString());
 			} catch (Exception e) {
 				logger.warn("Failed to save account: {}", e.getMessage());
 			}
 			
-			tag.put("options", LaunchOptions.loader.save(object.options));
+			tag.put("options", LaunchOptions.loader.save(options));
 			
 			return tag;
 		}
 	};
 	
-	public final LaunchOptions options;
-	public UUID profile;
-	public UUID account;
+	public static LaunchOptions options;
+	public static UUID profile;
+	public static UUID account;
 	
 	/**
-	 * Constructs a {@link Launcher} object with the specified launch options and profile.
-	 *
-	 * @param options The launch options for the Minecraft client.
-	 * @param profile The UUID of Minecraft profile to be used for launching.
-	 * @param account The UUID of Minecraft account to be used for launching.
+	 * Initializes the {@link Launcher} with default options, profile, and account.
 	 */
-	public Launcher(LaunchOptions options, UUID profile, UUID account) {
-		this.options = options;
-		this.profile = profile;
-		this.account = account;
+	public static void initDefault() {
+		options = LaunchOptions.defaultOptions;
+		profile = null;
+		account = null;
 	}
 	
 	/**
@@ -104,7 +100,7 @@ public class Launcher {
 	 * @return A {@link ProcessListener} for monitoring the launched process.
 	 * @throws LaunchException If there is an issue launching the Minecraft client.
 	 */
-	public ProcessListener launch() throws LaunchException {
+	public static ProcessListener launch() throws LaunchException {
 		return launch(Profile.Collection.resolve(profile));
 	}
 	
@@ -115,7 +111,7 @@ public class Launcher {
 	 * @return A {@link ProcessListener} for monitoring the launched process.
 	 * @throws LaunchException If there is an issue launching the Minecraft client.
 	 */
-	public ProcessListener launch(Profile profile) throws LaunchException {
+	public static ProcessListener launch(Profile profile) throws LaunchException {
 		return launch(generateArguments(profile));
 	}
 	
@@ -126,7 +122,7 @@ public class Launcher {
 	 * @return A {@link ProcessListener} for monitoring the launched process.
 	 * @throws LaunchException If there is an issue launching the Minecraft client.
 	 */
-	private ProcessListener launch(LaunchArguments arguments) throws LaunchException {
+	private static ProcessListener launch(LaunchArguments arguments) throws LaunchException {
 		Objects.requireNonNull(arguments);
 		
 		logger.info("Launching Minecraft...");
@@ -158,7 +154,7 @@ public class Launcher {
 	 *
 	 * @return The generated launch arguments.
 	 */
-	public LaunchArguments generateArguments() {
+	public static LaunchArguments generateArguments() {
 		return generateArguments(Profile.Collection.resolve(profile));
 	}
 	
@@ -169,7 +165,7 @@ public class Launcher {
 	 * @return The generated launch arguments.
 	 * @throws NullPointerException If the profile is null.
 	 */
-	public LaunchArguments generateArguments(Profile profile) {
+	public static LaunchArguments generateArguments(Profile profile) {
 		return new LaunchArguments(profile.options.getIfEnabled(options), profile, Account.Collection.resolve(account));
 	}
 }

@@ -6,6 +6,8 @@ import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 import dev.dewy.nbt.api.Tag;
 import dev.dewy.nbt.tags.collection.CompoundTag;
 
+import java.util.function.*;
+
 /**
  * A container object that allows to switch on or off and modify the value at the same time.
  *
@@ -108,29 +110,37 @@ public class Switchable<T> extends Modifiable<T> {
 	}
 	
 	/**
-	 * Returns the value of the {@link Switchable} object if it is enabled,
-	 * or {@code null} otherwise.
+	 * Returns the value of the {@link Switchable} object if it is enabled, or {@code null} otherwise.
 	 * <p>
 	 * This method is equivalent to {@code getIfEnabled(null)}
 	 *
-	 * @return The value of the {@link Switchable} object if it is enabled,
-	 *         or {@code null} otherwise.
+	 * @return The value of the {@link Switchable} object if it is enabled, or {@code null} otherwise.
 	 * @see #getIfEnabled(T)
 	 */
 	public T getIfEnabled() {
-		return getIfEnabled(null);
+		return getIfEnabled((T) null);
 	}
 	
 	/**
-	 * Returns the value of the {@link Switchable} object if it is enabled,
-	 * or {@code defaultValue} otherwise.
+	 * Returns the value of the {@link Switchable} object if it is enabled, or {@code defaultValue} otherwise.
+	 * <p>
+	 * This method is equivalent to {@code getIfEnabled(() -> defaultValue))}
 	 *
-	 * @param defaultValue The default value to be returned if the {@link Switchable}
-	 *        is disabled.
-	 * @return The value of the {@link Switchable} object if it is enabled,
-	 *         or {@code defaultValue} otherwise.
+	 * @param defaultValue The default value to be returned if the {@link Switchable} is disabled.
+	 * @return The value of the {@link Switchable} object if it is enabled, or {@code defaultValue} otherwise.
+	 * @see #getIfEnabled(Supplier)
 	 */
 	public T getIfEnabled(T defaultValue) {
-		return enabled ? value : defaultValue;
+		return getIfEnabled(() -> defaultValue);
+	}
+	
+	/**
+	 * Returns the value of the {@link Switchable} object if it is enabled, or {@code defaultValue} otherwise.
+	 *
+	 * @param defaultValue The default value to be returned if the {@link Switchable} is disabled.
+	 * @return The value of the {@link Switchable} object if it is enabled, or {@code defaultValue} otherwise.
+	 */
+	public T getIfEnabled(Supplier<T> defaultValue) {
+		return enabled ? value : defaultValue.get();
 	}
 }

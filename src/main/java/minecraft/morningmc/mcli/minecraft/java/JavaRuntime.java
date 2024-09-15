@@ -252,6 +252,23 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 		}
 		
 		/**
+		 * Gets a single Java runtime with the specified version. If no runtime with the specified version is found, the {@code defaultValue} is returned.
+		 *
+		 * @param version The version of the Java runtime to be retrieved.
+		 * @param defaultValue The default value to be returned if no runtime with the specified version is found.
+		 * @return The Java runtime with the specified version, or the {@code defaultValue} if not found.
+		 */
+		public static JavaRuntime get(int version, JavaRuntime defaultValue) {
+			return runtimes.stream()
+							.filter(runtime -> runtime.version.feature() == version)
+							.findFirst()
+							.orElseGet(() -> {
+								logger.warn("No Java runtime with major version {} found, use default value instead.", version);
+								return defaultValue;
+							});
+		}
+		
+		/**
 		 * Add a Java runtime to the collection.
 		 *
 		 * @param runtime The Java runtime to be added.
@@ -355,11 +372,11 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 							
 							try {
 								potentialRuntimes.add(fromPath(new File("/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin/java")));
-							} catch (IllegalJavaException ignored) {}
+							} catch (IllegalJavaException ignored) {} // illegal java runtime
 							
 							try {
 								potentialRuntimes.add(fromPath(new File("/Applications/Xcode.app/Contents/Applications/Application Loader.app/Contents/MacOS/itms/java/bin/java")));
-							} catch (IllegalJavaException ignored) {}
+							} catch (IllegalJavaException ignored) {} // illegal java runtime
 						}
 					}
 					
@@ -369,10 +386,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 					Set<File> minecraftLocations = new HashSet<>();
 					switch (Platform.current.operatingSystem()) {
 						case WINDOWS -> {
-							File file = new File(System.getenv("LocalAppData"), "Packages\\Microsoft.4297127D64EC6_8wekyb3d8bbwe\\LocalCache\\Local\\runtime");
-							if (file.exists()) {
-								minecraftLocations.add(file);
-							}
+							minecraftLocations.add(new File(System.getenv("LocalAppData"), "Packages\\Microsoft.4297127D64EC6_8wekyb3d8bbwe\\LocalCache\\Local\\runtime"));
 							
 							File programFile = new File(Optional.ofNullable(System.getenv("ProgramFiles(x86)")).orElse("C:\\Program Files (x86)"));
 							if (programFile.exists()) {
@@ -380,20 +394,12 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 							}
 						}
 						
-						case LINUX -> {
-							File file = new File(System.getProperty("user.home", ".minecraft/runtime"));
-							if (file.exists()) {
-								minecraftLocations.add(file);
-							}
-						}
+						case LINUX -> minecraftLocations.add(new File(System.getProperty("user.home", ".minecraft/runtime")));
 						
 						case MACOS -> {
 							String userHome = System.getProperty("user.home");
 							if (userHome != null) {
-								File file = new File(userHome, "Library/Application Support/minecraft/runtime");
-								if (file.exists()) {
-									minecraftLocations.add(file);
-								}
+								minecraftLocations.add(new File(userHome, "Library/Application Support/minecraft/runtime"));
 							}
 						}
 					}
@@ -463,7 +469,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 			if (files != null) {
 				return Arrays.stream(files).filter(File::isDirectory);
 			}
-			return Stream.empty();
+			return Stream.empty(); // directory does not denote a directory, or if an I/O error occurs
 		}
 		
 		/**
@@ -489,6 +495,8 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 		 * @param location The Windows Registry key location.
 		 * @return The set of Java runtimes found in the registry key.
 		 * @throws IOException If there is an issue with querying the registry.
+		 *
+		 * @author huanghongxun
 		 */
 		private static Set<JavaRuntime> queryJavaHomesInRegistryKey(String location) throws IOException {
 			Set<JavaRuntime> homes = new HashSet<>();
@@ -514,6 +522,8 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 		 * @param location The Windows Registry key location.
 		 * @return The set of sub-folder names.
 		 * @throws IOException If there is an issue with querying the registry.
+		 *
+		 * @author huanghongxun
 		 */
 		private static Set<String> querySubFolders(String location) throws IOException {
 			Set<String> res = new HashSet<>();
@@ -537,6 +547,8 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 		 * @param name The name of the registry value to query.
 		 * @return The value associated with the specified registry value name.
 		 * @throws IOException If there is an issue with querying the registry.
+		 *
+		 * @author huanghongxun
 		 */
 		private static String queryRegisterValue(String location, String name) throws IOException {
 			boolean last = false;

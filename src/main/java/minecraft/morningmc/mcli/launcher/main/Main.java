@@ -1,8 +1,6 @@
 package minecraft.morningmc.mcli.launcher.main;
 
 import minecraft.morningmc.mcli.minecraft.java.JavaRuntime;
-import minecraft.morningmc.mcli.minecraft.launch.options.LaunchOptions;
-import minecraft.morningmc.mcli.minecraft.launch.Launcher;
 import minecraft.morningmc.mcli.ui.UIManager;
 import minecraft.morningmc.mcli.utils.FileManager;
 
@@ -16,9 +14,6 @@ import dev.dewy.nbt.Nbt;
 import dev.dewy.nbt.tags.collection.CompoundTag;
 
 import java.io.*;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 
 /**
  * The Main class represents the main entry point for the Minecraft launcher application.
@@ -30,18 +25,11 @@ import java.io.OutputStream;
 public class Main extends Application {
 	private static final Logger logger = LogManager.getLogger();
 	
-	public static Main instance = null;
-	
-	public Launcher launcher;
-	private UIManager manager;
-	
 	/**
 	 * Initializes the application. Completes files, loads configuration.
 	 */
 	@Override
 	public void init() {
-		instance = this;
-		
 		logger.info("Initializing launcher...");
 		
 		if (FileManager.config.exists()) {
@@ -50,9 +38,7 @@ public class Main extends Application {
 			
 			try {
 				FileManager.configBackup.createNewFile();
-				try (InputStream in = new FileInputStream(FileManager.config); OutputStream out = new FileOutputStream(FileManager.configBackup)) {
-					in.transferTo(out);
-				}
+				FileManager.copyFile(FileManager.config, FileManager.configBackup);
 			} catch (Exception e) {
 				logger.warn("Failed to backup config: {}", e.getMessage());
 			}
@@ -61,7 +47,12 @@ public class Main extends Application {
 			// try complete config
 			try {
 				FileManager.config.createNewFile();
-			} catch (IOException e) {
+				
+				// try reverse config
+				if (FileManager.configBackup.exists()) {
+					FileManager.copyFile(FileManager.configBackup, FileManager.config);
+				}
+			} catch (Exception e) {
 				logger.error("Failed to complete config file: ", e);
 			}
 		}
@@ -77,16 +68,7 @@ public class Main extends Application {
 		}
 		
 		ConfigHelper.loadConfigs(config);
-		
-		try {
-			launcher = Launcher.loader.load(config.getCompound("launcher"));
-		} catch (Exception e) {
-			logger.warn("Failed to load launcher: {}", e.getMessage());
-			launcher = new Launcher(LaunchOptions.defaultOptions, null, null);
-		}
-		
-		// start auto-save thread
-		ConfigHelper.startAutoSave();
+		ConfigHelper.startAutoSave(); // start auto-save thread
 	}
 	
 	/**
@@ -96,10 +78,12 @@ public class Main extends Application {
 	 */
 	@Override
 	public void start(Stage mainStage) {
+		// stub
+		
 		try {
 			logger.info("Starting launcher lifecycle...");
 			
-			manager = new UIManager(mainStage);
+			UIManager manager = new UIManager(mainStage);
 			
 			mainStage.show();
 		} catch (Throwable t) {
@@ -119,10 +103,7 @@ public class Main extends Application {
 			Thread.onSpinWait();
 		}
 		
-		// stop auto-save thread
-		ConfigHelper.stopAutoSave();
-		
-		// save config
-		ConfigHelper.saveAll();
+		ConfigHelper.stopAutoSave(); // stop auto-save thread
+		ConfigHelper.saveAll(); // save config
 	}
 }

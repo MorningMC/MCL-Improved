@@ -1,7 +1,8 @@
 package moe.mickey.minecraft.skin.fx.animation;
 
-import javafx.util.Duration;
 import moe.mickey.minecraft.skin.fx.*;
+
+import javafx.util.Duration;
 
 public final class SkinAniRunning extends SkinAnimation {
 

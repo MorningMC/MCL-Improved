@@ -18,6 +18,9 @@
     <inspection_tool class="LossyEncoding" enabled="true" level="ERROR" enabled_by_default="true" editorAttributes="WRONG_REFERENCES_ATTRIBUTES" />
     <inspection_tool class="SameParameterValue" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="SuspiciousNameCombination" enabled="true" level="INFORMATION" enabled_by_default="true" editorAttributes="INFORMATION_ATTRIBUTES">
+    <inspection_tool class="ConstPropertyName" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="MemberVisibilityCanBePrivate" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="SuspiciousNameCombination" enabled="false" level="WARNING" enabled_by_default="false">
       <group names="x,width,left,right" />
       <group names="y,height,top,bottom" />
       <ignored>
@@ -28,10 +31,11 @@
     <inspection_tool class="VulnerableCodeUsages" enabled="true" level="SERVER PROBLEM" enabled_by_default="true" editorAttributes="GENERIC_SERVER_ERROR_OR_WARNING" />
     <inspection_tool class="VulnerableLibrariesGlobal" enabled="true" level="WEAK WARNING" enabled_by_default="true" editorAttributes="INFO_ATTRIBUTES" />
     <inspection_tool class="VulnerableLibrariesLocal" enabled="true" level="WEAK WARNING" enabled_by_default="true" editorAttributes="INFO_ATTRIBUTES">
+    <inspection_tool class="VulnerableLibrariesLocal" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="isIgnoringEnabled" value="true" />
       <option name="ignoredModules">
         <list>
-          <option value="mcli" />
+          <option value="mcl-improved" />
         </list>
       </option>
       <option name="ignoredPackages">

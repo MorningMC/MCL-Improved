@@ -13,7 +13,7 @@ import java.util.*;
 public record Conditional<T>(Set<Rule> rules, T value) {
 	
 	/**
-	 * Creates an unconditional {@link Conditional} instance, which always passes the rule check.
+	 * Creates an {@link Conditional} instance without rules, which always passes the rule check.
 	 *
 	 * @param value The value associated with the unconditional condition.
 	 * @param <T> The type of the value.
@@ -54,7 +54,7 @@ public record Conditional<T>(Set<Rule> rules, T value) {
 	 * @param arch      The architecture that this rule applies to, or {@link Platform.Architecture#UNKNOWN} if not specified.
 	 */
 	public record Rule(boolean action, Map<String, Boolean> features, Platform.OperatingSystem os, Platform.Architecture arch) {
-		/** The rule that always passes the check. */
+		/** The rule that always passes the check. This means its {@link #check(Map)} method always returns {@code true}. */
 		public static final Rule allow = new Rule(true, Map.of(), Platform.OperatingSystem.UNKNOWN, Platform.Architecture.UNKNOWN);
 		
 		/**
@@ -67,8 +67,8 @@ public record Conditional<T>(Set<Rule> rules, T value) {
 			boolean passed = true;
 			
 			passed &= this.features.entrySet().stream().allMatch(entry -> features.getOrDefault(entry.getKey(), false) == entry.getValue());
-			passed &= os == Platform.OperatingSystem.UNKNOWN || Platform.system.operatingSystem() == os;
-			passed &= arch == Platform.Architecture.UNKNOWN || Platform.system.architecture() == arch;
+			passed &= os == Platform.OperatingSystem.UNKNOWN || Platform.system.operatingSystem() == os; // Platform.OperatingSystem.UNKNOWN also refers to any operating system
+			passed &= arch == Platform.Architecture.UNKNOWN || Platform.system.architecture() == arch; // Platform.Architecture.UNKNOWN also refers to any architecture
 			
 			return passed == action;
 		}

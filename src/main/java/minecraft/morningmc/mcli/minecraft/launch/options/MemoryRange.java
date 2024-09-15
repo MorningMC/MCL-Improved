@@ -80,7 +80,7 @@ public record MemoryRange(long minimum, long maximum) {
 				java.lang.management.OperatingSystemMXBean bean = java.lang.management.ManagementFactory.getOperatingSystemMXBean();
 				if (bean instanceof com.sun.management.OperatingSystemMXBean) {
 					com.sun.management.OperatingSystemMXBean sunBean = (com.sun.management.OperatingSystemMXBean) java.lang.management.ManagementFactory.getOperatingSystemMXBean();
-					totalMemory = sunBean.getTotalMemorySize() / 1024 / 1024;
+					totalMemory = sunBean.getTotalMemorySize() >> 20 /* convert Bytes to MB */;
 				} else {
 					totalMemory = 1024;
 				}

@@ -1,6 +1,5 @@
 package minecraft.morningmc.mcli.minecraft.client;
 
-import minecraft.morningmc.mcli.utils.FileManager;
 import minecraft.morningmc.mcli.minecraft.client.resources.Modification;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 

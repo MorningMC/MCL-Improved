@@ -46,7 +46,7 @@ public class FileManager {
 	 * @return An {@link InputStream} for the specified resource.
 	 */
 	public static InputStream getResource(String path) {
-		return FileManager.class.getClassLoader().getResourceAsStream(path);
+		return ClassLoader.getSystemResourceAsStream(path);
 	}
 	
 	/**
@@ -68,5 +68,18 @@ public class FileManager {
 	 */
 	public static boolean renameFile(File file, String name) {
 		return file.renameTo(new File(file.getParentFile(), name));
+	}
+	
+	/**
+	 * Copies a file to a new location.
+	 *
+	 * @param source      The source file.
+	 * @param destination The destination file.
+	 * @throws IOException If an I/O error occurs.
+	 */
+	public static void copyFile(File source, File destination) throws IOException {
+		try (InputStream in = new FileInputStream(source); OutputStream out = new FileOutputStream(destination)) {
+			in.transferTo(out);
+		}
 	}
 }

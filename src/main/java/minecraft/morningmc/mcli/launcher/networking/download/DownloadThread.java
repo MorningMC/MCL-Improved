@@ -1,7 +1,6 @@
 package minecraft.morningmc.mcli.launcher.networking.download;
 
 import minecraft.morningmc.mcli.launcher.networking.ConnectionBuilder;
-import minecraft.morningmc.mcli.launcher.networking.Requester;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
