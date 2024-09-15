@@ -18,6 +18,7 @@ import java.util.*;
  * @param profile The profile to be used.
  * @param account The account to be used.
  */
+@SuppressWarnings("ALL")
 public record LaunchArguments(LaunchOptions options, Profile profile, Account account) {
 	
 	/**

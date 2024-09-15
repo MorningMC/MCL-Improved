@@ -16,10 +16,10 @@ public class FileManager {
 	public static final File workingRoot = new File(appdata, ".mcli");
 
 	/** The configuration file for MCLI. */
-	public static File config = new File(workingRoot, "config.nbt");
+	public static final File config = new File(workingRoot, "config.nbt");
 	
 	/** The backup configuration file for MCLI. */
-	public static File configBackup = new File(workingRoot, "config.backup.nbt");
+	public static final File configBackup = new File(workingRoot, "config.backup.nbt");
 
 	/**
 	 * Resolves the root directory for application data.

@@ -8,11 +8,11 @@ import java.util.*;
 @StaticClass
 public class DownloadManager {
 	
-	public static DownloadTask startTask(List<DownloadInfo> downloadInfos) throws DownloadException {
+	public static DownloadTask startTask(List<DownloadInfo> downloadInfos) {
 		return null;
 	}
 	
-	public static DownloadTask startTask(UUID identifier) throws DownloadException {
+	public static DownloadTask startTask(UUID identifier) {
 		return null;
 	}
 }

@@ -11,7 +11,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -21,6 +20,7 @@ import java.util.*;
  * It also stores a temporary file for the download process.
  * The destination file will be replaced by the temporary file if the download is successful.
  */
+@SuppressWarnings("ALL")
 @LauncherProcess("download")
 public class DownloadTask implements UniqueObject {
 	private static final Logger logger = LogManager.getLogger();

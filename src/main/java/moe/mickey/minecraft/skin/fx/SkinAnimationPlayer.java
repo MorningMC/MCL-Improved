@@ -26,7 +26,7 @@ public class SkinAnimationPlayer {
                 }
                 playing = tmp;
                 if (playing == null && animations.size() > 0)
-                    playing = animations.get(animations.size() - 1);
+                    playing = animations.getLast();
                 if (playing != null) {
                     playing.playFromStart();
                     lastPlayTime = now;

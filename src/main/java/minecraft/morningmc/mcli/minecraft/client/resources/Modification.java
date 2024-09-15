@@ -15,8 +15,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.jar.*;
 import java.util.stream.*;
 import java.util.zip.*;

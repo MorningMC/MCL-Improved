@@ -34,7 +34,7 @@ public class MinecraftDirectory {
 	};
 	
 	public final File root;
-	public Set<Modification> mods = Collections.newSetFromMap(new ConcurrentHashMap<>());
+	public final Set<Modification> mods = Collections.newSetFromMap(new ConcurrentHashMap<>());
 	
 	/**
 	 * Constructs a {@link MinecraftDirectory} with a specified root directory.
@@ -53,6 +53,7 @@ public class MinecraftDirectory {
 	public void refresh() {
 		// load mods
 		File modsDir = new File(root, "mods");
+		mods.clear();
 		try {
 			Arrays.stream(Objects.requireNonNull(modsDir.listFiles()))
 					.parallel()

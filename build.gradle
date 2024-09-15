@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'minecraft.morningmc'
-version = '0.5.3.0'
+version = '0.5.3.1'
 
 repositories {
     mavenCentral()

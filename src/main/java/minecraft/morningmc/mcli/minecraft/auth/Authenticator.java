@@ -12,7 +12,6 @@ public interface Authenticator {
 	 * Authenticates a Minecraft account and returns the corresponding account information.
 	 *
 	 * @return the authenticated Minecraft account.
-	 * @throws AuthenticationException if authentication fails due to invalid credentials or other authentication issues.
 	 */
-	Account auth() throws AuthenticationException;
+	Account auth();
 }

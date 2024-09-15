@@ -19,7 +19,7 @@ object Metadata {
 
     /** Represents the version of the launcher.  */
     @JvmField
-    val version: Version = Version(0, 5, 3, 0)
+    val version: Version = Version(0, 5, 3, 1)
 
     // Auto-complete
     /** Represents the full name of the launcher including name and version.  */
@@ -65,9 +65,10 @@ object Metadata {
          */
         fun toFullString(): String = "${if (isStable) "Stable" else "Dev"} Version $version Branch $build Build $patch"
 
-        override fun compareTo(other: Version): Int = Comparator.comparingInt(Version::version)
-            .thenComparingInt(Version::build)
-            .thenComparingInt(Version::patch)
-            .compare(this, other)
+        override fun compareTo(other: Version): Int =
+            Comparator.comparingInt(Version::version)
+                .thenComparingInt(Version::build)
+                .thenComparingInt(Version::patch)
+                .compare(this, other)
     }
 }
