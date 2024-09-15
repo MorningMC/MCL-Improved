@@ -154,7 +154,7 @@ public final class ColorStyle {
 	 */
 	public static ColorStyle followSystem() {
 		try {
-			return switch (Platform.system.operatingSystem) {
+			return switch (Platform.system.operatingSystem()) {
 				case WINDOWS -> {
 					Process process = Runtime.getRuntime().exec(new String[]{ "reg", "query", "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "/v", "AppsUseLightTheme" });
 					yield new String(process.getInputStream().readAllBytes()).contains("0x0") ? dark : bright;

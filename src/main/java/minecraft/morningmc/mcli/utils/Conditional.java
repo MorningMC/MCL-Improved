@@ -67,8 +67,8 @@ public record Conditional<T>(Set<Rule> rules, T value) {
 			boolean passed = true;
 			
 			passed &= this.features.entrySet().stream().allMatch(entry -> features.getOrDefault(entry.getKey(), false) == entry.getValue());
-			passed &= os == Platform.OperatingSystem.UNKNOWN || Platform.system.operatingSystem == os; // Platform.OperatingSystem.UNKNOWN also refers to any operating system
-			passed &= arch == Platform.Architecture.UNKNOWN || Platform.system.architecture == arch; // Platform.Architecture.UNKNOWN also refers to any architecture
+			passed &= os == Platform.OperatingSystem.UNKNOWN || Platform.system.operatingSystem() == os; // Platform.OperatingSystem.UNKNOWN also refers to any operating system
+			passed &= arch == Platform.Architecture.UNKNOWN || Platform.system.architecture() == arch; // Platform.Architecture.UNKNOWN also refers to any architecture
 			
 			return passed == action;
 		}

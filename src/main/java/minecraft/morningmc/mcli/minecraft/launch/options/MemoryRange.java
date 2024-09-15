@@ -60,7 +60,7 @@ public record MemoryRange(long minimum, long maximum) {
 	 */
 	private static long resolveTotalMemory() {
 		long totalMemory = -1;
-		if (Platform.system.operatingSystem == Platform.OperatingSystem.LINUX) {
+		if (Platform.system.operatingSystem() == Platform.OperatingSystem.LINUX) {
 			try (BufferedReader reader = new BufferedReader(new FileReader("/proc/meminfo"))) {
 				for (String line; ( line = reader.readLine() ) != null; ) {
 					Matcher matcher = Pattern.compile("^(?<key>.*?):\\s+(?<value>\\d+) kB?$").matcher(line);

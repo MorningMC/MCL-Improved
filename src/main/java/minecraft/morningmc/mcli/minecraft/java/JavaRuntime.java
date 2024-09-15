@@ -47,7 +47,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	};
 	
 	/** The default executable name for Java. */
-	public static final String executableName = Platform.system.operatingSystem == Platform.OperatingSystem.WINDOWS ? "java.exe" : "java";
+	public static final String executableName = Platform.system.operatingSystem() == Platform.OperatingSystem.WINDOWS ? "java.exe" : "java";
 	
 	/** The current Java runtime based on the system properties. */
 	public static final JavaRuntime current = resolveCurrent();
@@ -176,7 +176,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	@Override
 	public int compareTo(@NotNull JavaRuntime o) {
 		return Comparator.comparing(JavaRuntime::version)
-				       .thenComparingInt(runtime -> runtime.platform.architecture.bits())
+				       .thenComparingInt(runtime -> runtime.platform.architecture().bits())
 				       .compare(this, o);
 	}
 	
@@ -263,7 +263,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 							.filter(runtime -> runtime.version.feature() == version)
 							.findFirst()
 							.orElseGet(() -> {
-								logger.warn("No Java runtime with version {} found, use default value instead.", version);
+								logger.warn("No Java runtime with major version {} found, use default value instead.", version);
 								return defaultValue;
 							});
 		}
@@ -329,7 +329,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 					// System-defined locations
 					logger.debug("Searching in system-defined locations...");
 					
-					switch (Platform.current.operatingSystem) {
+					switch (Platform.current.operatingSystem()) {
 						case WINDOWS -> {
 							potentialRuntimes.addAll(queryJavaHomesInRegistryKey("HKEY_LOCAL_MACHINE\\SOFTWARE\\JavaSoft\\Java Runtime Environment\\"));
 							potentialRuntimes.addAll(queryJavaHomesInRegistryKey("HKEY_LOCAL_MACHINE\\SOFTWARE\\JavaSoft\\Java Development Kit\\"));
@@ -384,7 +384,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 					logger.debug("Searching in Minecraft-installed locations...");
 					
 					Set<File> minecraftLocations = new HashSet<>();
-					switch (Platform.current.operatingSystem) {
+					switch (Platform.current.operatingSystem()) {
 						case WINDOWS -> {
 							minecraftLocations.add(new File(System.getenv("LocalAppData"), "Packages\\Microsoft.4297127D64EC6_8wekyb3d8bbwe\\LocalCache\\Local\\runtime"));
 							
@@ -419,7 +419,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 					logger.debug("Searching in PATH...");
 					
 					try {
-						Arrays.stream(System.getenv("PATH").split(Platform.current.pathSeparator))
+						Arrays.stream(System.getenv("PATH").split(Platform.current.pathSeparator()))
 								.parallel()
 								.map(File::new)
 								.filter(bin -> bin.getName().equals("bin"))

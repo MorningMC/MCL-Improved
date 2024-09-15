@@ -6,7 +6,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.*;
 
 public class DownloadThread extends Thread {
 	private static final Logger LOGGER = LogManager.getLogger();

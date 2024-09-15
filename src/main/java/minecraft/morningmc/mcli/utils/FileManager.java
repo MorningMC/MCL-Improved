@@ -28,7 +28,7 @@ public class FileManager {
 	 */
 	private static File resolveAppData() {
 		try {
-			return switch (Platform.current.operatingSystem) {
+			return switch (Platform.current.operatingSystem()) {
 				case WINDOWS -> new File(System.getenv("AppData"));
 				case MACOS -> new File(System.getProperty("user.home"), "Library/Application Support");
 				case LINUX -> new File(System.getProperty("user.home"), ".config");

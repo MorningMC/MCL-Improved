@@ -11,7 +11,7 @@ public final class SkinAniWavingArms extends SkinAnimation {
                                                            canvas.larm.getZRotate().angleProperty());
 
         SkinTransition rarmTransition = new SkinTransition(Duration.millis(time), v -> v * -angle,
-                canvas.rarm.getZRotate().angleProperty());
+                                                           canvas.rarm.getZRotate().angleProperty());
 
         FunctionHelper.alwaysB(SkinTransition::setAutoReverse, true, larmTransition, rarmTransition);
         FunctionHelper.alwaysB(SkinTransition::setCycleCount, 2, larmTransition, rarmTransition);
