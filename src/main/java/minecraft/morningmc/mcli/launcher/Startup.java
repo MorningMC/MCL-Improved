@@ -10,6 +10,8 @@ import javafx.application.Application;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.*;
+
 /**
  * The entry point for launching MCL Improved.
  *
@@ -29,7 +31,7 @@ public class Startup {
 	    logger.info("System platform: {}", Platform.system);
 	    logger.info("Current platform: {}", Platform.current);
         logger.info("Java runtime: {}", JavaRuntime.current != null ? JavaRuntime.current : "N/A");
-	    logger.info("Working root: {}", FileManager.workingRoot);
+	    logger.info("Working root: {}", FileManager.workingRoot.getAbsolutePath());
         
         if (!Metadata.version.isStable()) {
             logger.warn("This is a development build. There may be some issues.");
@@ -43,6 +45,7 @@ public class Startup {
      */
     public static void main(String... args) {
         logger.info("Starting launcher...");
+        logger.info("Arguments: {}", args.length > 0 ? Arrays.toString(args) : "N/A");
         
         try {
             new Startup().run(args);
@@ -53,7 +56,7 @@ public class Startup {
         
         logger.info("Launcher quit.");
         if (pendingRestart) {
-            System.exit(64); // this will be handled by the launcher and took a restart
+            System.exit(64); // this will be handled by the wrapper and took a restart
         }
     }
     

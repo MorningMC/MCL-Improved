@@ -15,7 +15,7 @@ public record Conditional<T>(Set<Rule> rules, T value) {
 	/**
 	 * Creates an {@link Conditional} instance without rules, which always passes the rule check.
 	 *
-	 * @param value The value associated with the unconditional condition.
+	 * @param value The value associated without condition.
 	 * @param <T> The type of the value.
 	 * @return A {@link Conditional} instance that always passes the rule check.
 	 */

@@ -32,43 +32,10 @@ public class Main extends Application {
 	public void init() {
 		logger.info("Initializing launcher...");
 		
-		if (FileManager.config.exists()) {
-			// backup config
-			logger.info("Config found! Backing up config...");
-			
-			try {
-				FileManager.configBackup.createNewFile();
-				FileManager.copyFile(FileManager.config, FileManager.configBackup);
-			} catch (Exception e) {
-				logger.warn("Failed to backup config: {}", e.getMessage());
-			}
-			
-		} else {
-			// try complete config
-			try {
-				FileManager.config.createNewFile();
-				
-				// try reverse config
-				if (FileManager.configBackup.exists()) {
-					FileManager.copyFile(FileManager.configBackup, FileManager.config);
-				}
-			} catch (Exception e) {
-				logger.error("Failed to complete config file: ", e);
-			}
-		}
-		
-		// load config
-		logger.info("Loading configurations...");
-		CompoundTag config;
-		try {
-			config = new Nbt().fromFile(FileManager.config);
-		} catch (IOException e) {
-			logger.warn("Failed to load config: {}", e.getMessage());
-			config = new CompoundTag();
-		}
-		
-		ConfigHelper.loadConfigs(config);
+		ConfigHelper.loadAll(); // load config
 		ConfigHelper.startAutoSave(); // start auto-save thread
+		
+//		Runtime.getRuntime().addShutdownHook(new Thread(ConfigHelper::saveAll, "shutdown")); // save config after the application stopped
 	}
 	
 	/**

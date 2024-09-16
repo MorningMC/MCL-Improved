@@ -16,10 +16,11 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
- * A Utility class for managing configurations.
+ * Utility class for managing configurations.
  */
 @StaticClass
 public final class ConfigHelper implements Runnable {
@@ -91,6 +92,51 @@ public final class ConfigHelper implements Runnable {
 	}
 	
 	/**
+	 * Loads all configurations.
+	 */
+	public static void loadAll() {
+		logger.info("Loading configurations...");
+		
+		FileManager.workingRoot.mkdirs(); // create working directory
+		if (FileManager.config.exists()) {
+			// backup config
+			logger.info("Config found! Backing up config...");
+			
+			try {
+				FileManager.configBackup.createNewFile();
+				FileManager.copyFile(FileManager.config, FileManager.configBackup);
+			} catch (Exception e) {
+				logger.warn("Failed to backup config: {}", e.getMessage());
+			}
+			
+		} else {
+			// try complete config
+			try {
+				FileManager.config.createNewFile();
+				
+				// try reverse config
+				if (FileManager.configBackup.exists()) {
+					FileManager.copyFile(FileManager.configBackup, FileManager.config);
+				}
+			} catch (Exception e) {
+				logger.error("Failed to complete config file: ", e);
+			}
+		}
+		
+		// load config
+		logger.info("Loading configurations...");
+		CompoundTag config;
+		try {
+			config = new Nbt().fromFile(FileManager.config);
+		} catch (IOException e) {
+			logger.warn("Failed to load config: {}", e.getMessage());
+			config = new CompoundTag();
+		}
+		
+		ConfigHelper.loadConfigs(config);
+	}
+	
+	/**
 	 * Saves all configurations.
 	 */
 	public static void saveAll() {
@@ -98,10 +144,8 @@ public final class ConfigHelper implements Runnable {
 		
 		// save config to file
 		// this process sometimes throws exceptions, so some retries are required to be taken
-		byte retries = 0;
-		while (retries < GlobalSettings.saveConfigMaxRetries) {
+		for (byte retries = 0;;) {
 			CompoundTag config = new CompoundTag();
-			
 			ConfigHelper.saveConfigs(config);
 			
 			try {
@@ -111,22 +155,26 @@ public final class ConfigHelper implements Runnable {
 				// otherwise an exception will be thrown and jump to the catch branch
 				logger.info("Configuration successfully saved to file: {}", FileManager.config);
 				break; // break out the while loop to stop retries
+				
 			} catch (Exception e) {
 				logger.warn("Failed to save config, tried {}: {}", ++retries /* variable retries updated here */, e.getMessage());
-			}
-		}
-		if (retries >= GlobalSettings.saveConfigMaxRetries) { // if exceptions still throw
-			logger.error("Failed to save config after {} retries.", retries);
-			
-			// try reverse config
-			// this prevents file format corruption
-			if (FileManager.configBackup.exists()) {
-				logger.info("Backup file found! reverting...");
 				
-				try {
-					FileManager.copyFile(FileManager.configBackup, FileManager.config);
-				} catch (Exception e) {
-					logger.error("Failed to revert to backup: ", e);
+				if (retries >= GlobalSettings.saveConfigMaxRetries) { // if exceptions still throw
+					logger.error("Failed to save config after {} retries.", retries);
+					
+					// try reverse config
+					// this prevents file format corruption
+					if (FileManager.configBackup.exists()) {
+						logger.info("Backup file found! reverting...");
+						
+						try {
+							FileManager.copyFile(FileManager.configBackup, FileManager.config);
+						} catch (Exception ex) {
+							logger.error("Failed to revert to backup: ", ex);
+						}
+					}
+					
+					break; // break out the while loop
 				}
 			}
 		}
