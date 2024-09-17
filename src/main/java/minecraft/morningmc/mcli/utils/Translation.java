@@ -56,7 +56,7 @@ public class Translation {
 		// Load translations
 		logger.info("Loading translations for language: {}", language);
 		
-		try (BufferedReader reader = FileManager.getReader(FileManager.getResource("assets/lang/lang_%s.properties".formatted(language)))) {
+		try (BufferedReader reader = FileManager.getReader(ClassLoader.getSystemResourceAsStream("assets/lang/lang_%s.properties".formatted(language)))) {
 			for (String line; (line = reader.readLine()) != null; ) {
 				Matcher matcher = Pattern.compile("(?<key>.*)=(?<value>.*)").matcher(line);
 				if (matcher.matches()) {

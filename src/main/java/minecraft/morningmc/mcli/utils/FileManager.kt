@@ -44,17 +44,6 @@ object FileManager {
     }
 
     /**
-     * Retrieves an input stream for the specified resource path.
-     *
-     * @param path The path of the resource.
-     * @return An [InputStream] for the specified resource.
-     */
-    @JvmStatic
-    fun getResource(path: String?): InputStream? {
-        return ClassLoader.getSystemResourceAsStream(path)
-    }
-
-    /**
      * Retrieves a buffered reader for the specified input stream.
      *
      * @param stream The specified input stream.
@@ -88,8 +77,8 @@ object FileManager {
     @Throws(IOException::class)
     fun copyFile(source: File, destination: File) {
         FileInputStream(source).use { `in` ->
-            FileOutputStream(destination).use { out ->
-                `in`.transferTo(out)
+            FileOutputStream(destination).use { `out` ->
+                `in`.transferTo(`out`)
             }
         }
     }

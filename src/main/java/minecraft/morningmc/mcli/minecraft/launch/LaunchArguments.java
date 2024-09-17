@@ -1,6 +1,5 @@
 package minecraft.morningmc.mcli.minecraft.launch;
 
-import minecraft.morningmc.mcli.launcher.settings.FileSettings;
 import minecraft.morningmc.mcli.minecraft.auth.Account;
 import minecraft.morningmc.mcli.minecraft.client.MinecraftDirectory;
 import minecraft.morningmc.mcli.minecraft.client.Profile;
@@ -8,18 +7,17 @@ import minecraft.morningmc.mcli.minecraft.java.JavaRuntime;
 import minecraft.morningmc.mcli.minecraft.launch.options.LaunchOptions;
 import minecraft.morningmc.mcli.utils.Conditional;
 
-import java.io.File;
 import java.util.*;
 
 /**
  * Represents the arguments to be passed to the Minecraft client.
- *
- * @param options The launch options.
- * @param profile The profile to be used.
- * @param account The account to be used.
  */
-@SuppressWarnings("ALL")
-public record LaunchArguments(LaunchOptions options, Profile profile, Account account) {
+public final class LaunchArguments {
+	public final LaunchOptions options;
+	public final Profile profile;
+	public final Account account;
+	
+	public final List<String> commandline;
 	
 	/**
 	 * Constructs a new {@link LaunchArguments} instance.
@@ -27,13 +25,14 @@ public record LaunchArguments(LaunchOptions options, Profile profile, Account ac
 	 * @param options The launch options.
 	 * @param profile The profile to be used.
 	 * @param account The account to be used.
-	 *
 	 * @throws NullPointerException If any of the parameters are {@code null}.
 	 */
 	public LaunchArguments(LaunchOptions options, Profile profile, Account account) {
 		this.options = Objects.requireNonNull(options);
 		this.profile = Objects.requireNonNull(profile);
 		this.account = Objects.requireNonNull(account);
+		
+		this.commandline = generateCommandline();
 	}
 	
 	/**
@@ -41,7 +40,7 @@ public record LaunchArguments(LaunchOptions options, Profile profile, Account ac
 	 *
 	 * @return The commandline for launching the Minecraft client.
 	 */
-	public List<String> generateCommandline() {
+	private List<String> generateCommandline() {
 		return List.of(); // TODO complete launch statement
 	}
 	
@@ -54,19 +53,10 @@ public record LaunchArguments(LaunchOptions options, Profile profile, Account ac
 	private List<String> generateCommandlineTemplate(Map<String, Boolean> features) {
 		List<String> template = new ArrayList<>();
 		
-		template.add(options.javaRuntime.getIfEnabled(JavaRuntime.Collection.get(profile.version.javaVersion(), options.javaRuntime.get())).executable().getAbsolutePath());
-		template.addAll(options.javaArguments.getIfEnabled(
-				() -> profile.version.javaArguments().stream()
-						      .filter(arg -> arg.check(features))
-						      .map(Conditional::value)
-						      .toList()
-		));
+		template.add(options.javaRuntime.getIfEnabled(JavaRuntime.Collection.getOne(profile.version.javaVersion(), options.javaRuntime.get())).executable().getAbsolutePath());
+		template.addAll(options.javaArguments.getIfEnabled(() -> profile.version.javaArguments().stream().filter(arg -> arg.check(features)).map(Conditional::value).toList()));
 		template.add(profile.version.mainClass());
-		template.addAll(profile.version.gameArguments().stream()
-						 .filter(arg -> arg.check(features))
-						 .map(Conditional::value)
-						 .toList()
-		);
+		template.addAll(profile.version.gameArguments().stream().filter(arg -> arg.check(features)).map(Conditional::value).toList());
 		
 		return template;
 	}
@@ -86,7 +76,7 @@ public record LaunchArguments(LaunchOptions options, Profile profile, Account ac
 	 * @return The directory for the Minecraft client.
 	 */
 	public MinecraftDirectory getDirectory() {
-		MinecraftDirectory directory = options.gameDir.getIfEnabled(() -> new MinecraftDirectory(new File(FileSettings.isolateRoot, profile.identifier().toString())));
+		MinecraftDirectory directory = options.gameDir.getIfEnabled(profile::isolatedDirectory);
 		directory.root.mkdirs();
 		return directory;
 	}

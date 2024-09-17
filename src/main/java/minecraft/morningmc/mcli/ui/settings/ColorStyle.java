@@ -48,8 +48,8 @@ public final class ColorStyle {
 					ButtonStyle.loader.load(tag.getCompound("background")),
 					ButtonStyle.loader.load(tag.getCompound("title")),
 					ButtonStyle.loader.load(tag.getCompound("close")),
-					NbtLoader.colorLoader.load(tag.getCompound("text")),
-					NbtLoader.colorLoader.load(tag.getCompound("text_shadow")),
+					NbtLoader.colorLoader.load(tag.getInt("text")),
+					NbtLoader.colorLoader.load(tag.getInt("text_shadow")),
 					ButtonStyle.loader.load(tag.getCompound("text_entry"))
 			);
 		}
@@ -202,9 +202,9 @@ public final class ColorStyle {
 			@Override
 			public ButtonStyle load(CompoundTag tag) throws IllegalNbtException {
 				return new ButtonStyle(
-						NbtLoader.colorLoader.load(tag.getCompound("major")),
-						NbtLoader.colorLoader.load(tag.getCompound("edge")),
-						NbtLoader.colorLoader.load(tag.getCompound("bottom"))
+						NbtLoader.colorLoader.load(tag.getInt("major")),
+						NbtLoader.colorLoader.load(tag.getInt("edge")),
+						NbtLoader.colorLoader.load(tag.getInt("bottom"))
 				);
 			}
 			

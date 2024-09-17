@@ -153,7 +153,7 @@ public final class ConfigHelper implements Runnable {
 				
 				// code below will be executed if config successfully saved to file
 				// otherwise an exception will be thrown and jump to the catch branch
-				logger.info("Configuration successfully saved to file: {}", FileManager.config);
+				logger.info("Configuration successfully saved to file: {}", FileManager.config.getAbsolutePath());
 				break; // break out the while loop to stop retries
 				
 			} catch (Exception e) {

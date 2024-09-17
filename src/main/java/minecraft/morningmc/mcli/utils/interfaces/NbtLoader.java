@@ -1,5 +1,7 @@
 package minecraft.morningmc.mcli.utils.interfaces;
 
+import dev.dewy.nbt.tags.array.IntArrayTag;
+import dev.dewy.nbt.tags.primitive.IntTag;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 
 import javafx.scene.text.Font;
@@ -75,6 +77,44 @@ public interface NbtLoader<C, T extends Tag> {
 		}
 	};
 	
+	/** {@link NbtLoader} for loading and saving {@link UUID} objects from/to NBT data. */
+	NbtLoader<UUID, IntArrayTag> uuidLoader = new NbtLoader<>() {
+
+		/**
+		 * Load a {@link UUID} from an NBT string tag.
+		 *
+		 * @param tag The NBT string tag containing a UUID string.
+		 * @return The loaded {@link UUID}.
+		 */
+		@Override
+		public UUID load(IntArrayTag tag) throws IllegalNbtException {
+			try {
+				long mostSigBits = (long)tag.getValue()[0] << 32 | (long)tag.getValue()[1] & 0xFFFFFFFFL;
+				long leastSigBits = (long)tag.getValue()[2] << 32 | (long)tag.getValue()[3] & 0xFFFFFFFFL;
+				
+				return new UUID(mostSigBits, leastSigBits);
+			} catch (Exception e) {
+				throw new IllegalNbtException("Exception while loading UUID object", e);
+			}
+		}
+
+		/**
+		 * Save a {@link UUID} to an NBT string tag.
+		 *
+		 * @param object The {@link UUID} to be saved.
+		 * @return The NBT string tag containing the saved UUID string.
+		 */
+		@Override
+		public IntArrayTag save(UUID object) {
+			return new IntArrayTag(new int[]{
+					(int) ( object.getMostSignificantBits() >> 32 ),
+					(int) object.getMostSignificantBits(),
+					(int) ( object.getLeastSignificantBits() >> 32 ),
+					(int) object.getLeastSignificantBits()
+			});
+		}
+	};
+	
 	/** {@link NbtLoader} for loading and saving a proxy from/to NBT data. */
 	NbtLoader<Proxy, CompoundTag> proxyLoader = new NbtLoader<>() {
 
@@ -119,40 +159,42 @@ public interface NbtLoader<C, T extends Tag> {
 	};
 	
 	/** {@link NbtLoader} for loading and saving {@link Color} objects from/to NBT data. */
-	NbtLoader<Color, CompoundTag> colorLoader = new NbtLoader<>() {
+	NbtLoader<Color, IntTag> colorLoader = new NbtLoader<>() {
 
 		/**
 		 * Load a color from an NBT compound tag.
 		 *
-		 * @param tag The NBT compound tag containing color data.
+		 * @param tag The NBT tag containing color data.
 		 * @return The loaded color.
 		 */
 		@Override
-		public Color load(CompoundTag tag) {
-			double red = tag.getDouble("red").getValue();
-			double green = tag.getDouble("green").getValue();
-			double blue = tag.getDouble("blue").getValue();
-			double opacity = tag.getDouble("opacity").getValue();
-
-			return Color.color(red, green, blue, opacity);
+		public Color load(IntTag tag) throws IllegalNbtException {
+			try {
+				byte red = (byte) (tag.getValue() >> 16 & 0xFF);
+				byte green = (byte) (tag.getValue() >> 8 & 0xFF);
+				byte blue = (byte) (tag.getValue() & 0xFF);
+				byte opacity = (byte) (tag.getValue() >> 24 & 0xFF);
+				
+				return Color.rgb(red, green, blue, opacity / 255.);
+			} catch (Exception e) {
+				throw new IllegalNbtException("Exception while loading Color object", e);
+			}
 		}
 
 		/**
 		 * Save a color to an NBT compound tag.
 		 *
 		 * @param object The color to be saved.
-		 * @return The NBT compound tag containing the saved color data.
+		 * @return The NBT tag containing the saved color data.
 		 */
 		@Override
-		public CompoundTag save(Color object) {
-			CompoundTag tag = new CompoundTag();
+		public IntTag save(Color object) {
+			int red = (byte) (object.getRed() * 255);
+			int green = (byte) (object.getGreen() * 255);
+			int blue = (byte) (object.getBlue() * 255);
+			int opacity = (byte) (object.getOpacity() * 255);
 
-			tag.putDouble("red", object.getRed());
-			tag.putDouble("green", object.getGreen());
-			tag.putDouble("blue", object.getBlue());
-			tag.putDouble("opacity", object.getOpacity());
-
-			return tag;
+			return new IntTag(opacity << 24 | red << 16 | green << 8 | blue);
 		}
 	};
 	

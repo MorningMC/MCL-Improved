@@ -10,7 +10,7 @@ import javafx.scene.image.Image;
  * A class to manage the UI of the launcher.
  */
 public class UIManager {
-	public static final Image icon = new Image(FileManager.getResource("assets/textures/icon.png"));
+	public static final Image icon = new Image(ClassLoader.getSystemResourceAsStream("assets/textures/icon.png"));
 	
 	public final Window mainWindow;
 	

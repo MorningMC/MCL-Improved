@@ -73,7 +73,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 			}
 			
 			// parse version
-			String versionString = Objects.requireNonNull(getProperty(content, "java.version"));
+			String versionString = getProperty(content, "java.version");
 			if (versionString.startsWith("1.")) {
 				// in some cases, the version number has an extra "1." at the beginning
 				versionString = versionString.substring(2); // filter out the extra "1."
@@ -252,13 +252,24 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 		}
 		
 		/**
+		 * Gets a single Java runtime. If there are multiple runtimes, the first one is returned.
+		 *
+		 * @return The Java runtime, or {@code null} if none is available.
+		 */
+		public static JavaRuntime getOne() {
+			return runtimes.stream()
+					       .findFirst()
+					       .orElse(null);
+		}
+		
+		/**
 		 * Gets a single Java runtime with the specified version. If no runtime with the specified version is found, the {@code defaultValue} is returned.
 		 *
 		 * @param version The version of the Java runtime to be retrieved.
 		 * @param defaultValue The default value to be returned if no runtime with the specified version is found.
 		 * @return The Java runtime with the specified version, or the {@code defaultValue} if not found.
 		 */
-		public static JavaRuntime get(int version, JavaRuntime defaultValue) {
+		public static JavaRuntime getOne(int version, JavaRuntime defaultValue) {
 			return runtimes.stream()
 							.filter(runtime -> runtime.version.feature() == version)
 							.findFirst()

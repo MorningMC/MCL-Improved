@@ -128,13 +128,9 @@ public class Launcher {
 		logger.info("Launching Minecraft...");
 		
 		// log commandline
-		List<String> commandline = arguments.generateCommandline();
-		logger.debug("Commandline: ");
-		for (String arg : commandline) {
-			logger.debug(arg);
-		}
+		logger.debug("Commandline: {}", arguments.commandline);
 		
-		ProcessBuilder builder = new ProcessBuilder(commandline);
+		ProcessBuilder builder = new ProcessBuilder(arguments.commandline);
 		builder.directory(arguments.getDirectory().root);
 		
 		Process process;

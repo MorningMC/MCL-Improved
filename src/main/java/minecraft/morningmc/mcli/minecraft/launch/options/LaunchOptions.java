@@ -166,7 +166,7 @@ public final class LaunchOptions {
 	
 	/** The default launch options. */
 	public static final LaunchOptions defaultOptions = new LaunchOptions(
-			Switchable.ofDisabled(JavaRuntime.current),
+			Switchable.ofDisabled(JavaRuntime.Collection.getOne()),
 			Switchable.ofDisabled(MemoryRange.of(2048)),
 			Switchable.ofDisabled(List.of("-XX:+UnlockExperimentalVMOptions", "-XX:+UseG1GC", "-XX:G1NewSizePercent=20", "-XX:G1ReservePercent=20", "-XX:MaxGCPauseMillis=50", "-XX:G1HeapRegionSize=32M")),
 			Map.of(),

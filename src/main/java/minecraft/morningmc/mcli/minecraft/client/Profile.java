@@ -1,7 +1,7 @@
 package minecraft.morningmc.mcli.minecraft.client;
 
 import dev.dewy.nbt.tags.collection.ListTag;
-import minecraft.morningmc.mcli.utils.FileManager;
+import minecraft.morningmc.mcli.launcher.settings.FileSettings;
 import minecraft.morningmc.mcli.minecraft.client.version.Version;
 import minecraft.morningmc.mcli.minecraft.launch.options.LaunchOptions;
 import minecraft.morningmc.mcli.utils.annotations.ObjectCollection;
@@ -17,6 +17,7 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.*;
 
@@ -36,22 +37,21 @@ public final class Profile implements UniqueObject {
 					tag.getString("icon").getValue(),
 					Version.loader.load(tag.getString("version")),
 					Switchable.generateLoader(LaunchOptions.loader).load(tag.getCompound("options")),
-					UUID.fromString(tag.getString("identifier").getValue()));
+					NbtLoader.uuidLoader.load(tag.getIntArray("identifier"))
+			);
 		}
 		
 		@Override
 		public CompoundTag save(Profile object) {
 			CompoundTag tag = new CompoundTag();
 			
-			if (object == null) {
-				return tag;
+			if (object != null) {
+				tag.putString("name", object.name);
+				tag.putString("icon", object.icon);
+				tag.put("version", Version.loader.save(object.version));
+				tag.put("options", Switchable.generateLoader(LaunchOptions.loader).save(object.options));
+				tag.put("identifier", NbtLoader.uuidLoader.save(object.identifier));
 			}
-			
-			tag.putString("name", object.name);
-			tag.putString("icon", object.icon);
-			tag.put("version", Version.loader.save(object.version));
-			tag.put("options", Switchable.generateLoader(LaunchOptions.loader).save(object.options));
-			tag.putString("identifier", object.identifier.toString());
 			
 			return tag;
 		}
@@ -96,12 +96,21 @@ public final class Profile implements UniqueObject {
 	 *
 	 * @return The icon image.
 	 */
-	public Image getIconImage() {
+	public Image iconImage() {
 		try {
-			return new Image(FileManager.getResource(icon));
+			return new Image(ClassLoader.getSystemResourceAsStream(icon));
 		} catch (Exception e) {
 			return null;
 		}
+	}
+	
+	/**
+	 * Gets the isolated directory for the profile.
+	 *
+	 * @return The isolated directory.
+	 */
+	public MinecraftDirectory isolatedDirectory() {
+		return new MinecraftDirectory(new File(FileSettings.isolateRoot, identifier.toString()));
 	}
 	
 	@Override
