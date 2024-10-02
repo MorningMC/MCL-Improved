@@ -65,10 +65,15 @@ public class Enumerable<T, E extends Enum<E>> extends Modifiable<T> {
 			 */
 			@Override
 			public Enumerable<C, E> load(CompoundTag tag) throws IllegalNbtException {
-				E policy = Enum.valueOf(enumClass, tag.getString("policy").getValue());
-				C value = loader.load(tag.get("value"));
-				
-				return of(value, policy);
+				try {
+					E policy = enumClass.getEnumConstants()[tag.getInt("policy").getValue()];
+					C value = loader.load(tag.get("value"));
+					
+					return of(value, policy);
+					
+				} catch (Exception e) {
+					throw new IllegalNbtException("Exception while loading Enumerable object", e);
+				}
 			}
 			
 			/**
@@ -80,7 +85,7 @@ public class Enumerable<T, E extends Enum<E>> extends Modifiable<T> {
 			@Override
 			public CompoundTag save(Enumerable<C, E> object) {
 				CompoundTag tag = new CompoundTag();
-				tag.putString("policy", object.policy.name());
+				tag.putInt("policy", object.policy.ordinal());
 				tag.put("value", loader.save(object.value));
 
 				return tag;

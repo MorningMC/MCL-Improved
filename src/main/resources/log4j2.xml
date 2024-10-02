@@ -15,6 +15,7 @@
                 <OnStartupTriggeringPolicy minSize="1"/>
             </Policies>
             <PatternLayout pattern="${pattern}" />
+            <DefaultRolloverStrategy max="16" />
         </RollingFile>
     </Appenders>
 

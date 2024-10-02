@@ -6,6 +6,7 @@ import minecraft.morningmc.mcli.utils.annotations.ObjectCollection;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalJavaException;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
+import minecraft.morningmc.mcli.utils.functions.ExceptionUtils;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.primitive.StringTag;
@@ -116,7 +117,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 		try {
 			return fromHome(new File(System.getProperty("java.home")));
 		} catch (IllegalJavaException e) {
-			logger.warn("Failed to get current Java runtime: {}", e.getMessage());
+			logger.warn("Failed to get current Java runtime: {}", ExceptionUtils.getMessages(e));
 			return null;
 		}
 	}
@@ -202,7 +203,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 							     try {
 								     return Stream.of(JavaRuntime.loader.load(subTag));
 							     } catch (IllegalNbtException e) {
-								     logger.warn("Failed to load Java runtime from NBT: {}", e.getMessage());
+								     logger.warn("Failed to load Java runtime from NBT: {}", ExceptionUtils.getMessages(e));
 								     return Stream.empty();
 							     }
 						     })
@@ -320,7 +321,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 							runtimes.add(newRuntime);
 						}
 					} catch (IllegalJavaException e) {
-						logger.warn("Expired Java runtime: {}", e.getMessage());
+						logger.warn("Expired Java runtime: {}", ExceptionUtils.getMessages(e));
 						runtimes.remove(runtime);
 					}
 				});
@@ -446,7 +447,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 								.forEach(potentialRuntimes::add);
 						
 					} catch (Exception e) {
-						logger.warn("Failed to parse PATH: {}", e.getMessage());
+						logger.warn("Failed to parse PATH: {}", ExceptionUtils.getMessages(e));
 					}
 					
 					if (current != null) {

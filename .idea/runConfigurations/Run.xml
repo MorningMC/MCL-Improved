@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run" type="CompoundRunConfigurationType">
+    <toRun name="Compile" type="CompoundRunConfigurationType" />
+    <toRun name="RunWrapper" type="ShConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>

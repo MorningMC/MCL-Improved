@@ -10,26 +10,20 @@ object Metadata {
     // Constants
     /** Represents the name of the launcher.  */
     const val name: String = "MCL Improved"
-
     /** Represents the long name of the launcher.  */
     const val longName: String = "Minecraft Launcher Improved"
-
     /** Represents the short name of the launcher.  */
     const val shortName: String = "MCLI"
-
     /** Represents the version of the launcher.  */
     @JvmField
     val version: Version = Version(0, 5, 3, 1)
-
     // Auto-complete
     /** Represents the full name of the launcher including name and version.  */
     @JvmField
     val fullName: String = "$name $version"
-
     /** Represents the long full name of the launcher including long name and detailed version information.  */
     @JvmField
     val longFullName: String = longName + " " + version.toFullString()
-
     /** Represents the short full name of the launcher including short name and version.  */
     val shortFullName: String = "$shortName $version"
 

@@ -4,6 +4,7 @@ import minecraft.morningmc.mcli.launcher.settings.FileSettings;
 import minecraft.morningmc.mcli.minecraft.client.MinecraftDirectory;
 import minecraft.morningmc.mcli.minecraft.java.JavaRuntime;
 import minecraft.morningmc.mcli.utils.containers.*;
+import minecraft.morningmc.mcli.utils.functions.ExceptionUtils;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
@@ -30,7 +31,7 @@ public final class LaunchOptions {
 			try {
 				javaRuntime = Switchable.generateLoader(JavaRuntime.loader).load(tag.getCompound("java_runtime"));
 			} catch (Exception e) {
-				logger.warn("java_runtime load failed: {}", e.getMessage());
+				logger.warn("java_runtime load failed: {}", ExceptionUtils.getMessages(e));
 				javaRuntime = defaultOptions.javaRuntime;
 			}
 			
@@ -38,7 +39,7 @@ public final class LaunchOptions {
 			try {
 				memoryRange = Switchable.generateLoader(MemoryRange.loader).load(tag.getCompound("memory_range"));
 			} catch (Exception e) {
-				logger.warn("memory_range load failed: {}", e.getMessage());
+				logger.warn("memory_range load failed: {}", ExceptionUtils.getMessages(e));
 				memoryRange = defaultOptions.memoryRange;
 			}
 			
@@ -46,7 +47,7 @@ public final class LaunchOptions {
 			try {
 				javaArguments = Switchable.generateLoader(NbtLoader.stringListLoader).load(tag.getCompound("java_arguments"));
 			} catch (Exception e) {
-				logger.warn("java_arguments load failed: {}", e.getMessage());
+				logger.warn("java_arguments load failed: {}", ExceptionUtils.getMessages(e));
 				javaArguments = defaultOptions.javaArguments;
 			}
 			
@@ -54,7 +55,7 @@ public final class LaunchOptions {
 			try {
 				customArgumentParameters = tag.getCompound("custom_argument_parameters").getValue().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> ((StringTag) entry.getValue()).getValue()));
 			} catch (Exception e) {
-				logger.warn("custom_argument_parameters load failed: {}", e.getMessage());
+				logger.warn("custom_argument_parameters load failed: {}", ExceptionUtils.getMessages(e));
 				customArgumentParameters = defaultOptions.customArgumentParameters;
 			}
 			
@@ -62,7 +63,7 @@ public final class LaunchOptions {
 			try {
 				watermark = Switchable.generateLoader(NbtLoader.stringLoader).load(tag.getCompound("watermark"));
 			} catch (Exception e) {
-				logger.warn("watermark load failed: {}", e.getMessage());
+				logger.warn("watermark load failed: {}", ExceptionUtils.getMessages(e));
 				watermark = defaultOptions.watermark;
 			}
 			
@@ -70,7 +71,7 @@ public final class LaunchOptions {
 			try {
 				gameDir = Switchable.generateLoader(MinecraftDirectory.loader).load(tag.getCompound("game_dir"));
 			} catch (Exception e) {
-				logger.warn("game_dir load failed: {}", e.getMessage());
+				logger.warn("game_dir load failed: {}", ExceptionUtils.getMessages(e));
 				gameDir = defaultOptions.gameDir;
 			}
 			
@@ -78,7 +79,7 @@ public final class LaunchOptions {
 			try {
 				windowSize = WindowSize.loader.load(tag.getCompound("window_size"));
 			} catch (Exception e) {
-				logger.warn("window_size load failed: {}", e.getMessage());
+				logger.warn("window_size load failed: {}", ExceptionUtils.getMessages(e));
 				windowSize = defaultOptions.windowSize;
 			}
 			
@@ -86,7 +87,7 @@ public final class LaunchOptions {
 			try {
 				quickPlay = QuickPlay.loader.load(tag.getCompound("quick_play"));
 			} catch (Exception e) {
-				logger.warn("quick_play load failed: {}", e.getMessage());
+				logger.warn("quick_play load failed: {}", ExceptionUtils.getMessages(e));
 				quickPlay = defaultOptions.quickPlay;
 			}
 			
@@ -94,7 +95,7 @@ public final class LaunchOptions {
 			try {
 				demo = tag.getByte("demo").getValue() != 0;
 			} catch (Exception e) {
-				logger.warn("demo load failed: {}", e.getMessage());
+				logger.warn("demo load failed: {}", ExceptionUtils.getMessages(e));
 				demo = defaultOptions.demo;
 			}
 			
@@ -108,56 +109,56 @@ public final class LaunchOptions {
 			try {
 				tag.put("java_runtime", Switchable.generateLoader(JavaRuntime.loader).save(object.javaRuntime));
 			} catch (Exception e) {
-				logger.warn("java_runtime save failed: {}", e.getMessage());
+				logger.warn("java_runtime save failed: {}", ExceptionUtils.getMessages(e));
 			}
 			
 			try {
 				tag.put("memory_range", Switchable.generateLoader(MemoryRange.loader).save(object.memoryRange));
 			} catch (Exception e) {
-				logger.warn("memory_range save failed: {}", e.getMessage());
+				logger.warn("memory_range save failed: {}", ExceptionUtils.getMessages(e));
 			}
 			
 			try {
 				tag.put("java_arguments", Switchable.generateLoader(NbtLoader.stringListLoader).save(object.javaArguments));
 			} catch (Exception e) {
-				logger.warn("java_arguments save failed: {}", e.getMessage());
+				logger.warn("java_arguments save failed: {}", ExceptionUtils.getMessages(e));
 			}
 			
 			try {
 				tag.put("custom_argument_parameters", new CompoundTag(object.customArgumentParameters.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> new StringTag(entry.getValue())))));
 			} catch (Exception e) {
-				logger.warn("custom_argument_parameters save failed: {}", e.getMessage());
+				logger.warn("custom_argument_parameters save failed: {}", ExceptionUtils.getMessages(e));
 			}
 			
 			try {
 				tag.put("watermark", Switchable.generateLoader(NbtLoader.stringLoader).save(object.watermark));
 			} catch (Exception e) {
-				logger.warn("watermark save failed: {}", e.getMessage());
+				logger.warn("watermark save failed: {}", ExceptionUtils.getMessages(e));
 			}
 			
 			try {
 				
 				tag.put("game_dir", Switchable.generateLoader(MinecraftDirectory.loader).save(object.gameDir));
 			} catch (Exception e) {
-				logger.warn("game_dir save failed: {}", e.getMessage());
+				logger.warn("game_dir save failed: {}", ExceptionUtils.getMessages(e));
 			}
 			
 			try {
 				tag.put("window_size", WindowSize.loader.save(object.windowSize));
 			} catch (Exception e) {
-				logger.warn("window_size save failed: {}", e.getMessage());
+				logger.warn("window_size save failed: {}", ExceptionUtils.getMessages(e));
 			}
 			
 			try {
 				tag.put("quick_play", QuickPlay.loader.save(object.quickPlay));
 			} catch (Exception e) {
-				logger.warn("quick_play save failed: {}", e.getMessage());
+				logger.warn("quick_play save failed: {}", ExceptionUtils.getMessages(e));
 			}
 			
 			try {
 				tag.putByte("demo", object.demo ? (byte) 1 : (byte) 0);
 			} catch (Exception e) {
-				logger.warn("demo save failed: {}", e.getMessage());
+				logger.warn("demo save failed: {}", ExceptionUtils.getMessages(e));
 			}
 			
 			return tag;

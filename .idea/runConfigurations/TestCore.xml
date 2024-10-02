@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Startup" type="Application" factoryName="Application">
+  <configuration default="false" name="TestCore" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="minecraft.morningmc.mcli.launcher.Startup" />
-    <module name="mcl-improved.main" />
+    <module name="mcli.main" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/run" />
     <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
       <option name="credential" />

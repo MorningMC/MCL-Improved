@@ -1,19 +1,20 @@
 package minecraft.morningmc.mcli.minecraft.client;
 
-import dev.dewy.nbt.tags.collection.ListTag;
 import minecraft.morningmc.mcli.launcher.settings.FileSettings;
 import minecraft.morningmc.mcli.minecraft.client.version.Version;
 import minecraft.morningmc.mcli.minecraft.launch.options.LaunchOptions;
 import minecraft.morningmc.mcli.utils.annotations.ObjectCollection;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
-import minecraft.morningmc.mcli.utils.interfaces.UniqueObject;
+import minecraft.morningmc.mcli.utils.functions.ExceptionUtils;
+import minecraft.morningmc.mcli.utils.interfaces.*;
 import minecraft.morningmc.mcli.utils.containers.Switchable;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
-import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import javafx.scene.image.Image;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
+import dev.dewy.nbt.tags.collection.ListTag;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -140,7 +141,7 @@ public final class Profile implements UniqueObject {
 							     try {
 								     return Stream.of(Profile.loader.load(subTag));
 							     } catch (IllegalNbtException e) {
-								     logger.warn("Failed to load profile from NBT: {}", e.getMessage());
+								     logger.warn("Failed to load profile from NBT: {}", ExceptionUtils.getMessages(e));
 								     return Stream.empty();
 							     }
 						     })

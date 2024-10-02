@@ -2,6 +2,7 @@ package minecraft.morningmc.mcli.utils.interfaces;
 
 import dev.dewy.nbt.tags.array.IntArrayTag;
 import dev.dewy.nbt.tags.primitive.IntTag;
+import minecraft.morningmc.mcli.ui.settings.FontStyle;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 
 import javafx.scene.text.Font;
@@ -85,6 +86,7 @@ public interface NbtLoader<C, T extends Tag> {
 		 *
 		 * @param tag The NBT string tag containing a UUID string.
 		 * @return The loaded {@link UUID}.
+		 * @throws IllegalNbtException If there is an issue with the NBT data.
 		 */
 		@Override
 		public UUID load(IntArrayTag tag) throws IllegalNbtException {
@@ -123,18 +125,23 @@ public interface NbtLoader<C, T extends Tag> {
 		 *
 		 * @param tag The NBT compound tag containing proxy data.
 		 * @return The loaded proxy.
+		 * @throws IllegalNbtException If there is an issue with the NBT data.
 		 */
 		@Override
-		public Proxy load(CompoundTag tag) {
-			Proxy.Type type = Proxy.Type.valueOf(tag.getString("type").getValue());
-			
-			if (type == Proxy.Type.DIRECT) {
-				return Proxy.NO_PROXY;
+		public Proxy load(CompoundTag tag) throws IllegalNbtException {
+			try {
+				Proxy.Type type = Proxy.Type.values()[tag.getInt("type").getValue()];
+				
+				if (type == Proxy.Type.DIRECT) {
+					return Proxy.NO_PROXY;
+				}
+				String address = tag.getString("address").getValue();
+				int port = tag.getInt("port").getValue();
+				return new Proxy(type, new InetSocketAddress(address, port));
+				
+			} catch (Exception e) {
+				throw new IllegalNbtException("Exception while loading Proxy object", e);
 			}
-			String address = tag.getString("address").getValue();
-			int port = tag.getInt("port").getValue();
-			
-			return new Proxy(type, new InetSocketAddress(address, port));
 		}
 
 		/**
@@ -147,7 +154,7 @@ public interface NbtLoader<C, T extends Tag> {
 		public CompoundTag save(Proxy object) {
 			CompoundTag tag = new CompoundTag();
 			
-			tag.putString("type", object.type().name());
+			tag.putInt("type", object.type().ordinal());
 			if (object.type() != Proxy.Type.DIRECT) {
 				InetSocketAddress address = (InetSocketAddress) object.address();
 				tag.putString("address", address.getHostString());
@@ -160,41 +167,46 @@ public interface NbtLoader<C, T extends Tag> {
 	
 	/** {@link NbtLoader} for loading and saving {@link Color} objects from/to NBT data. */
 	NbtLoader<Color, IntTag> colorLoader = new NbtLoader<>() {
-
+		
 		/**
-		 * Load a color from an NBT compound tag.
+		 * Load a color from an NBT int tag in the format of {@code AARRGGBB}.
 		 *
 		 * @param tag The NBT tag containing color data.
 		 * @return The loaded color.
+		 * @throws IllegalNbtException If there is an issue with the NBT data.
 		 */
 		@Override
 		public Color load(IntTag tag) throws IllegalNbtException {
 			try {
-				byte red = (byte) (tag.getValue() >> 16 & 0xFF);
-				byte green = (byte) (tag.getValue() >> 8 & 0xFF);
-				byte blue = (byte) (tag.getValue() & 0xFF);
-				byte opacity = (byte) (tag.getValue() >> 24 & 0xFF);
+				// extract alpha, red, green, and blue components using bitwise operations
+				int opacity = (tag.getValue() >> 24) & 0xFF;  // extract the alpha channel
+				int red = (tag.getValue() >> 16) & 0xFF;      // extract the red channel
+				int green = (tag.getValue() >> 8) & 0xFF;     // extract the green channel
+				int blue = tag.getValue() & 0xFF;             // extract the blue channel
 				
+				// convert to JavaFX color (RGB takes 0-255, opacity takes 0.0-1.0)
 				return Color.rgb(red, green, blue, opacity / 255.);
 			} catch (Exception e) {
 				throw new IllegalNbtException("Exception while loading Color object", e);
 			}
 		}
-
+		
 		/**
-		 * Save a color to an NBT compound tag.
+		 * Save a color to an NBT int tag in the format of {@code AARRGGBB}.
 		 *
 		 * @param object The color to be saved.
 		 * @return The NBT tag containing the saved color data.
 		 */
 		@Override
 		public IntTag save(Color object) {
-			int red = (byte) (object.getRed() * 255);
-			int green = (byte) (object.getGreen() * 255);
-			int blue = (byte) (object.getBlue() * 255);
-			int opacity = (byte) (object.getOpacity() * 255);
-
-			return new IntTag(opacity << 24 | red << 16 | green << 8 | blue);
+			// convert color components to integers (0-255 scale)
+			int red = (int) (object.getRed() * 255);
+			int green = (int) (object.getGreen() * 255);
+			int blue = (int) (object.getBlue() * 255);
+			int opacity = (int) (object.getOpacity() * 255);
+			
+			// combine components into a single 32-bit int (AARRGGBB format)
+			return new IntTag((opacity << 24) | (red << 16) | (green << 8) | blue);
 		}
 	};
 	
@@ -211,6 +223,12 @@ public interface NbtLoader<C, T extends Tag> {
 		public Font load(CompoundTag tag) {
 			String family = tag.getString("family").getValue();
 			double size = tag.getDouble("size").getValue();
+			
+			// if the font is built-in in the application
+			String builtin = FontStyle.builtinFonts.get(family);
+			if (builtin != null) {
+				FontStyle.loadFont(builtin, size);
+			}
 
 			return Font.font(family, size);
 		}

@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Compile" type="CompoundRunConfigurationType">
+    <toRun name="CompileCore" type="GradleRunConfiguration" />
+    <toRun name="compileWrapper" type="GradleRunConfiguration" />
+    <method v="2" />
+  </configuration>
+</component>

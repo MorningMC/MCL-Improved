@@ -5,6 +5,7 @@ import minecraft.morningmc.mcli.launcher.settings.FileSettings;
 import minecraft.morningmc.mcli.launcher.settings.NetworkSettings;
 import minecraft.morningmc.mcli.utils.annotations.LauncherProcess;
 import minecraft.morningmc.mcli.utils.exceptions.DownloadException;
+import minecraft.morningmc.mcli.utils.functions.ExceptionUtils;
 import minecraft.morningmc.mcli.utils.interfaces.UniqueObject;
 
 import org.apache.logging.log4j.LogManager;
@@ -97,7 +98,7 @@ public class DownloadTask implements UniqueObject {
 					       .build()
 					       .getContentLengthLong();
 		} catch (IOException e) {
-			logger.warn("Failed to get the length of file: {}", e.getMessage());
+			logger.warn("Failed to get the length of file: {}", ExceptionUtils.getMessages(e));
 			return -1;
 		}
 	}

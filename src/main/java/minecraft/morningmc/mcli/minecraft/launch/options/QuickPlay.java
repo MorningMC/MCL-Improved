@@ -22,18 +22,22 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 		
 		@Override
 		public QuickPlay load(CompoundTag tag) throws IllegalNbtException {
-			return new QuickPlay(
-					Type.valueOf(tag.getString("type").getValue()),
-					Singleplayer.loader.load(tag.getString("singleplayer")),
-					Multiplayer.loader.load(tag.getCompound("multiplayer"))
-			);
+			try {
+				return new QuickPlay(
+						Type.values()[tag.getInt("type").getValue()],
+						Singleplayer.loader.load(tag.getString("singleplayer")),
+						Multiplayer.loader.load(tag.getCompound("multiplayer"))
+				);
+			} catch (Exception e) {
+				throw new IllegalNbtException("Exception while loading QuickPlay object", e);
+			}
 		}
 		
 		@Override
 		public CompoundTag save(QuickPlay object) {
 			CompoundTag tag = new CompoundTag();
 			
-			tag.putString("type", object.type().name());
+			tag.putInt("type", object.type().ordinal());
 			tag.put("singleplayer", Singleplayer.loader.save(object.singleplayer()));
 			tag.put("multiplayer", Multiplayer.loader.save(object.multiplayer()));
 			
@@ -184,7 +188,7 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 		 *
 		 * @param host The host of the Minecraft multiplayer.
 		 * @return A new {@link Multiplayer} object.
-		 * @throws NullPointerException If the host is null.
+		 * @throws NullPointerException If the host is {@code null}.
 		 */
 		public static Multiplayer of(String host) {
 			return of(host, 25565);
@@ -197,7 +201,7 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 		 * @param port The port of the Minecraft multiplayer.
 		 * @return A new {@link Multiplayer} object.
 		 * @throws IndexOutOfBoundsException If the port is not within the valid range [0, 65535].
-		 * @throws NullPointerException If the host is null.
+		 * @throws NullPointerException If the host is {@code null}.
 		 */
 		public static Multiplayer of(String host, int port) {
 			if (port < 0 || port > 65535) {

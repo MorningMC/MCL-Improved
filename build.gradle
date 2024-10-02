@@ -21,6 +21,58 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compileOnly 'org.jetbrains:annotations:24.1.0'
 }
+
+jar {
+    destinationDirectory.set(file("$rootDir/run/cores"))
+
+}
+
 kotlin {
     jvmToolchain(21)
+}
+
+tasks.register("compileWrapper") {
+    group = "mcli"
+    doLast {
+        final executable = "mcli.exe"
+
+        Process installer = new ProcessBuilder(
+                "pyinstaller",
+                "--distpath",
+                "$rootDir/build/tmp/pyinstaller/dist",
+                "--specpath",
+                "$rootDir/build/tmp/pyinstaller",
+                "--workpath",
+                "$rootDir/build/tmp/pyinstaller",
+                "--clean",
+                '-y',
+                "-n",
+                executable,
+                "-w",
+                "-i",
+                "$rootDir/src/main/resources/assets/textures/icon.png",
+                "$rootDir/src/wrapper/main.py"
+        ).start()
+        installer.getInputStream().transferTo(System.out)
+        installer.getErrorStream().transferTo(System.err)
+        println "Pyinstaller exited with code ${installer.waitFor()}."
+
+        mergeDirectories(new File("$rootDir/build/tmp/pyinstaller/dist/$executable"), new File("$rootDir/run"))
+    }
+}
+
+static void mergeDirectories(File source, File target) {
+    File[] files = source.listFiles()
+    if (files != null) {
+        for (File file : files) {
+            File targetFile = new File(target, file.getName())
+
+            if (file.isDirectory()) {
+                targetFile.mkdir()
+                mergeDirectories(file, targetFile)
+            } else {
+                file.renameTo(targetFile)
+            }
+        }
+    }
 }

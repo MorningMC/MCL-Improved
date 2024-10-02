@@ -1,6 +1,7 @@
 package minecraft.morningmc.mcli.minecraft.client;
 
 import minecraft.morningmc.mcli.minecraft.client.resources.Modification;
+import minecraft.morningmc.mcli.utils.functions.ExceptionUtils;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.primitive.StringTag;
@@ -61,7 +62,7 @@ public class MinecraftDirectory {
 						try {
 							return Stream.of(new Modification(mod));
 						} catch (Exception e) {
-							logger.warn("Failed to parse mod from file {}: {}", mod.getAbsolutePath(), e.getMessage());
+							logger.warn("Failed to parse mod from file {}: {}", mod.getAbsolutePath(), ExceptionUtils.getMessages(e));
 							return Stream.empty();
 						}
 					})

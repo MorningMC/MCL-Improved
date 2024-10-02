@@ -124,6 +124,11 @@ public class Translation {
 	 * @return the formatted translated string, or the key itself if no translation is found.
 	 */
 	public static String get(String key, Object... args) {
-		return get(key).formatted(args);
+		String value =  instance.translations.get(key);
+		if (value == null) {
+			logger.warn("Translation key not found: {}", key);
+			return key;
+		}
+		return value.formatted(args);
 	}
 }

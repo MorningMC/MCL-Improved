@@ -29,9 +29,4 @@ public interface UniqueObject {
 	 * @return the {@link UUID} associated with this object.
 	 */
 	UUID identifier();
-	
-	@ObjectCollection
-	interface Collection<E extends UniqueObject> {
-	
-	}
 }

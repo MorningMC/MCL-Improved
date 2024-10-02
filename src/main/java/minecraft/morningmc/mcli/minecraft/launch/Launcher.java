@@ -6,6 +6,7 @@ import minecraft.morningmc.mcli.minecraft.launch.options.LaunchOptions;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.exceptions.LaunchException;
+import minecraft.morningmc.mcli.utils.functions.ExceptionUtils;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
@@ -39,14 +40,14 @@ public class Launcher {
 			try {
 				profile = UUID.fromString(tag.getString("profile").getValue());
 			} catch (Exception e) {
-				logger.warn("Failed to load profile: {}", e.getMessage());
+				logger.warn("Failed to load profile: {}", ExceptionUtils.getMessages(e));
 				profile = null;
 			}
 			
 			try {
 				account = UUID.fromString(tag.getString("account").getValue());
 			} catch (Exception e) {
-				logger.warn("Failed to load account: {}", e.getMessage());
+				logger.warn("Failed to load account: {}", ExceptionUtils.getMessages(e));
 				account = null;
 			}
 			
@@ -66,13 +67,13 @@ public class Launcher {
 			try {
 				tag.putString("profile", profile.toString());
 			} catch (Exception e) {
-				logger.warn("Failed to save profile: {}", e.getMessage());
+				logger.warn("Failed to save profile: {}", ExceptionUtils.getMessages(e));
 			}
 			
 			try {
 				tag.putString("account", account.toString());
 			} catch (Exception e) {
-				logger.warn("Failed to save account: {}", e.getMessage());
+				logger.warn("Failed to save account: {}", ExceptionUtils.getMessages(e));
 			}
 			
 			tag.put("options", LaunchOptions.loader.save(options));

@@ -1,12 +1,13 @@
 package minecraft.morningmc.mcli.ui.settings;
 
-import javafx.scene.Cursor;
 import minecraft.morningmc.mcli.launcher.settings.UISettings;
 import minecraft.morningmc.mcli.utils.Platform;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
+import minecraft.morningmc.mcli.utils.functions.ExceptionUtils;
 import minecraft.morningmc.mcli.utils.interfaces.Builder;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
+import javafx.scene.Cursor;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import javafx.scene.paint.Color;
@@ -80,28 +81,28 @@ public final class ColorStyle {
 	
 	/** The preset bright color style. */
 	public static final ColorStyle bright = new ColorStyle(
-			ButtonStyle.ofSimple(Color.rgb(208, 209, 212)),
-			ButtonStyle.ofSimple(Color.rgb(60, 133, 39)),
-			ButtonStyle.ofSimple(Color.rgb(115, 69, 229)),
-			ButtonStyle.ofSimple(Color.rgb(146, 146, 148)),
-			ButtonStyle.ofSimple(Color.rgb(208, 209, 212)),
-			ButtonStyle.ofSimple(Color.rgb(202, 54, 54)),
+			ButtonStyle.of(Color.rgb(208, 209, 212)),
+			ButtonStyle.of(Color.rgb(60, 133, 39)),
+			ButtonStyle.of(Color.rgb(115, 69, 229)),
+			ButtonStyle.of(Color.rgb(146, 146, 148)),
+			ButtonStyle.of(Color.rgb(208, 209, 212)),
+			ButtonStyle.of(Color.rgb(202, 54, 54)),
 			Color.rgb(0, 0, 0),
 			Color.rgb(0, 0, 0, 0.4),
-			ButtonStyle.ofSimple(Color.rgb(185, 186, 189))
+			ButtonStyle.of(Color.rgb(185, 186, 189))
 	);
 	
 	/** The preset dark color style. */
 	public static final ColorStyle dark = new ColorStyle(
-			ButtonStyle.ofSimple(Color.rgb(49, 50, 51)),
-			ButtonStyle.ofSimple(Color.rgb(60, 133, 39)),
-			ButtonStyle.ofSimple(Color.rgb(115, 69, 229)),
-			ButtonStyle.ofSimple(Color.rgb(72, 73, 74)),
-			ButtonStyle.ofSimple(Color.rgb(49, 50, 51)),
-			ButtonStyle.ofSimple(Color.rgb(202, 54, 54)),
+			ButtonStyle.of(Color.rgb(49, 50, 51)),
+			ButtonStyle.of(Color.rgb(60, 133, 39)),
+			ButtonStyle.of(Color.rgb(115, 69, 229)),
+			ButtonStyle.of(Color.rgb(72, 73, 74)),
+			ButtonStyle.of(Color.rgb(49, 50, 51)),
+			ButtonStyle.of(Color.rgb(202, 54, 54)),
 			Color.rgb(255, 255, 255),
 			Color.rgb(0, 0, 0, 0.4),
-			ButtonStyle.ofSimple(Color.rgb(49, 50, 51))
+			ButtonStyle.of(Color.rgb(49, 50, 51))
 	);
 	
 	public ButtonStyle simple;
@@ -173,7 +174,7 @@ public final class ColorStyle {
 				}
 			};
 		} catch (Exception e) {
-			logger.warn("Unable to determine system color scheme, use bright default: {}", e.getMessage());
+			logger.warn("Unable to determine system color scheme, use bright default: {}", ExceptionUtils.getMessages(e));
 			return bright;
 		}
 	}
@@ -246,7 +247,7 @@ public final class ColorStyle {
 		 * @param major The major color of the button.
 		 * @return A new simple {@link ButtonStyle} instance.
 		 */
-		public static ButtonStyle ofSimple(Color major) {
+		public static ButtonStyle of(Color major) {
 			return of(major, major.brighter(), major.darker().darker());
 		}
 		

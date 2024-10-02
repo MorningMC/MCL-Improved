@@ -92,10 +92,10 @@ public class UISettings extends Settings {
 	 */
 	public static void init() {
 		colorStyle.switcher = (value, policy) -> switch (policy) {
-			case SYSTEM -> ColorStyle.followSystem();
 			case BRIGHT -> ColorStyle.bright;
 			case DARK -> ColorStyle.dark;
-			case CUSTOM -> value;
+			case SYSTEM -> ColorStyle.followSystem();
+			default -> value;
 		};
 	}
 	

@@ -2,6 +2,7 @@ package minecraft.morningmc.mcli.minecraft.client.resources;
 
 import minecraft.morningmc.mcli.launcher.networking.Requester;
 import minecraft.morningmc.mcli.utils.FileManager;
+import minecraft.morningmc.mcli.utils.functions.ExceptionUtils;
 import minecraft.morningmc.mcli.minecraft.client.resources.marker.Marker;
 
 import javafx.scene.image.Image;
@@ -26,7 +27,7 @@ public class Modification {
 	private static final Logger logger = LogManager.getLogger();
 	
 	public final Set<Info> infos;
-	public final Set<Loader> loaders;
+	public final EnumSet<Loader> loaders;
 	public final File file;
 	public Marker marker;
 	
@@ -97,8 +98,8 @@ public class Modification {
 		 * @param file The mod file.
 		 * @return The inferred {@link Loader}.
 		 */
-		public static Set<Loader> infer(File file) {
-			Set<Loader> loaders = new HashSet<>();
+		public static EnumSet<Loader> infer(File file) {
+			EnumSet<Loader> loaders = EnumSet.noneOf(Loader.class);
 			
 			try (JarFile jarFile = new JarFile(file)) {
 				if (jarFile.getEntry("META-INF/mods.toml") != null) {
@@ -122,7 +123,7 @@ public class Modification {
 				return loaders;
 				
 			} catch (Exception e) {
-				logger.warn("Failed to infer mod loader for file {}: {}", file.getAbsolutePath(), e.getMessage());
+				logger.warn("Failed to infer mod loader for file {}: {}", file.getAbsolutePath(), ExceptionUtils.getMessages(e));
 				return loaders;
 			}
 		}
@@ -246,7 +247,7 @@ public class Modification {
 							infos.add(new Info(lowcode, fmlVersion, modID, version, name, description, icon, parseIconImage(jarFile, icon), iconBlur, contributors, null, contact, license, credits, environment, showAsResourcePack, false, usedServices, Map.of(), dependencies, null, Set.of()));
 						}
 					} catch (Exception e) {
-						logger.warn("Failed to parse Forge mod info for file {}: {}", file.getAbsolutePath(), e.getMessage());
+						logger.warn("Failed to parse Forge mod info for file {}: {}", file.getAbsolutePath(), ExceptionUtils.getMessages(e));
 					}
 				}
 				
@@ -307,7 +308,7 @@ public class Modification {
 							infos.add(new Info(lowcode, fmlVersion, modID, version, name, description, icon, parseIconImage(jarFile, icon), iconBlur, contributors, null, contact, license, credits, Environment.UNKNOWN, showAsResourcePack, showAsDataPack, usedServices, Map.of(), dependencies, null, Set.of()));
 						}
 					} catch (Exception e) {
-						logger.warn("Failed to parse NeoForge mod info for file {}: {}", file.getAbsolutePath(), e.getMessage());
+						logger.warn("Failed to parse NeoForge mod info for file {}: {}", file.getAbsolutePath(), ExceptionUtils.getMessages(e));
 					}
 				}
 				
@@ -359,7 +360,7 @@ public class Modification {
 						logger.trace("Parsed Fabric mod info: {}", modID);
 						infos.add(new Info(false, null, modID, version, name, description, icon, parseIconImage(jarFile, icon), false, contributors, null, contact, license, null, environment, false, false, Set.of(), entrypoints, dependencies, accessWidener, mixins));
 					} catch (Exception e) {
-						logger.warn("Failed to parse Fabric mod info for file {}: {}", file.getAbsolutePath(), e.getMessage());
+						logger.warn("Failed to parse Fabric mod info for file {}: {}", file.getAbsolutePath(), ExceptionUtils.getMessages(e));
 					}
 				}
 				
@@ -416,7 +417,7 @@ public class Modification {
 						logger.trace("Parsed Quilt mod info: {}", modID);
 						infos.add(new Info(false, null, modID, version, name, description, icon, parseIconImage(jarFile, icon), false, contributors, group, contact, null, null, Environment.UNKNOWN, false, false, Set.of(), entrypoints, dependencies, null, mixins));
 					} catch (Exception e) {
-						logger.warn("Failed to parse Quilt mod info for file {}: {}", file.getAbsolutePath(), e.getMessage());
+						logger.warn("Failed to parse Quilt mod info for file {}: {}", file.getAbsolutePath(), ExceptionUtils.getMessages(e));
 					}
 					
 					// parsing LiteLoader mod info is not supported yet
@@ -433,7 +434,7 @@ public class Modification {
 				return infos;
 				
 			} catch (Exception e) {
-				logger.warn("Failed to parse mod file {}: {}", file.getAbsolutePath(), e.getMessage());
+				logger.warn("Failed to parse mod file {}: {}", file.getAbsolutePath(), ExceptionUtils.getMessages(e));
 				return infos;
 			}
 		}
@@ -462,7 +463,7 @@ public class Modification {
 			try {
 				return new Image(getJarInputStream(jarFile, icon));
 			} catch (IOException e) {
-				logger.warn("Failed to parse icon image for mod file: {}", e.getMessage());
+				logger.warn("Failed to parse icon image for mod file: {}", ExceptionUtils.getMessages(e));
 				return null;
 			}
 		}

@@ -12,18 +12,15 @@ object FileManager {
     /** The root directory for application data.  */
     @JvmField
     val appdata: File = resolveAppData()
-
     /** The working root directory for MCLI.  */
     @JvmField
     val workingRoot: File = File("data")
-
     /** The configuration file for MCLI.  */
     @JvmField
     val config: File = File(workingRoot, "config.nbt")
-
     /** The backup configuration file for MCLI.  */
     @JvmField
-    val configBackup: File = File(workingRoot, "config.backup.nbt")
+    val configBackup: File = File(workingRoot, "config.bak.nbt")
 
     /**
      * Resolves the root directory for application data.
