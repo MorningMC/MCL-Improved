@@ -28,8 +28,8 @@ public class Window implements NamedObject {
 	
 	private final Stage stage;
 	private final SizeManager.Token sizeToken;
-	private final Elements base;
-	private minecraft.morningmc.mcli.ui.window.Elements content = null;
+	private final WindowElements base;
+	private Elements content = null;
 	
 	/**
 	 * Constructs a new {@link Window} instance.
@@ -46,12 +46,13 @@ public class Window implements NamedObject {
 		stage.getIcons().add(UIManager.icon);
 		stage.initStyle(StageStyle.TRANSPARENT);
 		
-		base = new Elements(this);
-		refresh();
+		// refresh the size when resize
+		stage.widthProperty().addListener((obs, old, ne) -> SizeManager.set(sizeToken, SizeManager.get(sizeToken).width(ne.intValue())));
+		stage.heightProperty().addListener((obs, old, ne) -> SizeManager.set(sizeToken, SizeManager.get(sizeToken).height(ne.intValue())));
+		stage.maximizedProperty().addListener((obs, old, ne) -> SizeManager.set(sizeToken, SizeManager.get(sizeToken).fullScreen(ne)));
 		
-		stage.widthProperty().addListener((obs, old, ne) -> resize(SizeManager.get(sizeToken).width(ne.intValue())));
-		stage.heightProperty().addListener((obs, old, ne) -> resize(SizeManager.get(sizeToken).height(ne.intValue())));
-		stage.maximizedProperty().addListener((obs, old, ne) -> resize(SizeManager.get(sizeToken).fullScreen(ne)));
+		base = new WindowElements(this);
+		refresh();
 		
 		stage.show();
 	}
@@ -75,18 +76,11 @@ public class Window implements NamedObject {
 	public void resize(WindowSize size) {
 		try {
 			WindowSize oldSize = SizeManager.get(sizeToken);
-			
-			SizeManager.set(sizeToken, size);
-			
-			stage.setWidth(size.width());
-			stage.setHeight(size.height());
-			stage.setMaximized(size.fullScreen());
-			
-			WindowSize currentSize = SizeManager.get(sizeToken);
+			WindowSize currentSize = refreshSize(size);
 			int width = currentSize.width() != oldSize.width() ? currentSize.width() : 0;
 			int height = currentSize.height() != oldSize.height() ? currentSize.height() : 0;
 			
-			stage.setScene(new Scene(base.redraw(width, height, false)));
+			stage.setScene(new Scene(base.render(width, height, false)));
 		} catch (Exception e) {
 			logger.warn("Exception when window \"{}\" resize: {}", stage.getTitle(), ExceptionUtils.getMessages(e));
 		}
@@ -96,8 +90,12 @@ public class Window implements NamedObject {
 	 * Refreshes the content of the window.
 	 */
 	public void refresh() {
-		WindowSize size = SizeManager.get(sizeToken);
-		stage.setScene(new Scene(base.redraw(size.width(), size.height(), true)));
+		try {
+			WindowSize size = refreshSize(SizeManager.get(sizeToken));
+			stage.setScene(new Scene(base.render(size.width(), size.height(), true)));
+		} catch (Exception e) {
+			logger.warn("Exception when window \"{}\" refresh: {}", stage.getTitle(), ExceptionUtils.getMessages(e));
+		}
 	}
 	
 	/**
@@ -105,9 +103,23 @@ public class Window implements NamedObject {
 	 *
 	 * @param content the content to be applied.
 	 */
-	public void apply(minecraft.morningmc.mcli.ui.window.Elements content) {
+	public void apply(Elements content) {
 		this.content = content;
 		refresh();
+	}
+	
+	/**
+	 * Refreshes the window size and returns the new size. This prevents the expected size of the window from being unequal to the actual size.
+	 *
+	 * @param size The new size of the window which needs to be updated.
+	 * @return the new size of the window.
+	 */
+	private WindowSize refreshSize(WindowSize size) {
+		stage.setWidth(size.width());
+		stage.setHeight(size.height());
+		stage.setMaximized(size.fullScreen());
+		
+		return SizeManager.get(sizeToken);
 	}
 	
 	@Override
@@ -115,7 +127,7 @@ public class Window implements NamedObject {
 		return stage.getTitle();
 	}
 	
-	public static class Elements implements minecraft.morningmc.mcli.ui.window.Elements {
+	private static class WindowElements implements Elements {
 		private final Window window;
 		private int width;
 		private int height;
@@ -125,9 +137,6 @@ public class Window implements NamedObject {
 		private AnchorPane maximize;
 		private AnchorPane minimize;
 		private AnchorPane titleBar;
-		private AnchorPane background;
-		private ImageView backgroundView;
-		private AnchorPane root;
 		private Button topLeftArea;
 		private Button topArea;
 		private Button topRightArea;
@@ -142,7 +151,7 @@ public class Window implements NamedObject {
 		private double resizeOldX;
 		private double resizeOldY;
 		
-		public Elements(Window window) {
+		public WindowElements(Window window) {
 			this.window = window;
 		}
 		
@@ -167,7 +176,7 @@ public class Window implements NamedObject {
 		}
 		
 		@Override
-		public Parent redraw(int width, int height, boolean redrawAll) {
+		public Parent render(int width, int height, boolean redrawAll) {
 			if (width > 0) {
 				this.width = width;
 			}
@@ -216,14 +225,21 @@ public class Window implements NamedObject {
 			}
 			
 			// render background
-			background = UISettings.colorStyle.getSwitch().background.render(this.width, this.height - UISettings.titleHeight).build();
-			backgroundView = UISettings.background.getIfEnabled(Background.of(null, 0, 0)).render(this.width, this.height - UISettings.titleHeight);
+			AnchorPane background = UISettings.colorStyle.getSwitch().background.render(this.width, this.height - UISettings.titleHeight).build();
+			ImageView backgroundView = UISettings.background.getIfEnabled(Background.of(null, 0, 0)).render(this.width, this.height - UISettings.titleHeight);
 			
 			// render root
-			root = new AnchorPane(titleBar, background, backgroundView);
+			AnchorPane root = new AnchorPane(titleBar, background, backgroundView);
 			root.setPrefSize(this.width, this.height);
 			AnchorPane.setTopAnchor(background, UISettings.titleHeight * 1.);
 			AnchorPane.setTopAnchor(backgroundView, UISettings.titleHeight * 1.);
+			
+			// render content
+			if (window.content != null) {
+				Parent content = window.content.render(width, Math.max(height - UISettings.titleHeight, 0), redrawAll);
+				root.getChildren().add(content);
+				AnchorPane.setTopAnchor(content, UISettings.titleHeight * 1.);
+			}
 			
 			// render resize area
 			if (!SizeManager.get(window.sizeToken).fullScreen()) { // ignore resize area when maximized
