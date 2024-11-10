@@ -1,10 +1,10 @@
 package minecraft.morningmc.mcli.launcher.task;
 
-import minecraft.morningmc.mcli.utils.interfaces.NamedObject;
-
 import java.util.*;
 
-public interface Task extends Runnable, NamedObject {
+public interface Task extends Runnable {
+	
+	String name();
 	
 	void stop();
 	

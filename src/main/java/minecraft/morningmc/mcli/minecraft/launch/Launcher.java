@@ -4,7 +4,6 @@ import minecraft.morningmc.mcli.minecraft.auth.Account;
 import minecraft.morningmc.mcli.minecraft.client.Profile;
 import minecraft.morningmc.mcli.minecraft.launch.options.LaunchOptions;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.exceptions.LaunchException;
 import minecraft.morningmc.mcli.utils.functions.ExceptionUtils;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
@@ -31,10 +30,10 @@ public class Launcher {
 		 *
 		 * @param tag The NBT compound tag representing the {@link Launcher} object.
 		 * @return {@code null}.
-		 * @throws IllegalNbtException If the NBT data is invalid or missing required information.
+		 * @throws IllegalArgumentException If the NBT data is invalid or missing required information.
 		 */
 		@Override
-		public Void load(CompoundTag tag) throws IllegalNbtException {
+		public Void load(CompoundTag tag) {
 			options = LaunchOptions.loader.load(tag.getCompound("options"));
 			
 			try {

@@ -6,8 +6,31 @@ import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.primitive.StringTag;
 
+import org.apache.logging.log4j.Level;
+
 import java.util.*;
 
+/**
+ * Represents a Minecraft version, containing various details about the game, such as libraries, assets, and more.
+ *
+ * @param version       The version folder name, e.g., "1.19.2".
+ * @param javaArguments The arguments to pass to the Java runtime.
+ * @param gameArguments The arguments to pass to the game.
+ * @param assets        The assets folder name.
+ * @param assetIndex    The asset index download information.
+ * @param client        The client download information.
+ * @param clientMappings The client mappings download information.
+ * @param server        The server download information.
+ * @param serverMappings The server mappings download information.
+ * @param id            The version ID.
+ * @param javaVersion   The Java version required for this version.
+ * @param libraries     The libraries required for this version.
+ * @param logging       The logging configuration.
+ * @param mainClass     The main class for the game.
+ * @param releaseTime   The release time of this version.
+ * @param time          The time of this version.
+ * @param type          The type of this version (e.g., release, snapshot).
+ */
 public record Version(String version,
 					  List<Conditional<String>> javaArguments,
 					  List<Conditional<String>> gameArguments,
@@ -48,6 +71,13 @@ public record Version(String version,
 	}
 	
 	public record Logging(String type, DownloadInfo downloads, String argument) {
+		
+		public Log parse(String log) {
+			return null;
+		}
+		
+		public record Log(Date timestamp, Level level, String thread, String message, String raw) {
+		}
 	}
 	
 	public static class Manifest {

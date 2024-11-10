@@ -1,12 +1,11 @@
 package minecraft.morningmc.mcli.ui.window;
 
-import minecraft.morningmc.mcli.launcher.Metadata;
 import minecraft.morningmc.mcli.launcher.settings.UISettings;
 import minecraft.morningmc.mcli.ui.UIManager;
 import minecraft.morningmc.mcli.ui.settings.Background;
 import minecraft.morningmc.mcli.minecraft.launch.options.WindowSize;
-import minecraft.morningmc.mcli.utils.functions.ExceptionUtils;
-import minecraft.morningmc.mcli.utils.interfaces.NamedObject;
+import minecraft.morningmc.mcli.ui.settings.ColorStyle;
+import static minecraft.morningmc.mcli.utils.functions.ExceptionUtils.getMessages;
 
 import javafx.event.EventHandler;
 import javafx.scene.*;
@@ -23,13 +22,42 @@ import org.apache.logging.log4j.Logger;
  * Represents a customizable window in the user interface.
  * It provides functionality for creating a window, managing its size and position, and handling user interactions such as resizing and dragging.
  */
-public class Window implements NamedObject {
+public class Window {
 	private static final Logger logger = LogManager.getLogger();
 	
 	private final Stage stage;
 	private final SizeManager.Token sizeToken;
 	private final WindowElements base;
 	private Elements content = null;
+	private final boolean utility;
+	
+	/**
+	 * Constructs a new {@link Window} instance.
+	 *
+	 * @param stage      The {@link Stage} instance associated with this window.
+	 * @param sizeToken  The token used to manage the window size.
+	 * @param title      The title of the window.
+	 * @param utility    Whether the window is in utility mode.
+	 */
+	public Window(Stage stage, SizeManager.Token sizeToken, String title, boolean utility) {
+		this.stage = stage;
+		this.sizeToken = sizeToken;
+		this.utility = utility;
+		
+		stage.setTitle(title);
+		stage.getIcons().add(UIManager.icon);
+		stage.initStyle(StageStyle.TRANSPARENT);
+		
+		// refresh the size when resize
+		stage.widthProperty().addListener((obs, old, ne) -> SizeManager.set(sizeToken, SizeManager.get(sizeToken).width(ne.intValue())));
+		stage.heightProperty().addListener((obs, old, ne) -> SizeManager.set(sizeToken, SizeManager.get(sizeToken).height(ne.intValue())));
+		stage.maximizedProperty().addListener((obs, old, ne) -> SizeManager.set(sizeToken, SizeManager.get(sizeToken).fullscreen(ne)));
+		
+		base = new WindowElements(this);
+		refresh();
+		
+		stage.show();
+	}
 	
 	/**
 	 * Constructs a new {@link Window} instance.
@@ -39,33 +67,7 @@ public class Window implements NamedObject {
 	 * @param title      The title of the window.
 	 */
 	public Window(Stage stage, SizeManager.Token sizeToken, String title) {
-		this.stage = stage;
-		this.sizeToken = sizeToken;
-		
-		stage.setTitle(title);
-		stage.getIcons().add(UIManager.icon);
-		stage.initStyle(StageStyle.TRANSPARENT);
-		
-		// refresh the size when resize
-		stage.widthProperty().addListener((obs, old, ne) -> SizeManager.set(sizeToken, SizeManager.get(sizeToken).width(ne.intValue())));
-		stage.heightProperty().addListener((obs, old, ne) -> SizeManager.set(sizeToken, SizeManager.get(sizeToken).height(ne.intValue())));
-		stage.maximizedProperty().addListener((obs, old, ne) -> SizeManager.set(sizeToken, SizeManager.get(sizeToken).fullScreen(ne)));
-		
-		base = new WindowElements(this);
-		refresh();
-		
-		stage.show();
-	}
-	
-	/**
-	 * Creates a new window.
-	 *
-	 * @param sizeToken  The token used to manage the window size.
-	 * @param title      The title of the window.
-	 * @return           A new {@link Window} instance.
-	 */
-	public static Window create(SizeManager.Token sizeToken, String title) {
-		return new Window(new Stage(), sizeToken, title);
+		this(stage, sizeToken, title, false);
 	}
 	
 	/**
@@ -81,8 +83,9 @@ public class Window implements NamedObject {
 			int height = currentSize.height() != oldSize.height() ? currentSize.height() : 0;
 			
 			stage.setScene(new Scene(base.render(width, height, false)));
+			logger.trace("Window \"{}\" resized. ({}x{})", stage.getTitle(), currentSize.width(), currentSize.height());
 		} catch (Exception e) {
-			logger.warn("Exception when window \"{}\" resize: {}", stage.getTitle(), ExceptionUtils.getMessages(e));
+			logger.warn("Exception when window \"{}\" resize: {}", stage.getTitle(), getMessages(e));
 		}
 	}
 	
@@ -93,8 +96,9 @@ public class Window implements NamedObject {
 		try {
 			WindowSize size = refreshSize(SizeManager.get(sizeToken));
 			stage.setScene(new Scene(base.render(size.width(), size.height(), true)));
+			logger.trace("Window \"{}\" refreshed.", stage.getTitle());
 		} catch (Exception e) {
-			logger.warn("Exception when window \"{}\" refresh: {}", stage.getTitle(), ExceptionUtils.getMessages(e));
+			logger.warn("Exception when window \"{}\" refresh: {}", stage.getTitle(), getMessages(e));
 		}
 	}
 	
@@ -109,24 +113,37 @@ public class Window implements NamedObject {
 	}
 	
 	/**
+	 * Closes the window.
+	 */
+	public void close() {
+		stage.hide();
+		stage.setMaximized(false);
+		stage.setIconified(false);
+		stage.close();
+		
+		logger.trace("Window \"{}\" closed.", stage.getTitle());
+	}
+	
+	/**
 	 * Refreshes the window size and returns the new size. This prevents the expected size of the window from being unequal to the actual size.
 	 *
 	 * @param size The new size of the window which needs to be updated.
 	 * @return the new size of the window.
 	 */
 	private WindowSize refreshSize(WindowSize size) {
-		stage.setWidth(size.width());
-		stage.setHeight(size.height());
-		stage.setMaximized(size.fullScreen());
+		if (!size.fullscreen()) {
+			stage.setWidth(size.width());
+			stage.setHeight(size.height());
+		}
+		stage.setMaximized(size.fullscreen());
 		
 		return SizeManager.get(sizeToken);
 	}
-	
-	@Override
-	public String name() {
-		return stage.getTitle();
-	}
-	
+
+	/**
+	 * Represents the base elements of a window.
+	 * This class implements the {@link Elements} interface and provides methods for rendering various elements of a window.
+	 */
 	private static class WindowElements implements Elements {
 		private final Window window;
 		private int width;
@@ -183,45 +200,57 @@ public class Window implements NamedObject {
 			if (height > 0) {
 				this.height = height;
 			}
+			boolean fullscreen = window.stage.isMaximized();
 			
 			// render titlebar
 			if (width > 0) {
-				title = UISettings.colorStyle.getSwitch().title.render(this.width, UISettings.titleHeight)
-						        .text(Metadata.fullName, UISettings.fontStyle.title)
-						        .icon(UIManager.icon)
-						        .cursorPressed(Cursor.MOVE)
-						        .pressHandler(event -> {
-							        dragOffsetX = event.getSceneX();
-							        dragOffsetY = event.getSceneY();
-						        })
-						        .dragHandler(event -> {
-							        window.stage.setX(event.getScreenX() - dragOffsetX);
-							        window.stage.setY(event.getScreenY() - dragOffsetY);
-						        })
-						        .build();
+				ColorStyle.ButtonStyle.Renderer titleRenderer = UISettings.colorStyle.getSwitch().title.render(this.width, UISettings.titleHeight)
+						                                                .text(window.stage.getTitle(), UISettings.fontStyle.title)
+						                                                .icon(UIManager.icon);
+				
+				if (!fullscreen) { // ignore drag when the window is maximized
+					titleRenderer = titleRenderer.cursorPressed(Cursor.MOVE)
+							                .pressHandler(event -> {
+												dragOffsetX = event.getSceneX();
+												dragOffsetY = event.getSceneY();
+											})
+							                .dragHandler(event -> {
+												window.stage.setX(event.getScreenX() - dragOffsetX);
+												window.stage.setY(event.getScreenY() - dragOffsetY);
+											});
+				}
+				
+				title = titleRenderer.build();
 			}
 			if (redrawAll) {
 				close = UISettings.colorStyle.getSwitch().close.render(UISettings.titleHeight, UISettings.titleHeight)
 						        .text("X", UISettings.fontStyle.title)
 						        .cursor(Cursor.HAND)
-						        .clickHandler(event -> window.stage.close())
+						        .clickHandler(event -> window.close())
 						        .build();
-				maximize = UISettings.colorStyle.getSwitch().title.render(UISettings.titleHeight, UISettings.titleHeight)
-						           .text("O", UISettings.fontStyle.title)
-						           .cursor(Cursor.HAND)
-						           .clickHandler(event -> window.resize(SizeManager.get(window.sizeToken).fullScreen(!window.stage.isMaximized())))
-						           .build();
-				minimize = UISettings.colorStyle.getSwitch().title.render(UISettings.titleHeight, UISettings.titleHeight)
-						           .text("_", UISettings.fontStyle.title)
-						           .cursor(Cursor.HAND)
-						           .clickHandler(event -> window.stage.setIconified(true))
-						           .build();
+				
+				if (!window.utility) {
+					maximize = UISettings.colorStyle.getSwitch().title.render(UISettings.titleHeight, UISettings.titleHeight)
+							           .text("O", UISettings.fontStyle.title)
+							           .cursor(Cursor.HAND)
+							           .clickHandler(event -> window.resize(SizeManager.get(window.sizeToken).fullscreen(!fullscreen)))
+							           .build();
+					minimize = UISettings.colorStyle.getSwitch().title.render(UISettings.titleHeight, UISettings.titleHeight)
+							           .text("_", UISettings.fontStyle.title)
+							           .cursor(Cursor.HAND)
+							           .clickHandler(event -> window.stage.setIconified(true))
+							           .build();
+				}
 			}
 			if (width > 0) {
-				titleBar = new AnchorPane(title, close, maximize, minimize);
+				titleBar = new AnchorPane(title, close);
 				AnchorPane.setLeftAnchor(close, this.width - UISettings.titleHeight * 1.);
-				AnchorPane.setLeftAnchor(maximize, this.width - UISettings.titleHeight * 2.);
-				AnchorPane.setLeftAnchor(minimize, this.width - UISettings.titleHeight * 3. + UISettings.edgeThickness);
+				
+				if (!window.utility) {
+					titleBar.getChildren().addAll(maximize, minimize);
+					AnchorPane.setLeftAnchor(maximize, this.width - UISettings.titleHeight * 2.);
+					AnchorPane.setLeftAnchor(minimize, this.width - UISettings.titleHeight * 3. + UISettings.edgeThickness);
+				}
 			}
 			
 			// render background
@@ -242,7 +271,7 @@ public class Window implements NamedObject {
 			}
 			
 			// render resize area
-			if (!SizeManager.get(window.sizeToken).fullScreen()) { // ignore resize area when maximized
+			if (!fullscreen && !window.utility) { // ignore resize area when the window is maximized or in utility mode
 				if (redrawAll) {
 					// render top-left resize area
 					topLeftArea = renderResizeArea(

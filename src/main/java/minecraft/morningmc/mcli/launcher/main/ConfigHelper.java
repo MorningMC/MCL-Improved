@@ -7,9 +7,9 @@ import minecraft.morningmc.mcli.ui.window.SizeManager;
 import minecraft.morningmc.mcli.utils.Translation;
 import minecraft.morningmc.mcli.launcher.settings.Settings;
 import minecraft.morningmc.mcli.minecraft.launch.Launcher;
-import minecraft.morningmc.mcli.utils.functions.ExceptionUtils;
 import minecraft.morningmc.mcli.utils.FileManager;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
+import static minecraft.morningmc.mcli.utils.functions.ExceptionUtils.getMessages;
 
 import dev.dewy.nbt.Nbt;
 import dev.dewy.nbt.tags.collection.CompoundTag;
@@ -17,6 +17,7 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -37,21 +38,21 @@ public final class ConfigHelper implements Runnable {
 		try {
 			Settings.loader.load(config.getCompound("settings"));
 		} catch (Exception e) {
-			logger.warn("Failed to load settings: {}", ExceptionUtils.getMessages(e));
+			logger.warn("Failed to load settings: {}", getMessages(e));
 			Settings.initDefault();
 		}
 		
 		try {
 			Profile.Collection.loader.load(config.getList("profile_collection"));
 		} catch (Exception e) {
-			logger.warn("Failed to load profile_collection: {}", ExceptionUtils.getMessages(e));
+			logger.warn("Failed to load profile_collection: {}", getMessages(e));
 			Profile.Collection.init(Set.of());
 		}
 		
 		try {
 			JavaRuntime.Collection.loader.load(config.getList("java_runtime_collection"));
 		} catch (Exception e) {
-			logger.warn("Failed to load java_runtime_collection: {}", ExceptionUtils.getMessages(e));
+			logger.warn("Failed to load java_runtime_collection: {}", getMessages(e));
 			JavaRuntime.Collection.init(Set.of());
 		}
 		JavaRuntime.Collection.search();
@@ -59,20 +60,20 @@ public final class ConfigHelper implements Runnable {
 		try {
 			SizeManager.loader.load(config.getCompound("size_manager"));
 		} catch (Exception e) {
-			logger.warn("Failed to load size_manager: {}", ExceptionUtils.getMessages(e));
+			logger.warn("Failed to load size_manager: {}", getMessages(e));
 		}
 		
 		try {
 			Translation.loader.load(config.getString("translation"));
 		} catch (Exception e) {
-			logger.warn("Failed to load translation: {}", ExceptionUtils.getMessages(e));
+			logger.warn("Failed to load translation: {}", getMessages(e));
 			Translation.init("en");
 		}
 		
 		try {
 			Launcher.loader.load(config.getCompound("launcher"));
 		} catch (Exception e) {
-			logger.warn("Failed to load launcher: {}", ExceptionUtils.getMessages(e));
+			logger.warn("Failed to load launcher: {}", getMessages(e));
 			Launcher.initDefault();
 		}
 	}
@@ -98,40 +99,38 @@ public final class ConfigHelper implements Runnable {
 		logger.info("Loading configurations...");
 		
 		FileManager.workingRoot.mkdirs(); // create working directory
-		if (FileManager.config.exists()) {
-			// backup config
+		
+		Optional<File> configFile;
+		if (FileManager.config.exists()) { // if config exists
 			logger.info("Config found! Backing up config...");
+			configFile = Optional.of(FileManager.config);
 			
+			// backup config
 			try {
 				FileManager.configBackup.createNewFile();
 				FileManager.copyFile(FileManager.config, FileManager.configBackup);
 			} catch (Exception e) {
-				logger.warn("Failed to backup config: {}", ExceptionUtils.getMessages(e));
+				logger.warn("Failed to backup config: {}", getMessages(e));
 			}
 			
-		} else {
-			// try complete config
-			try {
-				FileManager.config.createNewFile();
-				
-				// try reverse config
-				if (FileManager.configBackup.exists()) {
-					FileManager.copyFile(FileManager.configBackup, FileManager.config);
-				}
-			} catch (Exception e) {
-				logger.error("Failed to complete config file: ", e);
-			}
+		} else if (FileManager.configBackup.exists()) { // if config not found but backup exists
+			logger.info("Config not found! Loading from backup...");
+			configFile = Optional.of(FileManager.configBackup);
+			
+		} else { // if neither config nor backup not found
+			logger.info("First launch! Using default (empty) config...");
+			configFile = Optional.empty();
 		}
 		
 		// load config
-		logger.info("Loading configurations...");
-		CompoundTag config;
-		try {
-			config = new Nbt().fromFile(FileManager.config);
-		} catch (IOException e) {
-			logger.warn("Failed to load config: {}", ExceptionUtils.getMessages(e));
-			config = new CompoundTag();
-		}
+		CompoundTag config = configFile.map(file -> {
+			try {
+				return new Nbt().fromFile(file);
+			} catch (IOException e) {
+				logger.warn("Failed to load config: {}", getMessages(e));
+				return null; // use empty config
+			}
+		}).orElse(new CompoundTag());
 		
 		ConfigHelper.loadConfigs(config);
 	}
@@ -153,27 +152,27 @@ public final class ConfigHelper implements Runnable {
 				// code below will be executed if config successfully saved to file
 				// otherwise an exception will be thrown and jump to the catch branch
 				logger.info("Configuration successfully saved to file: {}", FileManager.config.getAbsolutePath());
-				break; // break out the while loop to stop retries
+				break; // break the while loop to stop retries
 				
 			} catch (Exception e) {
-				logger.warn("Failed to save config, tried {}: {}", ++retries /* variable retries updated here */, ExceptionUtils.getMessages(e));
+				logger.warn("Failed to save config, tried {}: {}", ++retries /* variable retries updated here */, getMessages(e));
 				
 				if (retries >= GlobalSettings.saveConfigMaxRetries) { // if exceptions still throw
 					logger.error("Failed to save config after {} retries.", retries);
 					
-					// try reverse config
+					// try restore config
 					// this prevents file format corruption
 					if (FileManager.configBackup.exists()) {
-						logger.info("Backup file found! reverting...");
+						logger.info("Backup file found! restoring...");
 						
 						try {
 							FileManager.copyFile(FileManager.configBackup, FileManager.config);
 						} catch (Exception ex) {
-							logger.error("Failed to revert to backup: ", ex);
+							logger.error("Failed to restore config from backup: ", ex);
 						}
 					}
 					
-					break; // break out the while loop
+					break; // break the while loop
 				}
 			}
 		}
@@ -186,6 +185,7 @@ public final class ConfigHelper implements Runnable {
 		if (thread == null) {
 			logger.info("Starting auto-save thread...");
 			thread = new Thread(new ConfigHelper(), "config");
+			thread.setDaemon(true);
 			thread.start();
 		}
 	}

@@ -1,6 +1,5 @@
 package minecraft.morningmc.mcli.utils.containers;
 
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.api.Tag;
@@ -61,10 +60,10 @@ public class Enumerable<T, E extends Enum<E>> extends Modifiable<T> {
 			 *
 			 * @param tag The NBT tag containing data to be loaded.
 			 * @return The loaded {@link Enumerable} object.
-			 * @throws IllegalNbtException If there is an issue with the NBT data.
+			 * @throws IllegalArgumentException If there is an issue with the NBT data.
 			 */
 			@Override
-			public Enumerable<C, E> load(CompoundTag tag) throws IllegalNbtException {
+			public Enumerable<C, E> load(CompoundTag tag) {
 				try {
 					E policy = enumClass.getEnumConstants()[tag.getInt("policy").getValue()];
 					C value = loader.load(tag.get("value"));
@@ -72,7 +71,7 @@ public class Enumerable<T, E extends Enum<E>> extends Modifiable<T> {
 					return of(value, policy);
 					
 				} catch (Exception e) {
-					throw new IllegalNbtException("Exception while loading Enumerable object", e);
+					throw new IllegalArgumentException("Exception while loading Enumerable object", e);
 				}
 			}
 			

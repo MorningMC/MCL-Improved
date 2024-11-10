@@ -1,5 +1,6 @@
 package minecraft.morningmc.mcli.minecraft.launch;
 
+import minecraft.morningmc.mcli.minecraft.client.version.Version;
 import minecraft.morningmc.mcli.utils.annotations.*;
 
 import org.apache.logging.log4j.LogManager;
@@ -27,7 +28,7 @@ public class ProcessListener {
 	public final Thread stdErrListener;
 	public final Thread exitChecker;
 	
-	public final List<String> logs;
+	public final List<Version.Logging.Log> logs;
 	
 	/**
 	 * Constructs a {@link ProcessListener} for the given Minecraft process.
@@ -61,7 +62,7 @@ public class ProcessListener {
 		stdErrListener.interrupt();
 		
 		minecraftInstance.destroy();
-		logger.info("Stopped Minecraft instance {}", minecraftInstance.pid());
+		logger.info("Stopped Minecraft instance {}", processID);
 	}
 	
 	// Thread Operations
@@ -73,10 +74,9 @@ public class ProcessListener {
 	private void readerListener(BufferedReader reader) {
 		try {
 			String line;
-			
 			while (running && (line = reader.readLine()) != null) {
 				logger.info("[Minecraft Log #{}] {}", processID, line);
-				logs.add(line);
+				logs.add(arguments.profile.version.logging().parse(line));
 			}
 			
 		} catch (IOException e) {

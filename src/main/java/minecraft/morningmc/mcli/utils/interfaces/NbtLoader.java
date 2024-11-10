@@ -3,7 +3,6 @@ package minecraft.morningmc.mcli.utils.interfaces;
 import dev.dewy.nbt.tags.array.IntArrayTag;
 import dev.dewy.nbt.tags.primitive.IntTag;
 import minecraft.morningmc.mcli.ui.settings.FontStyle;
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 
 import javafx.scene.text.Font;
 import javafx.scene.paint.Color;
@@ -86,17 +85,17 @@ public interface NbtLoader<C, T extends Tag> {
 		 *
 		 * @param tag The NBT string tag containing a UUID string.
 		 * @return The loaded {@link UUID}.
-		 * @throws IllegalNbtException If there is an issue with the NBT data.
+		 * @throws IllegalArgumentException If there is an issue with the NBT data.
 		 */
 		@Override
-		public UUID load(IntArrayTag tag) throws IllegalNbtException {
+		public UUID load(IntArrayTag tag) {
 			try {
 				long mostSigBits = (long)tag.getValue()[0] << 32 | (long)tag.getValue()[1] & 0xFFFFFFFFL;
 				long leastSigBits = (long)tag.getValue()[2] << 32 | (long)tag.getValue()[3] & 0xFFFFFFFFL;
 				
 				return new UUID(mostSigBits, leastSigBits);
 			} catch (Exception e) {
-				throw new IllegalNbtException("Exception while loading UUID object", e);
+				throw new IllegalArgumentException("Exception while loading UUID object", e);
 			}
 		}
 
@@ -125,10 +124,10 @@ public interface NbtLoader<C, T extends Tag> {
 		 *
 		 * @param tag The NBT compound tag containing proxy data.
 		 * @return The loaded proxy.
-		 * @throws IllegalNbtException If there is an issue with the NBT data.
+		 * @throws IllegalArgumentException If there is an issue with the NBT data.
 		 */
 		@Override
-		public Proxy load(CompoundTag tag) throws IllegalNbtException {
+		public Proxy load(CompoundTag tag) {
 			try {
 				Proxy.Type type = Proxy.Type.values()[tag.getInt("type").getValue()];
 				
@@ -140,7 +139,7 @@ public interface NbtLoader<C, T extends Tag> {
 				return new Proxy(type, new InetSocketAddress(address, port));
 				
 			} catch (Exception e) {
-				throw new IllegalNbtException("Exception while loading Proxy object", e);
+				throw new IllegalArgumentException("Exception while loading Proxy object", e);
 			}
 		}
 
@@ -173,10 +172,10 @@ public interface NbtLoader<C, T extends Tag> {
 		 *
 		 * @param tag The NBT tag containing color data.
 		 * @return The loaded color.
-		 * @throws IllegalNbtException If there is an issue with the NBT data.
+		 * @throws IllegalArgumentException If there is an issue with the NBT data.
 		 */
 		@Override
-		public Color load(IntTag tag) throws IllegalNbtException {
+		public Color load(IntTag tag) {
 			try {
 				// extract alpha, red, green, and blue components using bitwise operations
 				int opacity = (tag.getValue() >> 24) & 0xFF;  // extract the alpha channel
@@ -187,7 +186,7 @@ public interface NbtLoader<C, T extends Tag> {
 				// convert to JavaFX color (RGB takes 0-255, opacity takes 0.0-1.0)
 				return Color.rgb(red, green, blue, opacity / 255.);
 			} catch (Exception e) {
-				throw new IllegalNbtException("Exception while loading Color object", e);
+				throw new IllegalArgumentException("Exception while loading Color object", e);
 			}
 		}
 		
@@ -255,9 +254,8 @@ public interface NbtLoader<C, T extends Tag> {
 	 *
 	 * @param tag The NBT tag containing data to be loaded.
 	 * @return The loaded object.
-	 * @throws IllegalNbtException If there is an issue with the NBT data.
 	 */
-	C load(T tag) throws IllegalNbtException;
+	C load(T tag);
 	
 	/**
 	 * Save an object to an NBT tag.

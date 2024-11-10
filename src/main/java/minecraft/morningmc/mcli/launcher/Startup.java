@@ -28,9 +28,10 @@ public class Startup {
      */
     public Startup() {
         logger.info(Metadata.longFullName);
+        logger.info("Commandline: {}", ProcessHandle.current().info().commandLine().orElse("N/A"));
 	    logger.info("System platform: {}", Platform.system);
 	    logger.info("Current platform: {}", Platform.current);
-        logger.info("Java runtime: {}", JavaRuntime.current != null ? JavaRuntime.current : "N/A");
+        logger.info("Java runtime: {}", JavaRuntime.current.map(JavaRuntime::toString).orElse("N/A"));
 	    logger.info("Working root: {}", FileManager.workingRoot.getAbsolutePath());
         
         if (!Metadata.version.isStable()) {
@@ -45,7 +46,6 @@ public class Startup {
      */
     public static void main(String... args) {
         logger.info("Starting launcher...");
-        logger.info("Arguments: {}", args.length > 0 ? Arrays.toString(args) : "N/A");
         
         try {
             new Startup().run(args);

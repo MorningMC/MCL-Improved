@@ -8,7 +8,6 @@ import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 import minecraft.morningmc.mcli.utils.functions.ExceptionUtils;
 import minecraft.morningmc.mcli.utils.interfaces.*;
 import minecraft.morningmc.mcli.utils.containers.Switchable;
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 
 import javafx.scene.image.Image;
 
@@ -32,7 +31,7 @@ public final class Profile implements UniqueObject {
 	public static final NbtLoader<Profile, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
-		public Profile load(CompoundTag tag) throws IllegalNbtException {
+		public Profile load(CompoundTag tag) {
 			return new Profile(
 					tag.getString("name").getValue(),
 					tag.getString("icon").getValue(),
@@ -140,7 +139,7 @@ public final class Profile implements UniqueObject {
 						     .flatMap(subTag -> {
 							     try {
 								     return Stream.of(Profile.loader.load(subTag));
-							     } catch (IllegalNbtException e) {
+							     } catch (Exception e) {
 								     logger.warn("Failed to load profile from NBT: {}", ExceptionUtils.getMessages(e));
 								     return Stream.empty();
 							     }

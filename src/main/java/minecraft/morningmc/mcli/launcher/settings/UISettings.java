@@ -5,7 +5,6 @@ import minecraft.morningmc.mcli.minecraft.launch.options.WindowSize;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 import minecraft.morningmc.mcli.utils.containers.Enumerable;
 import minecraft.morningmc.mcli.utils.containers.Switchable;
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
@@ -19,7 +18,7 @@ public class UISettings extends Settings {
 	public static final NbtLoader<Void, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
-		public Void load(CompoundTag tag) throws IllegalNbtException {
+		public Void load(CompoundTag tag) {
 			defaultWindowSize = WindowSize.loader.load(tag.getCompound("default_window_size"));
 			colorStyle = Enumerable.generateLoader(ColorStyle.loader, ColorStyle.Policy.class).load(tag.getCompound("color_style"));
 			fontStyle = FontStyle.loader.load(tag.getCompound("font_style"));

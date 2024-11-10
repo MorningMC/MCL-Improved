@@ -5,7 +5,6 @@ import minecraft.morningmc.mcli.utils.Platform;
 import minecraft.morningmc.mcli.utils.annotations.ObjectCollection;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
 import minecraft.morningmc.mcli.utils.exceptions.IllegalJavaException;
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.functions.ExceptionUtils;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
@@ -15,10 +14,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
-import java.nio.file.InvalidPathException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.function.*;
+import java.util.regex.*;
 import java.util.stream.*;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,16 +26,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public record JavaRuntime(File executable, Runtime.Version version, Platform platform) implements Comparable<JavaRuntime> {
 	private static final Logger logger = LogManager.getLogger();
-	
 	/** {@link NbtLoader} for loading and saving {@link JavaRuntime} objects from/to NBT data. */
 	public static final NbtLoader<JavaRuntime, StringTag> loader = new NbtLoader<>() {
 		
 		@Override
-		public JavaRuntime load(StringTag tag) throws IllegalNbtException {
+		public JavaRuntime load(StringTag tag) {
 			try {
 				return JavaRuntime.fromPath(new File(tag.getValue()));
 			} catch (IllegalJavaException e) {
-				throw new IllegalNbtException(e);
+				throw new IllegalArgumentException(e);
 			}
 		}
 
@@ -46,12 +43,17 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 			return new StringTag(object.executable.getAbsolutePath());
 		}
 	};
-	
 	/** The default executable name for Java. */
 	public static final String executableName = Platform.system.operatingSystem() == Platform.OperatingSystem.WINDOWS ? "java.exe" : "java";
-	
 	/** The current Java runtime based on the system properties. */
-	public static final JavaRuntime current = resolveCurrent();
+	public static final Optional<JavaRuntime> current = ((Supplier<Optional<JavaRuntime>>) () -> {
+			try {
+				return Optional.of(fromHome(new File(System.getProperty("java.home"))));
+			} catch (IllegalJavaException e) {
+				logger.warn("Failed to get current Java runtime: {}", ExceptionUtils.getMessages(e));
+				return Optional.empty();
+			}
+		}).get();
 	
 	/**
 	 * Creates a {@link JavaRuntime} instance from the given executable path.
@@ -65,13 +67,12 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 		builder.redirectErrorStream(true);
 		
 		try {
+			// starts the Java runtime and read inputs
 			Process process = builder.start();
 			String content = new String(process.getInputStream().readAllBytes());
 			
 			// check whether the executable is a valid java runtime
-			if (!content.contains("Property settings:") || !content.contains("Runtime Environment")) {
-				throw new IllegalStateException();
-			}
+			assert content.contains("Property settings:") && content.contains("Runtime Environment");
 			
 			// parse version
 			String versionString = getProperty(content, "java.version");
@@ -106,20 +107,6 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 	 */
 	public static JavaRuntime fromHome(File home) throws IllegalJavaException {
 		return fromPath(new File(home, "bin/" + executableName));
-	}
-	
-	/**
-	 * Resolves the current Java runtime based on the system properties.
-	 *
-	 * @return The current Java runtime, or {@code null} if an error occurs.
-	 */
-	private static JavaRuntime resolveCurrent() {
-		try {
-			return fromHome(new File(System.getProperty("java.home")));
-		} catch (IllegalJavaException e) {
-			logger.warn("Failed to get current Java runtime: {}", ExceptionUtils.getMessages(e));
-			return null;
-		}
 	}
 	
 	/**
@@ -202,7 +189,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 						     .flatMap(subTag -> {
 							     try {
 								     return Stream.of(JavaRuntime.loader.load(subTag));
-							     } catch (IllegalNbtException e) {
+							     } catch (Exception e) {
 								     logger.warn("Failed to load Java runtime from NBT: {}", ExceptionUtils.getMessages(e));
 								     return Stream.empty();
 							     }
@@ -450,9 +437,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 						logger.warn("Failed to parse PATH: {}", ExceptionUtils.getMessages(e));
 					}
 					
-					if (current != null) {
-						potentialRuntimes.add(current);
-					}
+					current.ifPresent(potentialRuntimes::add);
 					
 					long stopTime = System.currentTimeMillis();
 					logger.info("Finish searching potential Java runtimes. Found {}. Used {} ms.", potentialRuntimes.size(), stopTime - startTime);
@@ -518,7 +503,7 @@ public record JavaRuntime(File executable, Runtime.Version version, Platform pla
 					if (home != null) {
 						try {
 							homes.add(fromHome(new File(home)));
-						} catch (InvalidPathException | IllegalJavaException e) {
+						} catch (IllegalJavaException e) {
 							logger.warn("Invalid Java path in system registry: {}", home);
 						}
 					}

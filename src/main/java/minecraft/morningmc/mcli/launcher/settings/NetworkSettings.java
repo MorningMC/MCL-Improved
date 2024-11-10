@@ -1,7 +1,6 @@
 package minecraft.morningmc.mcli.launcher.settings;
 
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
@@ -17,7 +16,7 @@ public class NetworkSettings extends Settings {
 	public static final NbtLoader<Void, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
-		public Void load(CompoundTag tag) throws IllegalNbtException {
+		public Void load(CompoundTag tag) {
 			proxy = NbtLoader.proxyLoader.load(tag.getCompound("proxy"));
 			connectTimeout = tag.getInt("connect_timeout").getValue();
 			readTimeout = tag.getInt("read_timeout").getValue();

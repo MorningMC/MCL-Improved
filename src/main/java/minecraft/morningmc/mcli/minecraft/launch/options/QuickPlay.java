@@ -1,7 +1,6 @@
 package minecraft.morningmc.mcli.minecraft.launch.options;
 
 import minecraft.morningmc.mcli.minecraft.client.resources.World;
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.tags.collection.CompoundTag;
@@ -21,7 +20,7 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 	public static final NbtLoader<QuickPlay, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
-		public QuickPlay load(CompoundTag tag) throws IllegalNbtException {
+		public QuickPlay load(CompoundTag tag) {
 			try {
 				return new QuickPlay(
 						Type.values()[tag.getInt("type").getValue()],
@@ -29,7 +28,7 @@ public record QuickPlay(Type type, Singleplayer singleplayer, Multiplayer multip
 						Multiplayer.loader.load(tag.getCompound("multiplayer"))
 				);
 			} catch (Exception e) {
-				throw new IllegalNbtException("Exception while loading QuickPlay object", e);
+				throw new IllegalArgumentException("Exception while loading QuickPlay object", e);
 			}
 		}
 		

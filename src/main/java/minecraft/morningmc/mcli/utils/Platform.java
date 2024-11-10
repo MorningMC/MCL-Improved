@@ -4,6 +4,7 @@ import minecraft.morningmc.mcli.minecraft.java.JavaRuntime;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.function.*;
 
 /**
  * Represents a platform-specific configuration.
@@ -23,39 +24,31 @@ public record Platform(OperatingSystem operatingSystem,
                        Charset encoding) {
     
     /** The system platform */
-    public static final Platform system = resolveSystem();
-    
-    /** The current Java runtime platform */
-    public static final Platform current = JavaRuntime.current != null ? JavaRuntime.current.platform() : system;
-    
-    /**
-     * Resolves the system platform.
-     *
-     * @return The system platform.
-     */
-    private static Platform resolveSystem() {
-        OperatingSystem os = OperatingSystem.infer(System.getProperty("os.name"));
-        
-        Architecture arch;
-        if (os == OperatingSystem.WINDOWS) {
-            String processorArch = System.getenv("PROCESSOR_ARCHITECTURE");
-            String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
+    public static final Platform system = ((Supplier<Platform>) () -> {
+            OperatingSystem os = OperatingSystem.infer(System.getProperty("os.name"));
             
-            arch = processorArch != null && processorArch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64")
-                           ? Architecture.BIT64 : Architecture.BIT32;
-        } else {
-            arch = System.getProperty("os.arch").contains("64") ? Architecture.BIT64 : Architecture.BIT32;
-        }
-        
-        return new Platform(
-                os,
-                arch,
-		        File.separator,
-                File.pathSeparator,
-                System.lineSeparator(),
-                inferEncoding(System.getProperty("sun.jnu.encoding"))
-        );
-    }
+            Architecture arch;
+            if (os == OperatingSystem.WINDOWS) {
+                String processorArch = System.getenv("PROCESSOR_ARCHITECTURE");
+                String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
+                
+                arch = processorArch != null && processorArch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64")
+                               ? Architecture.BIT64 : Architecture.BIT32;
+            } else {
+                arch = System.getProperty("os.arch").contains("64") ? Architecture.BIT64 : Architecture.BIT32;
+            }
+            
+            return new Platform(
+                    os,
+                    arch,
+                    File.separator,
+                    File.pathSeparator,
+                    System.lineSeparator(),
+                    inferEncoding(System.getProperty("sun.jnu.encoding"))
+            );
+        }).get();
+    /** The current Java runtime platform */
+    public static final Platform current = JavaRuntime.current.map(JavaRuntime::platform).orElse(system);
     
     /**
      * Infers the encoding based on the provided name.
@@ -77,7 +70,7 @@ public record Platform(OperatingSystem operatingSystem,
     
     @Override
     public String toString() {
-        return operatingSystem + " " + architecture;
+        return operatingSystem + "-" + architecture;
     }
     
     /**

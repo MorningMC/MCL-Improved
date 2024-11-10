@@ -5,13 +5,13 @@ import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 import dev.dewy.nbt.tags.collection.CompoundTag;
 
 /**
- * Represents the size and state (full-screen or windowed) of a window.
+ * Represents the size and state (fullscreen or windowed) of a window.
  *
- * @param fullScreen Whether the window is full-screen.
+ * @param fullscreen Whether the window is fullscreen.
  * @param width      The width of the window in pixel.
  * @param height     The height of the window in pixel.
  */
-public record WindowSize(boolean fullScreen, int width, int height) {
+public record WindowSize(boolean fullscreen, int width, int height) {
 	
 	/** {@link NbtLoader} for loading and saving {@link WindowSize} objects from/to NBT data. */
 	public static final NbtLoader<WindowSize, CompoundTag> loader = new NbtLoader<>() {
@@ -46,7 +46,7 @@ public record WindowSize(boolean fullScreen, int width, int height) {
 			CompoundTag tag = new CompoundTag();
 			
 			if (object != null) {
-				tag.putByte("full_screen", (byte) (object.fullScreen ? 1 : 0));
+				tag.putByte("full_screen", (byte) (object.fullscreen ? 1 : 0));
 				tag.putInt("width", object.width);
 				tag.putInt("height", object.height);
 			}
@@ -56,9 +56,9 @@ public record WindowSize(boolean fullScreen, int width, int height) {
 	};
 	
 	/**
-	 * Creates a {@link WindowSize} object representing a full-screen window.
+	 * Creates a {@link WindowSize} object representing a fullscreen window.
 	 *
-	 * @return The {@link WindowSize} object for a full-screen window.
+	 * @return The {@link WindowSize} object for a fullscreen window.
 	 */
 	public static WindowSize window() {
 		return new WindowSize(true, 0, 0);
@@ -84,13 +84,13 @@ public record WindowSize(boolean fullScreen, int width, int height) {
 	}
 	
 	/**
-	 * Constructs a new {@link WindowSize} object with the specified full-screen state.
+	 * Constructs a new {@link WindowSize} object with the specified fullscreen state.
 	 *
-	 * @param fullScreen Whether the window should be full-screen or not.
+	 * @param fullscreen Whether the window should be fullscreen or not.
 	 * @return A new {@link WindowSize}.
 	 */
-	public WindowSize fullScreen(boolean fullScreen) {
-		return new WindowSize(fullScreen, width, height);
+	public WindowSize fullscreen(boolean fullscreen) {
+		return new WindowSize(fullscreen, width, height);
 	}
 	
 	/**
@@ -105,7 +105,7 @@ public record WindowSize(boolean fullScreen, int width, int height) {
 			throw new IndexOutOfBoundsException("width can't be negative");
 		}
 		
-		return new WindowSize(fullScreen, width, height);
+		return new WindowSize(fullscreen, width, height);
 	}
 	
 	/**
@@ -120,6 +120,6 @@ public record WindowSize(boolean fullScreen, int width, int height) {
 			throw new IndexOutOfBoundsException("height can't be negative");
 		}
 
-		return new WindowSize(fullScreen, width, height);
+		return new WindowSize(fullscreen, width, height);
 	}
 }

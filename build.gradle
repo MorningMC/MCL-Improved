@@ -24,12 +24,21 @@ dependencies {
 
 jar {
     destinationDirectory.set(file("$rootDir/run/cores"))
-
 }
 
 kotlin {
     jvmToolchain(21)
 }
+
+configurations
+        .matching(it -> it.name.contains("downloadSources"))
+        .configureEach {
+            attributes {
+                attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
+                attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named(OperatingSystemFamily, "runtime"))
+                attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named(MachineArchitecture, MachineArchitecture.X86_64))
+            }
+        }
 
 tasks.register("compileWrapper") {
     group = "mcli"

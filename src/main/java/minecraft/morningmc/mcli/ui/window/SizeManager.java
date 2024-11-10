@@ -3,7 +3,6 @@ package minecraft.morningmc.mcli.ui.window;
 import minecraft.morningmc.mcli.launcher.settings.UISettings;
 import minecraft.morningmc.mcli.minecraft.launch.options.WindowSize;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.functions.ExceptionUtils;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
@@ -29,7 +28,7 @@ public class SizeManager {
 			windowSizes = new ConcurrentHashMap<>(tag.getValue().entrySet().stream().flatMap(entry -> {
 				try {
 					return Stream.of(Map.entry(Token.valueOf(entry.getKey()), WindowSize.loader.load((CompoundTag) entry.getValue())));
-				} catch (IllegalNbtException e) {
+				} catch (Exception e) {
 					logger.warn("Illegal window size: {}", ExceptionUtils.getMessages(e));
 					return Stream.empty();
 				}

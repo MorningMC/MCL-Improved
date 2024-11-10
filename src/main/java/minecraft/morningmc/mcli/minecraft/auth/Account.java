@@ -2,7 +2,6 @@ package minecraft.morningmc.mcli.minecraft.auth;
 
 import minecraft.morningmc.mcli.utils.annotations.ObjectCollection;
 import minecraft.morningmc.mcli.utils.annotations.StaticClass;
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.functions.ExceptionUtils;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 import minecraft.morningmc.mcli.utils.interfaces.UniqueObject;
@@ -101,7 +100,7 @@ public record Account(String username,
 						     .flatMap(subTag -> {
 							     try {
 								     return Stream.of(Account.loader.load(subTag));
-							     } catch (IllegalNbtException e) {
+							     } catch (Exception e) {
 								     logger.warn("Failed to load account from NBT: {}", ExceptionUtils.getMessages(e));
 								     return Stream.empty();
 							     }

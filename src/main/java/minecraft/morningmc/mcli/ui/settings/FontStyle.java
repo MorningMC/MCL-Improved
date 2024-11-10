@@ -1,6 +1,5 @@
 package minecraft.morningmc.mcli.ui.settings;
 
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import javafx.scene.text.Font;
@@ -18,7 +17,7 @@ public class FontStyle {
 	public static final NbtLoader<FontStyle, CompoundTag> loader = new NbtLoader<>() {
 		
 		@Override
-		public FontStyle load(CompoundTag tag) throws IllegalNbtException {
+		public FontStyle load(CompoundTag tag) {
 			return new FontStyle(
 					NbtLoader.fontLoader.load(tag.getCompound("simple")),
 					NbtLoader.fontLoader.load(tag.getCompound("bold")),

@@ -2,7 +2,6 @@ package minecraft.morningmc.mcli.ui.settings;
 
 import minecraft.morningmc.mcli.launcher.settings.UISettings;
 import minecraft.morningmc.mcli.utils.Platform;
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.functions.ExceptionUtils;
 import minecraft.morningmc.mcli.utils.interfaces.Builder;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
@@ -38,10 +37,10 @@ public final class ColorStyle {
 		 *
 		 * @param tag The NBT tag containing the color style data.
 		 * @return A new {@link ColorStyle} instance loaded from the NBT data.
-		 * @throws IllegalNbtException if the NBT data is invalid or incomplete.
+		 * @throws IllegalArgumentException If the NBT data is invalid or incomplete.
 		 */
 		@Override
-		public ColorStyle load(CompoundTag tag) throws IllegalNbtException {
+		public ColorStyle load(CompoundTag tag) {
 			return new ColorStyle(
 					ButtonStyle.loader.load(tag.getCompound("simple")),
 					ButtonStyle.loader.load(tag.getCompound("launch")),
@@ -88,7 +87,7 @@ public final class ColorStyle {
 			ButtonStyle.of(Color.rgb(208, 209, 212)),
 			ButtonStyle.of(Color.rgb(202, 54, 54)),
 			Color.rgb(0, 0, 0),
-			Color.rgb(0, 0, 0, 0.4),
+			Color.rgb(0, 0, 0, 0.2),
 			ButtonStyle.of(Color.rgb(185, 186, 189))
 	);
 	
@@ -198,10 +197,10 @@ public final class ColorStyle {
 			 *
 			 * @param tag The NBT tag containing the button style data.
 			 * @return A new {@link ButtonStyle} instance loaded from the NBT data.
-			 * @throws IllegalNbtException if the NBT data is invalid or incomplete.
+			 * @throws IllegalArgumentException If the NBT data is invalid or incomplete.
 			 */
 			@Override
-			public ButtonStyle load(CompoundTag tag) throws IllegalNbtException {
+			public ButtonStyle load(CompoundTag tag) {
 				return new ButtonStyle(
 						NbtLoader.colorLoader.load(tag.getInt("major")),
 						NbtLoader.colorLoader.load(tag.getInt("edge")),

@@ -8,7 +8,7 @@ import java.util.function.*;
  *
  * @param <T> The type of the value.
  */
-public class Modifiable<T> {
+public class Modifiable<T> implements Supplier<T> {
 	protected T value;
 	public Set<Consumer<T>> observers = new HashSet<>();
 	
@@ -37,6 +37,7 @@ public class Modifiable<T> {
 	 *
 	 * @return The current value.
 	 */
+	@Override
 	public T get() {
 		return value;
 	}

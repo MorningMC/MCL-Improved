@@ -1,6 +1,5 @@
 package minecraft.morningmc.mcli.utils.containers;
 
-import minecraft.morningmc.mcli.utils.exceptions.IllegalNbtException;
 import minecraft.morningmc.mcli.utils.interfaces.NbtLoader;
 
 import dev.dewy.nbt.api.Tag;
@@ -81,10 +80,10 @@ public class Switchable<T> extends Modifiable<T> {
 			 *
 			 * @param tag The NBT tag containing data to be loaded.
 			 * @return The loaded {@link Switchable} object.
-			 * @throws IllegalNbtException If there is an issue with the NBT data.
+			 * @throws IllegalArgumentException If there is an issue with the NBT data.
 			 */
 			@Override
-			public Switchable<C> load(CompoundTag tag) throws IllegalNbtException {
+			public Switchable<C> load(CompoundTag tag) {
 				boolean enabled = tag.getByte("enabled").getValue() != 0;
 				C value = loader.load(tag.get("value"));
 				
@@ -131,7 +130,7 @@ public class Switchable<T> extends Modifiable<T> {
 	 * @see #getIfEnabled(Supplier)
 	 */
 	public T getIfEnabled(T defaultValue) {
-		return getIfEnabled(() -> defaultValue);
+		return enabled ? value : defaultValue;
 	}
 	
 	/**
