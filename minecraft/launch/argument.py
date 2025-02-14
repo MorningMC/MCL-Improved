@@ -1,0 +1,2 @@
+class LaunchArgument:
+    pass

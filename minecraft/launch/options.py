@@ -1,0 +1,2 @@
+class LaunchOptions:
+    pass
